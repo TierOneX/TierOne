@@ -1,0 +1,8 @@
+# Ignorar todo el código del proyecto en esta rama de documentación
+TierOne/
+.vite/
+node_modules/
+.idea/
+.vscode/
+*.log
+.DS_Store
