@@ -1,2 +1,2 @@
 # TierOne
-Proyecto Conjunto para el desarrollo de E-Commers
+Proyecto Conjunto para el desarrollo de E-Commerce
