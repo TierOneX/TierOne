@@ -90,3 +90,9 @@ ITEMS_ORDEN {
 1. **URGENTE**: Definir qué hacer con el campo `id_equipo` (Crear tabla o eliminar campo).
 2. **IMPORTANTE**: Agregar `costo_proveedor_snapshot` a `ITEMS_ORDEN` para no perder métricas de margen histórico.
 3. **RECOMENDADO**: Agregar chat a los reportes.
+
+---
+
+**Última actualización**: 2026-01-19  
+**Versión**: 2.0  
+**Estado**: Pendiente de revisión
