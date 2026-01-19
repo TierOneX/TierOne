@@ -16,13 +16,13 @@ Diagrama ER **actualizado (v2)** con todas las tablas y relaciones del sistema.
 
 ---
 
-### 📉 [Estado del Esquema (Análisis v2)](Updated-Analysis.md)
+### 📉 [Estado del Esquema (Análisis v2)](Analysis-Corrections-v2.md)
 **Documento de referencia actual**. Detalla el estado del esquema tras aplicar las correcciones solicitadas.
 
 **Contenido**:
 - Lista de correcciones aplicadas (v2)
-- Estado de propuestas anteriores
-- Próximos pasos técnicos
+- Riesgos pendientes (Deuda técnica)
+- Nuevas correcciones propuestas
 
 ---
 
