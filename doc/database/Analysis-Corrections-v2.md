@@ -31,9 +31,9 @@ Estos son puntos identificados en el análisis V1 que **no se han aplicado** y q
 
 ### 🔴 Riesgo Alto: Integridad Referencial de Equipos
 - **Falla**: Las tablas `PARTICIPANTES_PARTIDA` e `INSCRIPCIONES_TORNEO` tienen un campo `id_equipo`.
-- **Estado**: ❌ **La tabla `EQUIPOS` NO EXISTE**.
+- **Estado**: ⏳ **APLAZADO**. Se decide implementar en una fase futura por limitaciones de tiempo.
 - **Impacto**: `id_equipo` es actualmente un entero sin integridad referencial. Si se borra un equipo lógico, no hay cascada. No hay dónde guardar nombre, logo o capitán del equipo.
-- **Recomendación**: Si no se va a crear la tabla `EQUIPOS`, eliminar `id_equipo` y gestionar todo solo por usuarios individuales, o aceptar que `id_equipo` es un "dato huérfano" gestionado por código.
+- **Mitigación**: Los equipos se gestionarán temporalmente a nivel de aplicación (código) o simplemente se ignorará el campo `id_equipo` hasta la fase 2.
 
 ### 🟡 Riesgo Medio: Balance de Usuarios
 - **Falla**: No hay campo `balance` en la tabla `USERS`.
