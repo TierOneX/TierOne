@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Este documento describe el modelo de datos completo para **TierONE**, una plataforma integral para gestión de partidas competitivas (sincronizadas por API), torneos profesionales con sponsors y tienda de merchandising con dropshipping.
+Este documento describe el modelo de datos actualizado para **TierONE**, incorporando las correcciones solicitadas para la gestión de transacciones, moderación, reportes y dropshipping.
 
 ---
 
@@ -20,7 +20,12 @@ erDiagram
     USERS ||--o{ TRANSACCIONES : "ejecuta"
     USERS ||--o{ REVIEWS : "escribe"
     USERS ||--o{ RETIROS : "solicita"
+    USERS ||--o{ RETIROS : "procesa (admin)"
     USERS ||--o{ TORNEOS : "organiza"
+    USERS ||--o{ REVIEWS : "modera (admin)"
+    USERS ||--o{ ORDENES : "cancela (admin/user)"
+    USERS ||--o{ REPORTES : "crea"
+    USERS ||--o{ REPORTES : "resuelve (admin)"
     
     USERS {
         int id PK
@@ -73,6 +78,7 @@ erDiagram
     
     PARTIDAS ||--o{ PARTICIPANTES_PARTIDA : "incluye"
     PARTIDAS ||--|| RESULTADOS_PARTIDA : "genera"
+    PARTIDAS ||--o{ REPORTES : "tiene"
     PARTIDAS }o--|| JUEGOS : "pertenece a"
     
     PARTIDAS {
@@ -116,7 +122,20 @@ erDiagram
         boolean disputado
     }
 
-    
+    REPORTES {
+        int id PK
+        int id_partida FK "Partida reportada"
+        int id_usuario_reporta FK "Usuario que reporta"
+        int id_resuelto_por FK "Admin que resuelve"
+        enum tipo "trampa,comportamiento,resultado_erroneo,otro"
+        string descripcion
+        string evidencia_url "Screenshots/Videos"
+        enum estado "pendiente,en_revision,resuelta,desestimada"
+        string resolucion "Comentario del admin"
+        datetime fecha_reporte
+        datetime fecha_resolucion
+    }
+
     %% ==========================================
     %% GESTIÓN DE TORNEOS (CON SPONSORS)
     %% ==========================================
@@ -233,7 +252,6 @@ erDiagram
         string descripcion
         decimal precio_proveedor "coste del proveedor"
         decimal precio_venta "precio al público"
-        decimal margen "precio_venta - precio_proveedor"
         string imagen_principal
         boolean destacado
         boolean activo
@@ -268,6 +286,11 @@ erDiagram
         string comentario
         datetime fecha_review
         boolean verificado_compra
+        boolean aprobado "Moderación"
+        boolean reportado "Moderación"
+        int id_moderado_por FK "Admin que revisó"
+        datetime fecha_moderacion
+        string razon_rechazo
     }
     
     %% ==========================================
@@ -297,6 +320,9 @@ erDiagram
         datetime fecha_actualizacion
         string tracking_number "del proveedor"
         string transportista "del proveedor"
+        int id_cancelado_por FK "Admin o Usuario"
+        datetime fecha_cancelacion
+        string razon_cancelacion
     }
     
     ITEMS_ORDEN {
@@ -317,8 +343,8 @@ erDiagram
         enum tipo "pedido,seguimiento,entrega,incidencia"
         string asunto
         string contenido_email
-        string email_from
-        string email_to
+        string email_from "Email del sistema/admin"
+        string email_to "Email del proveedor"
         datetime fecha_envio
         datetime fecha_respuesta
         string respuesta_contenido
@@ -326,7 +352,7 @@ erDiagram
     }
     
     PROVEEDORES ||--o{ ITEMS_ORDEN : "suministra"
-    PROVEEDORES ||--o{ COMUNICACIONES_PROVEEDOR : "comunica"
+    PROVEEDORES ||--o{ COMUNICACIONES_PROVEEDOR : "recibe"
     
     DIRECCIONES_ENVIO {
         int id PK
@@ -362,22 +388,28 @@ erDiagram
     TRANSACCIONES {
         int id PK
         int id_usuario FK
-        int id_referencia "ID de orden/partida/torneo"
+        int id_orden FK "nullable - Referencia Tipo 1"
+        int id_partida FK "nullable - Referencia Tipo 2"
+        int id_torneo FK "nullable - Referencia Tipo 3"
+        int id_retiro FK "nullable - Referencia Tipo 4"
         enum tipo "deposito,retiro,premio,compra,reembolso,comision"
         decimal monto
         decimal balance_anterior
         decimal balance_nuevo
-        string referencia "descripción"
-        datetime fecha_transaccion
         string descripcion
+        datetime fecha_transaccion
     }
     
     USERS ||--o{ TRANSACCIONES : "ejecuta"
+    ORDENES ||--o{ TRANSACCIONES : "genera"
+    PARTIDAS ||--o{ TRANSACCIONES : "genera"
+    TORNEOS ||--o{ TRANSACCIONES : "genera"
+    RETIROS ||--o{ TRANSACCIONES : "genera"
     
     RETIROS {
         int id PK
         int id_usuario FK
-        int id_procesado_por FK "nullable"
+        int id_procesado_por FK "Admin que aprueba"
         decimal monto
         enum metodo "paypal,transferencia,cripto"
         string detalles_cuenta
@@ -390,71 +422,15 @@ erDiagram
 
 ---
 
-## 📋 Índice de Tablas
+## 📝 Resumen de Cambios Aplicados
 
-### 👥 Usuarios y Autenticación
-- `USERS` - Usuarios de la plataforma
+### ✅ Correcciones Implementadas
 
-### 🎮 Gestión de Juegos
-- `JUEGOS` - Catálogo de juegos soportados
-- `INTEGRACIONES_API` - Configuración de APIs externas
-
-### 🎯 Partidas Competitivas
-- `PARTIDAS` - Partidas individuales
-- `PARTICIPANTES_PARTIDA` - Jugadores en cada partida
-- `RESULTADOS_PARTIDA` - Resultados y verificación
-
-### 🏆 Torneos
-- `TORNEOS` - Torneos organizados
-- `SPONSORS_TORNEO` - Patrocinadores de torneos
-- `INSCRIPCIONES_TORNEO` - Inscripciones de jugadores
-- `PARTIDAS_TORNEO` - Estructura de brackets
-- `PREMIOS_TORNEO` - Premios y distribución
-
-### 🛍️ E-Commerce
-- `PROVEEDORES` - Proveedores de dropshipping
-- `CATEGORIAS` - Categorías de productos
-- `PRODUCTOS` - Catálogo de productos
-- `VARIANTES_PRODUCTO` - Variantes (tallas, colores)
-- `IMAGENES_PRODUCTO` - Galería de imágenes
-- `REVIEWS` - Reseñas de productos
-
-### 📦 Órdenes y Envíos
-- `ORDENES` - Órdenes de compra
-- `ITEMS_ORDEN` - Productos en cada orden
-- `DIRECCIONES_ENVIO` - Direcciones de entrega
-- `PAGOS` - Transacciones de pago
-- `COMUNICACIONES_PROVEEDOR` - Comunicación con proveedores
-
-### 💰 Gestión Financiera
-- `TRANSACCIONES` - Historial de transacciones
-- `RETIROS` - Solicitudes de retiro
+1. **Estructura Transacciones**: Se reemplazó el campo genérico `id_referencia` por claves foráneas explícitas (`id_orden`, `id_partida`, etc.) para mejor integridad referencial.
+2. **Retiros**: Se especificó la relación de aprobación con usuarios administradores (`id_procesado_por`).
+3. **Productos**: Se eliminó el campo calculado `margen`.
+4. **Reseñas (Reviews)**: Se agregaron campos para el flujo de moderación (`aprobado`, `razon_rechazo`, etc.).
+5. **Órdenes**: Se integraron campos para gestionar cancelaciones (`razon_cancelacion`, `id_cancelado_por`).
+6. **Reportes/Disputas**: Se creó una nueva tabla `REPORTES` para gestionar incidencias en partidas.
 
 ---
-
-## 🔑 Convenciones de Nomenclatura
-
-- **PK**: Primary Key (Clave Primaria)
-- **FK**: Foreign Key (Clave Foránea)
-- **unique**: Restricción de unicidad
-- **nullable**: Permite valores NULL
-- **enum**: Valores predefinidos
-
----
-
-## 📊 Estadísticas del Modelo
-
-- **Total de Tablas**: 27
-- **Módulos Principales**: 6
-  - Usuarios y Autenticación
-  - Gestión de Juegos
-  - Partidas Competitivas
-  - Torneos
-  - E-Commerce
-  - Gestión Financiera
-
----
-
-**Última actualización**: 2026-01-19  
-**Versión**: 1.0  
-**Estado**: En revisión
