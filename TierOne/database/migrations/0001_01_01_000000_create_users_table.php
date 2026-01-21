@@ -13,10 +13,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('username')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('nombre')->nullable();
+            $table->string('apellido')->nullable();
+            $table->string('pais')->nullable();
+            $table->timestamp('fecha_registro')->useCurrent();
+            $table->timestamp('ultima_conexion')->nullable();
+            $table->enum('rol', ['player', 'admin', 'streamer'])->default('player');
+            $table->boolean('verificado')->default(false);
+            $table->boolean('activo')->default(true);
+            $table->decimal('balance', 10, 2)->default(0); // Balance de la cuenta
             $table->rememberToken();
             $table->timestamps();
         });
