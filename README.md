@@ -3,7 +3,6 @@
 [![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql)](https://www.mysql.com)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb)](https://www.mongodb.com)
 
 **TierOne** es una plataforma integral que combina E-commerce con sistema de torneos gaming profesionales.
 
@@ -27,7 +26,6 @@
 - Composer
 - Node.js & NPM
 - MySQL 8.0+
-- MongoDB (local o Atlas)
 
 ### Instalación
 
@@ -53,11 +51,12 @@ Para más detalles, consulta la [Guía de Instalación Completa](docs/INSTALLATI
 ```
 TierOne/
 ├── docs/                    # 📚 Documentación completa
+│   ├── diagrams/           # 📊 Diagramas de flujo Mermaid
 │   ├── daily-reviews/      # Revisiones diarias
 │   ├── presentations/      # Presentaciones del proyecto
 │   ├── database/           # Documentación de BD
 │   ├── api/                # Contratos de API
-│   └── installation/       # Guías de instalación
+│   └── frontend/           # Documentación frontend
 ├── scripts/                # 🔧 Scripts de utilidad
 │   ├── install/           # Scripts de instalación
 │   └── database/          # Scripts de BD
@@ -71,6 +70,7 @@ TierOne/
 
 | Documento | Descripción |
 |-----------|-------------|
+| [Diagramas de Flujo](docs/diagrams/) | Diagramas Mermaid del sistema |
 | [Instalación](docs/INSTALLATION.md) | Guía completa de instalación |
 | [Base de Datos](docs/database/ER-Diagram.md) | Diagrama ER y estructura |
 | [API](docs/api/README.md) | Documentación de endpoints |
@@ -91,9 +91,8 @@ TierOne/
 - **Bundler:** Vite
 
 ### Base de Datos
-- **Relacional:** MySQL 8.0
-- **NoSQL:** MongoDB Atlas
-- **Arquitectura:** Híbrida
+- **Database:** MySQL 8.0
+- **ORM:** Eloquent
 
 ### Integraciones
 - **Pagos:** Stripe

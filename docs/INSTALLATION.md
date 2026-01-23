@@ -1,6 +1,6 @@
-# Guía de Instalación - Modelo Híbrido MySQL + MongoDB
+# Guía de Instalación - TierOne
 
-Esta guía te ayudará a instalar y configurar el **modelo híbrido de base de datos** para el proyecto **TierOne**. Actualmente el proyecto usa **SQLite**, y vamos a migrarlo a una arquitectura híbrida con **MySQL** (datos relacionales) y **MongoDB** (datos flexibles).
+Esta guía te ayudará a instalar y configurar el proyecto **TierOne** con **MySQL** como base de datos.
 
 ---
 
@@ -11,9 +11,7 @@ Antes de comenzar, verifica que tienes instalado:
 1. **PHP 8.2+**
 2. **Composer** (gestor de dependencias PHP)
 3. **Node.js & NPM** (para el frontend React)
-4. **MySQL 8.0+** o **MariaDB** (base de datos relacional)
-5. **MongoDB Server 7.0+** (base de datos NoSQL)
-6. **Extensión PHP MongoDB** (`php_mongodb.dll` para Windows)
+4. **MySQL 8.0+** o **MariaDB** (base de datos)
 
 ---
 
@@ -28,67 +26,40 @@ cd C:\Users\Fran\Desktop\TierOne\TierOne
 # 1. Verificar versión de PHP
 php -v
 
-# 2. Verificar extensión MongoDB (debe aparecer 'mongodb')
-php -m | findstr mongodb
-
-# 3. Verificar Composer
+# 2. Verificar Composer
 composer --version
 
-# 4. Verificar Node.js
+# 3. Verificar Node.js
 node -v
+
+# 4. Verificar MySQL
+mysql --version
 ```
-
-### ⚠️ Si MongoDB NO aparece en la lista:
-
-1. Localiza tu archivo `php.ini`:
-   ```powershell
-   php --ini
-   ```
-
-2. Abre `php.ini` con un editor de texto
-
-3. Busca la línea `;extension=mongodb` y elimina el punto y coma (`;`) para activarla:
-   ```ini
-   extension=mongodb
-   ```
-
-4. Si no existe, agrégala al final de la sección `[Extensions]`
-
-5. **Reinicia tu servidor web** (si usas XAMPP, reinicia Apache)
-
-6. Verifica de nuevo:
-   ```powershell
-   php -m | findstr mongodb
-   ```
 
 ---
 
-## 🗄️ Paso 2: Crear Bases de Datos
+## 🗄️ Paso 2: Crear Base de Datos MySQL
 
-### 2.1 Crear Base de Datos MySQL
+### Opción 1: Usando MySQL Workbench o phpMyAdmin
 
 1. Abre **MySQL Workbench** o **phpMyAdmin**
 2. Ejecuta este comando SQL:
-   ```sql
-   CREATE DATABASE tierone_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
 
-### 2.2 Verificar MongoDB está corriendo
+```sql
+CREATE DATABASE tierone_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-#### En Windows:
-
-1. Abre `services.msc` (Servicios de Windows)
-2. Busca **MongoDB Server**
-3. Si está detenido, haz clic derecho → **Iniciar**
-
-#### O desde PowerShell:
+### Opción 2: Desde línea de comandos
 
 ```powershell
-# Verificar si MongoDB está corriendo
-Get-Service -Name MongoDB
+# Conectar a MySQL
+mysql -u root -p
 
-# Si está detenido, iniciarlo (como administrador)
-Start-Service -Name MongoDB
+# Crear la base de datos
+CREATE DATABASE tierone_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+# Salir
+exit
 ```
 
 ---
@@ -97,22 +68,13 @@ Start-Service -Name MongoDB
 
 Abre el archivo `.env` ubicado en `C:\Users\Fran\Desktop\TierOne\TierOne\.env` con tu editor de código.
 
-### 3.1 Reemplazar la sección de Base de Datos
+### 3.1 Configurar conexión MySQL
 
-**ANTES (SQLite):**
-```ini
-DB_CONNECTION=sqlite
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=laravel
-# DB_USERNAME=root
-# DB_PASSWORD=
-```
+Asegúrate de que la sección de base de datos se vea así:
 
-**DESPUÉS (Modelo Híbrido - MySQL + MongoDB):**
 ```ini
 # ========================================
-# CONFIGURACIÓN MYSQL (Base de Datos Principal)
+# CONFIGURACIÓN DE BASE DE DATOS (MySQL)
 # ========================================
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -120,19 +82,6 @@ DB_PORT=3306
 DB_DATABASE=tierone_db
 DB_USERNAME=root
 DB_PASSWORD=
-
-# ========================================
-# CONFIGURACIÓN MONGODB (Base de Datos Auxiliar)
-# ========================================
-MONGODB_CONNECTION=mongodb
-MONGODB_HOST=127.0.0.1
-MONGODB_PORT=27017
-MONGODB_DATABASE=tierone_data
-MONGODB_USERNAME=
-MONGODB_PASSWORD=
-
-# Si usas MongoDB Atlas (cloud), descomenta y configura:
-# MONGODB_DSN=mongodb+srv://<usuario>:<password>@cluster.mongodb.net/tierone_data
 ```
 
 > **💡 Nota:** Si tu MySQL tiene contraseña, agrégala en `DB_PASSWORD=tu_contraseña`
@@ -141,148 +90,46 @@ MONGODB_PASSWORD=
 
 ---
 
-## 📦 Paso 4: Instalar Driver de MongoDB para Laravel
+## 📦 Paso 4: Instalar Dependencias
 
-Ejecuta este comando en la carpeta del proyecto:
+### 4.1 Instalar dependencias de PHP
 
 ```powershell
 cd C:\Users\Fran\Desktop\TierOne\TierOne
-composer require mongodb/laravel-mongodb:^5.0
+composer install
 ```
 
-Esto instalará el paquete `mongodb/laravel-mongodb` que permite a Laravel trabajar con MongoDB.
+### 4.2 Instalar dependencias de Node.js
 
-**Salida esperada:**
-```
-Using version ^5.0 for mongodb/laravel-mongodb
-./composer.json has been updated
-Loading composer repositories with package information
-...
+```powershell
+npm install
 ```
 
 ---
 
-## ⚙️ Paso 5: Registrar Conexión MongoDB en Laravel
+## 🧪 Paso 5: Verificar Conexión a MySQL
 
-Abre el archivo `C:\Users\Fran\Desktop\TierOne\TierOne\config\database.php`
-
-### 5.1 Localizar el array `connections`
-
-Busca la línea que dice:
-
-```php
-'connections' => [
-```
-
-### 5.2 Agregar configuración de MongoDB
-
-**Antes del cierre del array `connections`** (después de la configuración `'sqlsrv'`), agrega:
-
-```php
-        'mongodb' => [
-            'driver' => 'mongodb',
-            'host' => env('MONGODB_HOST', '127.0.0.1'),
-            'port' => env('MONGODB_PORT', 27017),
-            'database' => env('MONGODB_DATABASE', 'tierone_data'),
-            'username' => env('MONGODB_USERNAME', ''),
-            'password' => env('MONGODB_PASSWORD', ''),
-            'options' => [
-                'appName' => 'TierOne Platform',
-            ],
-        ],
-```
-
-### 5.3 Ejemplo de ubicación exacta:
-
-```php
-'connections' => [
-
-    'sqlite' => [
-        // ... configuración SQLite
-    ],
-
-    'mysql' => [
-        // ... configuración MySQL
-    ],
-
-    // ... otras conexiones
-
-    'sqlsrv' => [
-        // ... configuración SQL Server
-    ],
-
-    // ⬇️ AGREGAR AQUÍ ⬇️
-    'mongodb' => [
-        'driver' => 'mongodb',
-        'host' => env('MONGODB_HOST', '127.0.0.1'),
-        'port' => env('MONGODB_PORT', 27017),
-        'database' => env('MONGODB_DATABASE', 'tierone_data'),
-        'username' => env('MONGODB_USERNAME', ''),
-        'password' => env('MONGODB_PASSWORD', ''),
-        'options' => [
-            'appName' => 'TierOne Platform',
-        ],
-    ],
-
-], // ⬅️ Cierre del array connections
-```
-
-### 5.4 Guardar el archivo `database.php`
-
----
-
-## 🧪 Paso 6: Verificar Conexiones
-
-### 6.1 Limpiar caché de configuración
+Ejecuta:
 
 ```powershell
 php artisan config:clear
-php artisan cache:clear
-```
-
-### 6.2 Probar conexión MySQL
-
-```powershell
 php artisan migrate:status
 ```
 
-**Si sale error** del tipo "database does not exist", asegúrate de haber creado la base de datos `tierone_db` en MySQL (Paso 2.1).
-
-### 6.3 Probar conexión MongoDB con Tinker
-
-```powershell
-php artisan tinker
-```
-
-Una vez dentro de **tinker**, ejecuta:
-
-```php
-DB::connection('mongodb')->getMongoDB()->listCollections();
-```
-
-**Resultado esperado:**
-```
-=> MongoDB\Model\CollectionInfoIterator {#...}
-```
-
-Si ves este resultado, ¡la conexión a MongoDB funciona! ✅
-
-Para salir de tinker:
-```php
-exit
-```
+**Si sale error** del tipo "database does not exist", asegúrate de haber creado la base de datos `tierone_db` en MySQL (Paso 2).
 
 ---
 
-## 🏗️ Paso 7: Ejecutar Migraciones
+## 🏗️ Paso 6: Ejecutar Migraciones
 
-Como acabas de cambiar de SQLite a MySQL, necesitas ejecutar las migraciones en la nueva base de datos:
+Ejecuta las migraciones para crear las tablas en la base de datos:
 
 ```powershell
 php artisan migrate
 ```
 
 **Salida esperada:**
+
 ```
    INFO  Running migrations.
 
@@ -293,9 +140,9 @@ php artisan migrate
 
 ---
 
-## 🚀 Paso 8: Iniciar el Proyecto
+## 🚀 Paso 7: Iniciar el Proyecto
 
-### 8.1 Iniciar Backend (Laravel)
+### 7.1 Iniciar Backend (Laravel)
 
 En una terminal:
 
@@ -305,11 +152,12 @@ php artisan serve
 ```
 
 Deberías ver:
+
 ```
    INFO  Server running on [http://127.0.0.1:8000].
 ```
 
-### 8.2 Iniciar Frontend (React + Vite)
+### 7.2 Iniciar Frontend (React + Vite)
 
 En **otra terminal** (nueva ventana):
 
@@ -319,6 +167,7 @@ npm run dev
 ```
 
 Deberías ver:
+
 ```
   VITE v5.x.x  ready in xxx ms
 
@@ -326,7 +175,7 @@ Deberías ver:
   ➜  Network: use --host to expose
 ```
 
-### 8.3 Acceder a la aplicación
+### 7.3 Acceder a la aplicación
 
 Abre tu navegador en: **http://localhost:5173**
 
@@ -340,86 +189,67 @@ Ejecuta estos comandos para confirmar que todo funciona:
 # 1. Verificar que Laravel puede conectarse a MySQL
 php artisan db:show
 
-# 2. Verificar que Laravel puede conectarse a MongoDB
-php artisan tinker
-```
-
-Dentro de tinker:
-```php
-// Crear una colección de prueba en MongoDB
-DB::connection('mongodb')->collection('test')->insert(['mensaje' => 'Conexión exitosa!']);
-
-// Leer el documento
-DB::connection('mongodb')->collection('test')->first();
-
-// Salir
-exit
+# 2. Ver estado de las migraciones
+php artisan migrate:status
 ```
 
 ---
 
-## 🛠️ Arquitectura del Modelo Híbrido
+## 🗄️ Estructura de Base de Datos
 
-| Tipo de Dato | Base de Datos | Colecciones/Tablas |
-|-------------|---------------|-------------------|
-| **Usuarios, Autenticación** | MySQL | `users`, `password_resets` |
-| **Órdenes, Pagos** | MySQL | `orders`, `payments`, `transactions` |
-| **Productos (estructura)** | MySQL | `products`, `categories` |
-| **Reviews de Productos** | MongoDB | `product_reviews` |
-| **Logs de Sistema** | MongoDB | `system_logs`, `activity_logs` |
-| **Carrito de Compras** | MongoDB | `shopping_carts` |
-| **Sesiones (opcional)** | MongoDB | `sessions` |
+El proyecto utiliza MySQL para todos los datos:
+
+| Módulo | Tablas |
+|--------|--------|
+| **Usuarios y Autenticación** | `users`, `password_reset_tokens`, `sessions` |
+| **E-commerce** | `categorias`, `productos`, `proveedores`, `ordenes`, `items_orden`, `pagos` |
+| **Gaming** | `juegos`, `partidas`, `participantes_partida`, `resultados_partida` |
+| **Torneos** | `torneos`, `inscripciones_torneo`, `partidas_torneo`, `premios_torneo`, `sponsors_torneo` |
+| **Sistema** | `reviews`, `reportes`, `transacciones`, `retiros`, `integraciones_api` |
 
 ---
 
 ## 🆘 Solución de Problemas
-
-### ❌ Error: "Class 'MongoDB\Driver\Manager' not found"
-
-**Causa:** La extensión PHP de MongoDB no está instalada o habilitada.
-
-**Solución:**
-1. Verifica en `php -m` si aparece `mongodb`
-2. Si no aparece, edita `php.ini` y agrega/descomenta: `extension=mongodb`
-3. Reinicia tu servidor web
-
----
 
 ### ❌ Error: "SQLSTATE[HY000] [1049] Unknown database 'tierone_db'"
 
 **Causa:** La base de datos MySQL no existe.
 
 **Solución:**
+
 ```sql
 CREATE DATABASE tierone_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ---
 
-### ❌ Error: "Connection refused" (MongoDB)
+### ❌ Error: "Access denied for user 'root'@'localhost'"
 
-**Causa:** El servicio de MongoDB no está corriendo.
+**Causa:** Credenciales incorrectas en el archivo `.env`.
 
 **Solución:**
-```powershell
-# Verificar estado
-Get-Service -Name MongoDB
 
-# Iniciar servicio (como administrador)
-Start-Service -Name MongoDB
-```
+1. Verifica tu usuario y contraseña de MySQL
+2. Actualiza `DB_USERNAME` y `DB_PASSWORD` en `.env`
+3. Ejecuta `php artisan config:clear`
 
 ---
 
-### ❌ Error: "Target class [mongodb] does not exist"
+### ❌ Error: "SQLSTATE[HY000] [2002] Connection refused"
 
-**Causa:** El paquete `mongodb/laravel-mongodb` no está instalado correctamente.
+**Causa:** El servicio de MySQL no está corriendo.
 
 **Solución:**
-```powershell
-composer require mongodb/laravel-mongodb:^5.0
-php artisan config:clear
-```
+
+- **Windows (XAMPP):** Inicia MySQL desde el panel de control de XAMPP
+- **Windows (MySQL Service):**
+  ```powershell
+  Start-Service -Name MySQL80
+  ```
+- **Linux/Mac:**
+  ```bash
+  sudo systemctl start mysql
+  ```
 
 ---
 
@@ -427,16 +257,22 @@ php artisan config:clear
 
 Una vez completada la instalación:
 
-1. **Crear modelos híbridos** (algunos usando MySQL, otros MongoDB)
-2. **Configurar repositorios** para abstraer la lógica de acceso a datos
-3. **Implementar seeders** para poblar datos de prueba
-4. **Desarrollar APIs REST** que utilicen ambas bases de datos
+1. **Crear seeders** para poblar datos de prueba
+2. **Desarrollar APIs REST**
+3. **Implementar autenticación**
+4. **Desarrollar el frontend React**
 
 ---
 
 ## 📞 Soporte
 
 Si encuentras problemas, revisa:
+
 - Logs de Laravel: `C:\Users\Fran\Desktop\TierOne\TierOne\storage\logs\laravel.log`
-- Logs de MongoDB: Abre MongoDB Compass y verifica conexiones
 - Variables de entorno: Asegúrate de que `.env` está correctamente configurado
+- Verifica que MySQL esté corriendo y accesible
+
+---
+
+**Última actualización:** Enero 2026  
+**Versión:** 2.0 (MySQL only)

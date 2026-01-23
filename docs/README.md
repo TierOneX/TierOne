@@ -11,6 +11,14 @@ Resúmenes diarios del progreso del proyecto.
 
 - [2026-01-21](daily-reviews/2026-01-21.md) - Implementación esquema de BD
 
+### 📊 [Diagramas](diagrams/)
+Diagramas de flujo Mermaid del sistema.
+
+- [Admin E-commerce](diagrams/DF-Admin-Ecommerce.md) - Panel admin tienda
+- [Admin Torneos](diagrams/DF-Admin-Torneos.md) - Panel admin torneos
+- [Pagos Stripe](diagrams/DF-Pagos-Stripe.md) - Sistema de pagos
+- [Feature Branch Workflow](diagrams/Feature-Branch-Workflow.md) - Workflow Git
+
 ### 🎤 [Presentaciones](presentations/)
 Presentaciones completas del proyecto para reuniones.
 
@@ -21,7 +29,6 @@ Documentación completa del diseño de base de datos.
 
 - [Diagrama ER](database/ER-Diagram.md) - Diagrama Entidad-Relación
 - [Plan de Implementación](database/Implementation-Plan.md) - Roadmap de implementación
-- [Integración MongoDB](database/MongoDB-Integration.md) - Arquitectura híbrida
 
 ### 🔌 [API](api/)
 Documentación de endpoints y contratos de API.

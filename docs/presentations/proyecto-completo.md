@@ -63,7 +63,7 @@ Crear una plataforma completa donde los gamers puedan:
 #### 📋 Plan de Implementación (Implementation-Plan.md)
 - **Tamaño:** 571 líneas, 13.4 KB
 - **Contenido:**
-  - Stack tecnológico: Laravel + React + MySQL + MongoDB
+  - Stack tecnológico: Laravel + React + MySQL
   - Estructura de tablas por módulo
   - Plan de desarrollo en fases
   - Cronograma estimado: 10-11 días
@@ -75,23 +75,6 @@ Crear una plataforma completa donde los gamers puedan:
 4. 🚧 Implementar seeders
 5. 🚧 Configuración de Stripe
 6. 🚧 Testing
-
----
-
-#### 🔄 Integración MongoDB (MongoDB-Integration.md)
-- **Tamaño:** 417 líneas, 10.1 KB
-- **Contenido:**
-  - Decisión de arquitectura híbrida
-  - Guías de instalación (local y Atlas)
-  - Ejemplos de uso con Laravel
-  - Casos de uso recomendados
-
-**Decisión técnica:**
-```
-ARQUITECTURA HÍBRIDA IMPLEMENTADA:
-├── MySQL → Datos críticos (usuarios, órdenes, pagos, torneos)
-└── MongoDB → Datos flexibles (reviews, logs, carritos, analytics)
-```
 
 ---
 
@@ -249,9 +232,8 @@ graph TD
 - **Estado:** Desarrollo inicial (30%)
 
 ### Base de Datos
-- **Relacional:** MySQL 8.0
-- **NoSQL:** MongoDB Atlas (cloud)
-- **Arquitectura:** Híbrida
+- **Database:** MySQL 8.0
+- **ORM:** Eloquent
 
 ### Integraciones Planeadas
 - **Pagos:** Stripe
@@ -305,20 +287,12 @@ graph TD
 
 ## 🔧 Desafíos Técnicos Resueltos
 
-### 1. Arquitectura Híbrida MySQL + MongoDB
-**Desafío:** Integrar dos sistemas de base de datos diferentes.  
+### 1. Arquitectura de Base de Datos MySQL
+**Desafío:** Diseñar un esquema relacional completo para e-commerce y torneos.  
 **Solución:**
-```php
-// Configuración en config/database.php
-'connections' => [
-    'mysql' => [...],
-    'mongodb' => [
-        'driver' => 'mongodb',
-        'dsn' => env('MONGODB_DSN'),
-        'database' => 'tierone_data',
-    ],
-]
-```
+- 33 tablas organizadas en módulos
+- Relaciones claramente definidas con foreign keys
+- Índices optimizados para consultas frecuentes
 
 ### 2. Foreign Keys Circulares
 **Desafío:** Tablas con dependencias circulares (transacciones ↔ retiros).  
@@ -380,9 +354,8 @@ Tiempo de dev (DB):      1 sesión intensiva
 
 | Decisión | Razón | Estado |
 |----------|-------|--------|
-| Laravel 11 | Framework maduro, documentación extensiva | ✅ |
-| Arquitectura híbrida | Flexibilidad + rendimiento | ✅ |
-| MongoDB Atlas | Cloud, free tier, escalable | ✅ |
+| Laravel 12 | Framework maduro, documentación extensiva | ✅ |
+| MySQL único | Simplicidad y mantenibilidad | ✅ |
 | Inertia.js | SSR sin API endpoints complejos | ✅ |
 | Enum para estados | Validación a nivel de DB | ✅ |
 | Soft deletes | Preservar histórico | 🚧 |
@@ -431,7 +404,7 @@ TierOne/
 ## 🎓 Aprendizajes y Mejores Prácticas
 
 ### Técnicos
-1. ✅ **Migrar gradualmente** - Empezar con SQLite, migrar a MySQL+MongoDB
+1. ✅ **Migrar gradualmente** - Empezar con SQLite, migrar a MySQL
 2. ✅ **Documentar primero** - ER diagrams antes de código
 3. ✅ **Foreign keys explícitas** - Mejor `id_usuario` que `user_id`
 4. ✅ **Enums para estados** - Validación automática
@@ -507,7 +480,6 @@ comunicaciones_proveedor {
 - [x] Guía de instalación
 - [x] Configuración de entorno (.env)
 - [x] Base de datos MySQL creada
-- [x] MongoDB Atlas configurado
 - [x] 27 migraciones implementadas
 - [x] Foreign keys y relaciones
 - [x] Scripts de instalación (install.bat/sh)
