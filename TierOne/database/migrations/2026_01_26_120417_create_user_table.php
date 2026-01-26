@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('imagenes_producto', function (Blueprint $table) {
+        Schema::create('user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_producto')->constrained('productos')->onDelete('cascade');
-            $table->string('url');
-            $table->integer('orden')->default(0);
-            $table->boolean('es_principal')->default(false);
             $table->timestamps();
         });
     }
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('imagenes_producto');
+        Schema::dropIfExists('user');
     }
 };
