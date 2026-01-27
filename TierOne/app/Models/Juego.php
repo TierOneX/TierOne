@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $categoria
  * @property bool $activo
  * @property \Carbon\Carbon $fecha_agregado
+ * 
  */
 class Juego extends Model
 {
