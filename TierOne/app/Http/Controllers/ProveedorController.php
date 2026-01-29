@@ -106,18 +106,18 @@ class ProveedorController extends Controller
                 'nombre' => 'sometimes|required|string|max:100',
                 'contacto_nombre' => 'sometimes|required|string|max:100',
                 'email' => 'sometimes|required|email|max:100|unique:proveedores,email,' . $id,
-                'telefono'=> 'nullable|string|max:20',
-                'direccion'=> 'nullable|string|max:500',
-                'notas'=> 'nullable|string',
-                'activo'=> 'nullable|boolean',
+                'telefono' => 'nullable|string|max:20',
+                'direccion' => 'nullable|string|max:500',
+                'notas' => 'nullable|string',
+                'activo' => 'nullable|boolean',
             ]);
 
             $proveedor->update($validated);
-            return $this->successResponse($proveedor,'Proveedor actualizado correctamente');
+            return $this->successResponse($proveedor, 'Proveedor actualizado correctamente');
 
-        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Proveedor no encontrado');
-        }catch(\Illuminate\Validation\ValidationException $e){
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->validationErrorResponse($e->errors());
         }
     }
@@ -129,14 +129,14 @@ class ProveedorController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        try{
+        try {
             $proveedor = Proveedor::findOrFail($id);
             $proveedor->delete();
-            return $this->successResponse($proveedor,'Proveedor eliminado correctamente');
+            return $this->successResponse(null, 'Proveedor eliminado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Proveedor no encontrado');
         } catch (\Exception $e) {
-        return$this->errorResponse('Error al eliminar el proveedor',$e->getMessage());
+            return $this->errorResponse('Error al eliminar el proveedor', $e->getMessage());
         }
     }
 }
