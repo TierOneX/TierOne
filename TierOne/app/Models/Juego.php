@@ -54,9 +54,7 @@ class Juego extends Model
     ];
 
     /**
-     * Deshabilitar timestamps automáticos de Laravel
-     * 
-     * No usamos created_at/updated_at, solo 'fecha_agregado'
+     * Deshabilitar timestamps automáticos
      */
     public $timestamps = false;
 }
