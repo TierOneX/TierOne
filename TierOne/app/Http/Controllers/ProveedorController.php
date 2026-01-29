@@ -6,7 +6,6 @@ use App\Models\Proveedor;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use function PHPUnit\Framework\returnArgument;
 
 class ProveedorController extends Controller
 {
@@ -37,9 +36,11 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Summary of store
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -58,18 +59,27 @@ class ProveedorController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->validationErrorResponse($e->errors());
-        } catch(\Exception $e){
-            return $this->errorResponse('Error al crear el provedor', $e->getMessage());
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al crear el proveedor', $e->getMessage());
         }
-
     }
 
     /**
-     * Display the specified resource.
+     * Summary of show
+     * @param string $id
+     * @return JsonResponse
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        //
+        try {
+            $proveedor = Proveedor::findOrFail($id);
+            return $this->successResponse($proveedor, 'Proveedor Obtenido Correctamente');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Proveedor no encontrado');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al obtener proveedor', $e->getMessage());
+        }
     }
 
     /**
@@ -81,18 +91,52 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Summary of update
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        try {
+            $proveedor = Proveedor::findOrFail($id);
+
+            //Validar 
+            $validated = $request->validate([
+                'nombre' => 'sometimes|required|string|max:100',
+                'contacto_nombre' => 'sometimes|required|string|max:100',
+                'email' => 'sometimes|required|email|max:100|unique:proveedores,email,' . $id,
+                'telefono'=> 'nullable|string|max:20',
+                'direccion'=> 'nullable|string|max:500',
+                'notas'=> 'nullable|string',
+                'activo'=> 'nullable|boolean',
+            ]);
+
+            $proveedor->update($validated);
+            return $this->successResponse($proveedor,'Proveedor actualizado correctamente');
+
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Proveedor no encontrado');
+        }catch(\Illuminate\Validation\ValidationException $e){
+            return $this->validationErrorResponse($e->errors());
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Summary of destroy
+     * @param string $id
+     * @return JsonResponse
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
-        //
+        try{
+            $proveedor = Proveedor::findOrFail($id);
+            $proveedor->delete();
+            return $this->successResponse($proveedor,'Proveedor eliminado correctamente');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Proveedor no encontrado');
+        } catch (\Exception $e) {
+        return$this->errorResponse('Error al eliminar el proveedor',$e->getMessage());
+        }
     }
 }
