@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('transacciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_usuario')->constrained('users');
-            $table->foreignId('id_orden')->nullable(); // Referencia Tipo 1
-            $table->foreignId('id_partida')->nullable(); // Referencia Tipo 2
-            $table->foreignId('id_torneo')->nullable()->constrained('torneos'); // Referencia Tipo 3
-            $table->foreignId('id_retiro')->nullable(); // Referencia Tipo 4
+            $table->foreignId('id_orden')->nullable();
+            $table->foreignId('id_partida')->nullable();
+            $table->foreignId('id_torneo')->nullable()->constrained('torneos');
+            $table->foreignId('id_retiro')->nullable();
             $table->enum('tipo', ['deposito', 'retiro', 'premio', 'compra', 'reembolso', 'comision']);
             $table->decimal('monto', 10, 2);
             $table->decimal('balance_anterior', 10, 2);
