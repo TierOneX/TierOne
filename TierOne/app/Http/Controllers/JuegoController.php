@@ -33,9 +33,11 @@ class JuegoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Summary of store
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -43,13 +45,13 @@ class JuegoController extends Controller
                 'slug' => 'required|string|max:255|unique:juegos,slug',
                 'descripcion' => 'nullable|string',
                 'imagen_url' => 'nullable|url|max:255',
-                'categoria' => 'required|string|max:50', 
+                'categoria' => 'required|string|max:50',
                 'activo' => 'nullable|boolean',
             ]);
-            $juego = Juego::create($request->all());
+            $juego = Juego::create($validated);
             return $this->successResponse($juego, 'Juego ha sido creado correctamente', 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->getMessage());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear juego', $e->getMessage());
         }
@@ -57,11 +59,20 @@ class JuegoController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * Summary of show
+     * @param string $id
+     * @return JsonResponse
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        //
+        try {
+            $juego = Juego::findOrFail($id);
+            return $this->successResponse($juego, 'Juego obtenido correctamente', 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Juego no encontrado');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al obtener juego', $e->getMessage());
+        }
     }
 
     /**
@@ -73,18 +84,51 @@ class JuegoController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Summary of update
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $juego = Juego::findOrFail($id);
+
+            $validated = $request->validate([
+                'nombre' => 'sometimes|required|string|max:255',
+                'slug' => 'sometimes|required|string|max:255|unique:juegos,slug,' . $id,
+                'descripcion' => 'nullable|string',
+                'imagen_url' => 'nullable|url|max:255',
+                'categoria' => 'sometimes|required|string|max:50',
+                'activo' => 'nullable|boolean',
+            ]);
+
+            $juego->update($validated);
+            return $this->successResponse($juego, 'Juego actualizado correctamente', 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Juego no encontrado');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->errors());
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al actualizar juego', $e->getMessage());
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Summary of destroy
+     * @param string $id
+     * @return JsonResponse
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
-        //
+        try {
+            $juego = Juego::findOrFail($id);
+            $juego->delete();
+            return $this->successResponse(null, 'Juego eliminado correctamente', 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('Juego no encontrado');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error al eliminar juego', $e->getMessage());
+        }
     }
 }
