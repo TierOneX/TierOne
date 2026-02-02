@@ -21,7 +21,6 @@ class ProveedorController extends Controller
         try {
             $proveedores = Proveedor::all();
             return $this->successResponse($proveedores, 'Proveedores obtenidos correctamente');
-
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener los proveedores', $e->getMessage());
         }
@@ -119,6 +118,8 @@ class ProveedorController extends Controller
             return $this->notFoundResponse('Proveedor no encontrado');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->validationErrorResponse($e->errors());
+        }catch (\Exception $e){
+            return $this->errorResponse('Error al actualizar el proveedor', $e->getMessage());
         }
     }
 
