@@ -131,7 +131,7 @@ class UserController extends Controller
         try {
             $usuario = User::findOrFail($id);
             $usuario->delete();
-            return $this->successResponse($usuario, 'Usuario eliminado correctamente');
+            return $this->successResponse(null, 'Usuario eliminado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Usuario no encontrado');
         } catch (\Exception $e) {
