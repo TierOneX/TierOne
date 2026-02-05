@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,38 +27,18 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    // Metodo create eliminado (API no usa vistas)
 
     /**
      * Summary of store
-     * @param Request $request
+     * @param StoreUserRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreUserRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'username' => 'required|string|max:255|unique:users,username',
-                'email' => 'required|email|max:255|unique:users,email',
-                'password_hash' => 'required|string|max:255',
-                'nombre' => 'required|string|max:255',
-                'apellido' => 'required|string|max:255',
-                'pais' => 'required|string|max:100',
-                'rol' => 'nullable|in:player,admin,streamer',
-                'verificado' => 'nullable|boolean',
-                'activo' => 'nullable|boolean',
-            ]);
-
-            $usuario = User::create($validated);
+            $usuario = User::create($request->validated());
             return $this->successResponse($usuario, 'Usuario creado correctamente', 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors(), $e->getMessage());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear el usuario', $e->getMessage());
         }
@@ -79,42 +61,22 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    // Metodo edit eliminado (API no usa vistas)
 
     /**
      * Summary of update
-     * @param Request $request
+     * @param UpdateUserRequest $request
      * @param string $id
      * @return JsonResponse
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateUserRequest $request, string $id): JsonResponse
     {
         try {
             $usuario = User::findOrFail($id);
-            $validated = $request->validate([
-                'username' => 'sometimes|required|string|max:255|unique:users,username,' . $id,
-                'email' => 'sometimes|required|email|max:255|unique:users,email,' . $id,
-                'password_hash' => 'sometimes|required|string|min:8',
-                'nombre' => 'sometimes|required|string|max:255',
-                'apellido' => 'sometimes|required|string|max:255',
-                'pais' => 'sometimes|required|string|max:100',
-                'rol' => 'nullable|in:player,admin,streamer',
-                'verificado' => 'nullable|boolean',
-                'activo' => 'nullable|boolean',
-            ]);
-
-            $usuario->update($validated);
+            $usuario->update($request->validated());
             return $this->successResponse($usuario, 'Usuario actualizado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Usuario no encontrado');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors(), $e->getMessage());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar el usuario', $e->getMessage());
         }
