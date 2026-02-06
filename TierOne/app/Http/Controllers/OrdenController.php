@@ -49,12 +49,34 @@ class OrdenController extends Controller
                 // Optional fields
                 'tracking_number' => 'nullable|string',
                 'transportista' => 'nullable|string',
+
+                // Items de la orden
+                'items' => 'required|array|min:1',
+                'items.*.id_producto' => 'required|exists:productos,id',
+                'items.*.id_variante' => 'nullable|exists:variantes_productos,id',
+                'items.*.id_proveedor' => 'required|exists:proveedores,id',
+                'items.*.cantidad' => 'required|integer|min:1',
+                'items.*.precio_unitario' => 'required|numeric|min:0',
             ]);
 
-            // We use transaction to ensure consistency if we were adding items, 
-            // though here we are just creating the header for now.
             $orden = DB::transaction(function () use ($validated) {
-                return Orden::create($validated);
+                // 1. Crear la cabecera de la orden
+                $orden = Orden::create($validated);
+
+                // 2. Crear los detalles (Items)
+                foreach ($validated['items'] as $item) {
+                    ItemOrden::create([
+                        'id_orden' => $orden->id,
+                        'id_producto' => $item['id_producto'],
+                        'id_variante' => $item['id_variante'] ?? null,
+                        'id_proveedor' => $item['id_proveedor'],
+                        'cantidad' => $item['cantidad'],
+                        'precio_unitario' => $item['precio_unitario'],
+                        'subtotal' => $item['cantidad'] * $item['precio_unitario'],
+                    ]);
+                }
+
+                return $orden;
             });
 
             return $this->successResponse($orden, 'Orden creada correctamente', 201);
