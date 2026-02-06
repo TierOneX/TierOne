@@ -84,4 +84,12 @@ class Partida extends Model
     {
         return $this->belongsTo(User::class, 'id_creador');
     }
+
+    /**
+     * Relación: Participantes en la partida
+     */
+    public function participantes()
+    {
+        return $this->hasMany(ParticipantePartida::class, 'id_partida');
+    }
 }
