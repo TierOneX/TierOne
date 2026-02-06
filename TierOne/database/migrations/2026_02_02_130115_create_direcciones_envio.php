@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('direcciones_envio', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_usuario');
+            $table->foreignId('id_usuario')->constrained('users')->onDelete('cascade');
             $table->string('nombre_completo');
             $table->string('direccion_linea1');
             $table->string('ciudad');
@@ -23,6 +22,11 @@ return new class extends Migration
             $table->string('telefono'); // String para permitir prefijos (+34) y guiones
             $table->boolean('predeterminada')->default(true);
             $table->timestamps();
+        });
+
+        // Add FK to ordenes table now that direccioces_envio exists
+        Schema::table('ordenes', function (Blueprint $table) {
+            $table->foreign('id_direccion_envio')->references('id')->on('direcciones_envio')->onDelete('restrict');
         });
     }
 

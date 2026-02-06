@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,8 @@ return new class extends Migration
     {
         Schema::create('comunicaciones_proveedor', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_orden');
-            $table->unsignedBigInteger('id_proveedor');
+            $table->foreignId('id_orden')->constrained('ordenes')->onDelete('cascade');
+            $table->foreignId('id_proveedor')->constrained('proveedores')->onDelete('cascade');
             $table->enum('tipo', ['pedido', 'seguimiento', 'entrega', 'incidencia']);
             $table->string('asunto');
             $table->text('contenido_email');

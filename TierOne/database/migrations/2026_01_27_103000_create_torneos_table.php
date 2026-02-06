@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Ejecuta las migraciones.
      * Crea la tabla 'torneos' en la base de datos.
@@ -14,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('torneos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_juego'); 
+            $table->foreignId('id_juego')->constrained('juegos')->onDelete('cascade');
             $table->foreignId('id_organizador')->constrained('users');
             $table->string('nombre');
             $table->string('descripcion');
@@ -32,7 +31,7 @@ return new class extends Migration
             $table->string('reglas_url');
             $table->string('stream_url');
             $table->boolean('verificado');
-        
+
             // Timestamps opcionales
             // $table->timestamps();
         });
