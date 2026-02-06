@@ -1,75 +1,165 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-export default function Shop({ auth, productos = [] }) {
+export default function Shop({ productos = [] }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('ALL GEAR');
     const [showFilter, setShowFilter] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Datos Mock para visualización (se usan si no hay productos de la BD)
+    const mockProducts = [
+        {
+            id: 1,
+            nombre: 'TIERONE PRO JERSEY',
+            categoria: { nombre: 'JERSEYS' },
+            precio_venta: 85.00,
+            precio_proveedor: 110.00,
+            imagen_principal: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800&auto=format&fit=crop',
+            destacado: true
+        },
+        {
+            id: 2,
+            nombre: 'STEALTH BOMBER JACKET',
+            categoria: { nombre: 'HOODIES' },
+            precio_venta: 150.00,
+            precio_proveedor: 120.00,
+            imagen_principal: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
+            destacado: true
+        },
+        {
+            id: 3,
+            nombre: 'ELITE JOGGERS',
+            categoria: { nombre: 'BOTTOMS' },
+            precio_venta: 75.00,
+            precio_proveedor: 90.00,
+            imagen_principal: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=800&auto=format&fit=crop',
+            destacado: false
+        },
+        {
+            id: 4,
+            nombre: 'CHAMPIONSHIP CAP',
+            categoria: { nombre: 'HEADWEAR' },
+            precio_venta: 35.00,
+            precio_proveedor: 25.00,
+            imagen_principal: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop',
+            destacado: true
+        }
+    ];
+
+    const displayProducts = productos.length > 0 ? productos : mockProducts;
 
     const categories = [
-        'ALL GEAR',
-        'HOODIES',
-        'JERSEYS',
-        'BOTTOMS',
-        'ACCESSORIES',
-        'HEADWEAR',
+        'ALL GEAR', 'HOODIES', 'JERSEYS', 'BOTTOMS', 'ACCESSORIES', 'HEADWEAR',
+    ];
+
+    const navItems = [
+        { name: 'Home', href: '/' },
+        { name: 'Partidas', href: '/partidas' },
+        { name: 'Torneos', href: '/torneos' },
+        { name: 'Tienda', href: '/shop' },
+        { name: 'Comunidad', href: '/comunidad' },
+        { name: 'Perfil', href: '/perfil' },
     ];
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Shop</h2>}
-        >
+        <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-red-600 selection:text-white">
             <Head title="Shop - TierOne" />
 
-            <div className="min-h-screen bg-[#0a0a0a] text-white">
+            {/* HEADER CUSTOM (Sin depender de layouts externos) */}
+            <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center gap-2 group">
+                            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" />
+                                    <path d="M2 17L12 22L22 17V12L12 17L2 12V17Z" opacity="0.7" />
+                                </svg>
+                            </div>
+                            <span className="text-xl font-black tracking-tighter italic text-white">TIERONE</span>
+                        </Link>
+
+                        {/* Desktop Nav */}
+                        <nav className="hidden lg:flex items-center gap-8">
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={`text-sm font-bold uppercase tracking-wider transition-all hover:text-red-500 ${item.name === 'Tienda' ? 'text-red-500' : 'text-gray-400'
+                                        }`}
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </nav>
+
+                        {/* Right Icons */}
+                        <div className="flex items-center gap-4">
+                            <button className="p-2 text-gray-400 hover:text-white transition-colors relative">
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                            </button>
+                            <Link href="/login" className="hidden sm:block px-5 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-bold rounded-lg transition-all">
+                                LOG IN
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* MAIN CONTENT */}
+            <main className="pt-16">
                 {/* Hero Section */}
-                <section className="bg-gradient-to-b from-black via-gray-900 to-[#0a0a0a] pt-8 pb-12 px-4 sm:px-6 lg:px-8">
+                <section className="bg-gradient-to-b from-black via-gray-900 to-[#0a0a0a] pt-12 pb-16 px-4">
                     <div className="max-w-7xl mx-auto">
-                        <div className="mb-6">
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-3 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent italic tracking-tight">
-                                TIERONE
+                        <div className="mb-8 relative">
+                            <h1 className="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent italic tracking-tighter">
+                                TIERONE GEAR
                             </h1>
-                            <p className="text-gray-400 text-base sm:text-lg max-w-2xl">
-                                Premium gaming performance meets high-end street fashion. Gear up for the next drop.
+                            <p className="text-gray-400 text-lg max-w-2xl font-medium">
+                                Premium gaming performance meets high-end street fashion. <br />
+                                <span className="text-red-500">Gear up for the next drop.</span>
                             </p>
                         </div>
 
                         {/* Search and Filter */}
-                        <div className="flex gap-3 mb-6">
+                        <div className="flex flex-col sm:flex-row gap-4 mb-8">
                             <div className="flex-1 relative">
-                                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                                 <input
                                     type="text"
                                     placeholder="Search exclusive drops..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full bg-black/50 border border-gray-800 rounded-lg pl-12 pr-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
                                 />
                             </div>
                             <button
                                 onClick={() => setShowFilter(!showFilter)}
-                                className="bg-red-600 hover:bg-red-700 px-4 sm:px-6 rounded-lg flex items-center gap-2 font-bold transition-colors"
+                                className="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-all hover:scale-105 active:scale-95"
                             >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                                 </svg>
-                                <span className="hidden sm:inline">FILTER</span>
+                                <span>FILTER</span>
                             </button>
                         </div>
 
                         {/* Category Pills */}
-                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
                             {categories.map((category) => (
                                 <button
                                     key={category}
                                     onClick={() => setActiveCategory(category)}
-                                    className={`px-5 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all ${activeCategory === category
-                                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/50'
-                                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800 border border-gray-700'
+                                    className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all border ${activeCategory === category
+                                        ? 'bg-white text-black border-white'
+                                        : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white'
                                         }`}
                                 >
                                     {category}
@@ -80,109 +170,64 @@ export default function Shop({ auth, productos = [] }) {
                 </section>
 
                 {/* Products Grid */}
-                <section className="px-4 sm:px-6 lg:px-8 py-8">
+                <section className="px-4 py-8">
                     <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                            {productos.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                        </div>
+                        {displayProducts.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {displayProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+                        ) : (
+                            // EMPTY STATE VISUAL
+                            <div className="text-center py-20 border border-dashed border-gray-800 rounded-3xl bg-white/5">
+                                <div className="text-6xl mb-4">👾</div>
+                                <h3 className="text-2xl font-bold text-white mb-2">No products found</h3>
+                                <p className="text-gray-500">Inventory is empty. Wait for the next drop.</p>
+                            </div>
+                        )}
 
-                        {/* Load More */}
-                        <div className="mt-12 text-center">
-                            <div className="mb-4 text-gray-500 text-sm">
-                                SHOWING {productos.length} OF {productos.length} ITEMS
+                        {/* Load More Mock */}
+                        {displayProducts.length > 0 && (
+                            <div className="mt-16 text-center">
+                                <div className="mb-4 text-gray-500 text-xs font-bold tracking-widest uppercase">
+                                    Showing {displayProducts.length} items
+                                </div>
+                                <div className="w-64 mx-auto bg-gray-800 rounded-full h-1 mb-8 overflow-hidden">
+                                    <div className="bg-red-600 h-full w-1/3"></div>
+                                </div>
+                                <button className="bg-transparent border border-gray-700 hover:border-white text-white px-10 py-4 rounded-xl font-bold transition-all hover:bg-white/5 tracking-widest text-sm">
+                                    LOAD MORE
+                                </button>
                             </div>
-                            <div className="w-full bg-gray-800 rounded-full h-1 mb-6 overflow-hidden">
-                                <div className="bg-gradient-to-r from-red-600 to-red-500 h-full" style={{ width: '100%' }}></div>
-                            </div>
-                            <button className="bg-transparent border-2 border-gray-700 hover:border-white text-white px-8 sm:px-12 py-3 sm:py-4 rounded-lg font-bold transition-all hover:bg-white/5 tracking-wider text-sm sm:text-base">
-                                LOAD MORE DROPS
-                            </button>
-                        </div>
+                        )}
                     </div>
                 </section>
+            </main>
 
-                {/* Footer */}
-                <footer className="bg-black border-t border-gray-800 mt-16 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8">
-                            {/* Brand */}
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center">
-                                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2L2 7L12 12L22 7L12 2Z" />
-                                            <path d="M2 17L12 22L22 17V12L12 17L2 12V17Z" opacity="0.7" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-xl font-bold">TIERONE</span>
-                                </div>
-                                <p className="text-gray-500 text-sm leading-relaxed">
-                                    The premier destination for competitive gaming and streetwear. Built for the elite.
-                                </p>
-                            </div>
-
-                            {/* Shop Links */}
-                            <div>
-                                <h3 className="font-bold mb-4 text-sm tracking-wider">SHOP</h3>
-                                <ul className="space-y-2 text-sm text-gray-400">
-                                    <li><a href="#" className="hover:text-white transition-colors">New Arrivals</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Best Sellers</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Collections</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Limited Drops</a></li>
-                                </ul>
-                            </div>
-
-                            {/* Company Links */}
-                            <div>
-                                <h3 className="font-bold mb-4 text-sm tracking-wider">COMPANY</h3>
-                                <ul className="space-y-2 text-sm text-gray-400">
-                                    <li><a href="#" className="hover:text-white transition-colors">About TierOne</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Sustainability</a></li>
-                                </ul>
-                            </div>
-
-                            {/* Newsletter */}
-                            <div>
-                                <h3 className="font-bold mb-4 text-sm tracking-wider">NEWSLETTER</h3>
-                                <p className="text-gray-500 text-sm mb-4">
-                                    GET EARLY ACCESS TO EXCLUSIVE DROPS.
-                                </p>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="email"
-                                        placeholder="Email Address"
-                                        className="flex-1 bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-600"
-                                    />
-                                    <button className="bg-red-600 hover:bg-red-700 px-4 rounded font-bold text-sm transition-colors">
-                                        JOIN
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Bottom Bar */}
-                        <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-gray-500">
-                            <div>© 2024 TIERONE GAMING APPAREL. ALL RIGHTS RESERVED.</div>
-                            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                                <a href="#" className="hover:text-white transition-colors">PRIVACY POLICY</a>
-                                <a href="#" className="hover:text-white transition-colors">TERMS OF SERVICE</a>
-                                <a href="#" className="hover:text-white transition-colors">SHIPPING & RETURNS</a>
-                            </div>
-                        </div>
+            {/* Simple Footer */}
+            <footer className="bg-black border-t border-gray-900 mt-20 py-12 px-4">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-red-600 rounded"></div>
+                        <span className="font-bold text-lg tracking-tighter italic">TIERONE</span>
                     </div>
-                </footer>
-            </div>
-        </AuthenticatedLayout>
+                    <div className="text-gray-600 text-sm">
+                        © 2024 TIERONE. ALL RIGHTS RESERVED.
+                    </div>
+                </div>
+            </footer>
+        </div>
     );
 }
 
 function ProductCard({ product }) {
     const [isHovered, setIsHovered] = useState(false);
-    const hasDiscount = product.precio_proveedor && product.precio_venta < product.precio_proveedor;
+
+    // Safety check for prices
+    const precioVenta = parseFloat(product.precio_venta || 0);
+    const precioProveedor = parseFloat(product.precio_proveedor || 0);
+    const hasDiscount = precioProveedor > precioVenta;
 
     return (
         <div
@@ -190,60 +235,56 @@ function ProductCard({ product }) {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-gray-900 to-black border border-gray-800 hover:border-red-600 transition-all duration-300 mb-4">
+            <div className="relative overflow-hidden rounded-2xl bg-[#111] border border-gray-800 group-hover:border-red-600/50 transition-all duration-300 mb-4 aspect-[4/5]">
                 {/* Badges */}
                 {product.destacado && (
                     <div className="absolute top-3 left-3 z-10">
-                        <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded">
-                            TOURNAMENT DISCOUNT
+                        <span className="bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded uppercase tracking-wider">
+                            Tournament Discount
                         </span>
                     </div>
                 )}
 
-                {/* Product Image */}
-                <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+                {/* Image Area */}
+                <div className="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-[#151515] to-[#050505]">
                     {product.imagen_principal ? (
                         <img
                             src={product.imagen_principal}
                             alt={product.nombre}
-                            className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'
-                                }`}
+                            className={`w-full h-full object-contain transition-transform duration-500 ease-out ${isHovered ? 'scale-110' : 'scale-100'}`}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <div className="w-20 h-20 bg-gray-700/30 rounded-lg flex items-center justify-center">
-                                <svg className="w-10 h-10 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                            </div>
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center">
+                            <svg className="w-8 h-8 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                         </div>
                     )}
+                </div>
 
-                    {/* Hover Overlay */}
-                    <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
-                        }`}>
-                        <button className="bg-white text-black px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-colors transform translate-y-2 group-hover:translate-y-0 text-sm sm:text-base">
-                            QUICK VIEW
-                        </button>
-                    </div>
+                {/* Quick View Button */}
+                <div className={`absolute inset-x-0 bottom-4 flex justify-center transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                    <button className="bg-white text-black px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition-colors shadow-lg shadow-black/50">
+                        Quick View
+                    </button>
                 </div>
             </div>
 
-            {/* Product Info */}
-            <div className="px-1">
-                <h3 className="font-bold text-white mb-1 group-hover:text-red-500 transition-colors text-sm sm:text-base">
-                    {product.nombre}
+            {/* Info */}
+            <div className="space-y-1">
+                <h3 className="font-bold text-gray-200 group-hover:text-red-500 transition-colors truncate">
+                    {product.nombre || 'Product Name'}
                 </h3>
-                <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
-                    {product.categoria?.nombre || 'EXCLUSIVE'}
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+                    {product.categoria?.nombre || 'Category'}
                 </p>
-                <div className="flex items-center gap-2">
-                    <span className="text-red-500 font-bold text-lg sm:text-xl">
-                        ${parseFloat(product.precio_venta).toFixed(2)}
+                <div className="flex items-center gap-3 pt-1">
+                    <span className="text-white font-bold text-lg">
+                        ${precioVenta.toFixed(2)}
                     </span>
                     {hasDiscount && (
-                        <span className="text-gray-500 line-through text-xs sm:text-sm">
-                            ${parseFloat(product.precio_proveedor).toFixed(2)}
+                        <span className="text-gray-600 line-through text-sm font-medium">
+                            ${precioProveedor.toFixed(2)}
                         </span>
                     )}
                 </div>
