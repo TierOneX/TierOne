@@ -73,7 +73,7 @@ class Producto extends Model
      */
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class, 'id_categoria');
+        return $this->belongsTo(Categoria::class , 'id_categoria');
     }
 
     /**
@@ -83,6 +83,6 @@ class Producto extends Model
      */
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class, 'id_proveedor');
+        return $this->belongsTo(Proveedor::class , 'id_proveedor');
     }
 }
