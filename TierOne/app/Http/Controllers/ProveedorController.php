@@ -57,7 +57,7 @@ class ProveedorController extends Controller
             return $this->successResponse($proveedor, 'Proveedor creado correctamente', 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear el proveedor', $e->getMessage());
         }
@@ -117,7 +117,7 @@ class ProveedorController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Proveedor no encontrado');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar el proveedor', $e->getMessage());
         }

@@ -1,0 +1,49 @@
+﻿On branch main
+Your branch is up to date with 'origin/main'.
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+	new file:   TierOne/database/seeders/CategoriaSeeder.php
+	modified:   TierOne/database/seeders/DatabaseSeeder.php
+	new file:   TierOne/database/seeders/JuegoSeeder.php
+	new file:   TierOne/database/seeders/ProveedorSeeder.php
+	new file:   TierOne/database/seeders/UserSeeder.php
+	new file:   docs/database/nivel-1/NIVEL-1-COMPLETADO.md
+	new file:   docs/database/nivel-1/README.md
+	new file:   docs/database/nivel-1/comandos.md
+	new file:   docs/database/nivel-1/seeders.md
+	new file:   docs/database/nivel-1/troubleshooting.md
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+	both added:      TierOne/app/Http/Controllers/CategoriaController.php
+	both added:      TierOne/app/Http/Controllers/JuegoController.php
+	both added:      TierOne/app/Http/Controllers/ProveedorController.php
+	both added:      TierOne/app/Http/Controllers/UserController.php
+	both added:      TierOne/app/Models/Orden.php
+	both added:      TierOne/app/Models/Partida.php
+	both added:      TierOne/app/Models/Torneo.php
+	both modified:   TierOne/app/Models/User.php
+	both added:      TierOne/database/migrations/2026_01_26_120638_create_users_table.php
+	both added:      TierOne/database/migrations/2026_01_27_103000_create_torneos_table.php
+	both added:      TierOne/database/migrations/2026_02_02_111759_create_variantes_productos.php
+	both added:      TierOne/database/migrations/2026_02_02_115927_create_reviews.php
+	both added:      docs/database/README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	TierOne/status_merge.txt
+	all_branches.txt
+	branch_utf8.txt
+	branches.txt
+	branches_list.txt
+	current_branch.txt
+	current_status.txt
+	git_branch_output.txt
+	merge_result.txt
+	status.txt
+	status_merge_root.txt
+

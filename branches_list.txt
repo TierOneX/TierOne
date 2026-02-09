@@ -1,0 +1,16 @@
+﻿  feature/Doc
+  feature/creacion-bbdd
+  feature/migration
+  feature/routes
+  feature/seeders
+* main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/dev
+  remotes/origin/feature/Doc
+  remotes/origin/feature/backend-refactor
+  remotes/origin/feature/creacion-bbdd
+  remotes/origin/feature/migration
+  remotes/origin/feature/routes
+  remotes/origin/feature/seeders
+  remotes/origin/frontend-shop
+  remotes/origin/main

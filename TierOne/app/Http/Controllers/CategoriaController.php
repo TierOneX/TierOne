@@ -51,7 +51,7 @@ class CategoriaController extends Controller
             $categoria = Categoria::create($validated);
             return $this->successResponse($categoria, 'Categoría creada correctamente', 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear la categoría', $e->getMessage());
         }
@@ -70,7 +70,7 @@ class CategoriaController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener categoría', $e->getMessage());
+            return $this->errorResponse('Error al obtener categorías', $e->getMessage());
         }
     }
 
@@ -106,7 +106,7 @@ class CategoriaController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar la categoría', $e->getMessage());
         }
