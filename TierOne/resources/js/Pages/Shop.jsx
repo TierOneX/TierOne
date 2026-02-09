@@ -50,7 +50,7 @@ export default function Shop({ productos = [] }) {
     const displayProducts = productos.length > 0 ? productos : mockProducts;
 
     const categories = [
-        'ALL GEAR', 'HOODIES', 'JERSEYS', 'BOTTOMS', 'ACCESSORIES', 'HEADWEAR',
+        'ALL', 'HOODIES', 'JERSEYS', 'BOTTOMS', 'ACCESSORIES', 'HEADWEAR',
     ];
 
     const navItems = [
@@ -118,7 +118,7 @@ export default function Shop({ productos = [] }) {
                     <div className="max-w-7xl mx-auto">
                         <div className="mb-8 relative">
                             <h1 className="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent italic tracking-tighter">
-                                TIERONE GEAR
+                                TIERONE
                             </h1>
                             <p className="text-gray-400 text-lg max-w-2xl font-medium">
                                 Premium gaming performance meets high-end street fashion. <br />
@@ -213,7 +213,7 @@ export default function Shop({ productos = [] }) {
                         <span className="font-bold text-lg tracking-tighter italic">TIERONE</span>
                     </div>
                     <div className="text-gray-600 text-sm">
-                        © 2024 TIERONE. ALL RIGHTS RESERVED.
+                        © 2026 TIERONE. ALL RIGHTS RESERVED.
                     </div>
                 </div>
             </footer>
