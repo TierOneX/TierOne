@@ -11,7 +11,6 @@ class PartidaController extends Controller
 {
     use ApiResponseTrait;
 
-    use ApiResponseTrait;
 
     /**
      * Join a match.
