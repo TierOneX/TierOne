@@ -71,4 +71,48 @@ class User extends Authenticatable
      * Usamos fecha_registro y ultima_conexion personalizados
      */
     public $timestamps = false;
+
+    /**
+     * Relación: Carritos del usuario
+     */
+    public function carritos()
+    {
+        return $this->hasMany(Carrito::class, 'id_usuario');
+    }
+
+    // --- Relaciones de Torneos ---
+
+    /**
+     * Relación: Torneos organizados por el usuario
+     */
+    public function torneosOrganizados()
+    {
+        return $this->hasMany(Torneo::class, 'id_organizador');
+    }
+
+    /**
+     * Relación: Torneos en los que está inscrito
+     */
+    public function inscripcionesTorneos()
+    {
+        return $this->hasMany(InscripcionTorneo::class, 'id_usuario');
+    }
+
+    // --- Relaciones de Partidas (Matchmaking) ---
+
+    /**
+     * Relación: Partidas creadas por el usuario
+     */
+    public function partidasCreadas()
+    {
+        return $this->hasMany(Partida::class, 'id_creador');
+    }
+
+    /**
+     * Relación: Partidas en las que participa
+     */
+    public function participacionesPartidas()
+    {
+        return $this->hasMany(ParticipantePartida::class, 'id_usuario');
+    }
 }
