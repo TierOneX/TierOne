@@ -22,9 +22,50 @@ use App\Http\Controllers\ReporteController;
 // RUTAS PÚBLICAS (sin autenticación)
 // ===================================
 Route::get('/productos', [ProductoController::class, 'index']);
-Route::get('/productos/{id}', [ProductoController::class,'show']);
-Route::get('/categorias', [CategoriaController::class,'index']);
+Route::get('/productos/{id}', [ProductoController::class, 'show']);
+Route::get('/categorias', [CategoriaController::class, 'index']);
+Route::get('/juegos', [JuegoController::class, 'index']);
+Route::get('/torneos', [TorneoController::class, 'index']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// ===================================
+// RUTAS PROTEGIDAS (Auth:Sanctum)
+// ===================================
+Route::middleware('auth:sanctum')->group(function () {
+    // Usuario autentificado
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    // ===================================
+    // GESTIÓN DE USUARIOS (Admin)
+    // ===================================
+    Route::apiResource('users', UserController::class);
+
+    // ===================================
+    // CATÁLOGO (Admin/Staff)
+    // ===================================
+    Route::apiResource('categorias', CategoriaController::class);
+    Route::apiResource('productos', ProductoController::class);
+    Route::apiResource('proveedores', ProveedorController::class);
+    Route::apiResource('juegos', JuegoController::class);
+
+    // ===================================
+    // TORNEOS
+    // ===================================
+    Route::apiResource('torneos', TorneoController::class);
+    Route::apiResource('partidas', PartidaController::class);
+    Route::apiResource('inscripciones-torneo', InscripcionTorneoController::class);
+
+    // ===================================
+    // E-COMMERCE
+    // ===================================
+    Route::apiResource('ordenes', OrdenController::class);
+    Route::apiResource('carritos', CarritoController::class);
+    Route::apiResource('direcciones-envio', DireccionEnvioController::class);
+    Route::apiResource('reviews', ReviewController::class);
+
+    // ===================================
+    // REPORTES
+    // ===================================
+    Route::apiResource('reportes', ReporteController::class);
+});
