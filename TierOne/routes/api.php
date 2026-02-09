@@ -24,7 +24,7 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('users', UserController::class);
 
 // Rutas para los Proveedores
-Route::apiResource('proveedores', ProveedorController::class); 
+Route::apiResource('proveedores', ProveedorController::class);
 
 // Rutas para los Juegos
 Route::apiResource('juegos', JuegoController::class);
