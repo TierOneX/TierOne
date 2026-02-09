@@ -51,7 +51,7 @@ class JuegoController extends Controller
             $juego = Juego::create($validated);
             return $this->successResponse($juego, 'Juego ha sido creado correctamente', 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear juego', $e->getMessage());
         }
@@ -67,7 +67,7 @@ class JuegoController extends Controller
     {
         try {
             $juego = Juego::findOrFail($id);
-            return $this->successResponse($juego, 'Juego obtenido correctamente');
+            return $this->successResponse($juego, 'Juego obtenido correctamente', 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Juego no encontrado');
         } catch (\Exception $e) {
@@ -104,11 +104,11 @@ class JuegoController extends Controller
             ]);
 
             $juego->update($validated);
-            return $this->successResponse($juego, 'Juego actualizado correctamente');
+            return $this->successResponse($juego, 'Juego actualizado correctamente', 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Juego no encontrado');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
+            return $this->validationErrorResponse($e->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar juego', $e->getMessage());
         }
@@ -124,7 +124,7 @@ class JuegoController extends Controller
         try {
             $juego = Juego::findOrFail($id);
             $juego->delete();
-            return $this->successResponse(null, 'Juego eliminado correctamente');
+            return $this->successResponse(null, 'Juego eliminado correctamente', 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Juego no encontrado');
         } catch (\Exception $e) {
