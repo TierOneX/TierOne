@@ -124,7 +124,7 @@ export default function Header({ cartCount = 2 }) {
                                     />
                                 </svg>
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 bg-[#e31837] text-white text-[10px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-lg shadow-red-900/50 animate-pulse">
+                                    <span className="absolute -top-0.5 -right-0.5 bg-[#e31837] text-white text-[10px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-lg shadow-red-900/50">
                                         {cartCount}
                                     </span>
                                 )}
