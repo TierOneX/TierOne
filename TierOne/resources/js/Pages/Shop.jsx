@@ -62,11 +62,11 @@ export default function Shop({ productos = [] }) {
                 <div className="max-w-7xl mx-auto">
                     <div className="mb-8 relative">
                         <h1 className="text-5xl md:text-7xl font-black mb-4 bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent italic tracking-tighter">
-                            TIERONE
+                            Tienda
                         </h1>
                         <p className="text-gray-400 text-lg max-w-2xl font-medium">
-                            Premium gaming performance meets high-end street fashion. <br />
-                            <span className="text-red-500">Gear up for the next drop.</span>
+                            Merhandising de la mejor calidad que encontrarás. <br />
+                            <span className="text-red-500">Atento al sigueinte drop.</span>
                         </p>
                     </div>
 

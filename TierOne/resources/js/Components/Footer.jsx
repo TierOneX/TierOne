@@ -4,19 +4,19 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     const servicesLinks = [
-        { name: 'Live Tournaments', href: '/tournaments' },
-        { name: 'Wager Matches', href: '/matches' },
-        { name: 'Streetwear Shop', href: '/shop' },
-        { name: 'Limited Drops', href: '/drops' },
-        { name: 'Affiliate Program', href: '/affiliates' },
+        { name: 'INICIO', href: '/' },
+        { name: 'PARTIDAS', href: '/matches' },
+        { name: 'TORNEOS', href: '/tournaments' },
+        { name: 'TIENDA', href: '/shop' },
+        { name: 'COMUNIDAD', href: '/community' },
     ];
 
     const supportLinks = [
-        { name: 'Help Center / FAQ', href: '/help' },
-        { name: 'Contact Us', href: '/contact' },
-        { name: 'Shipping & Returns', href: '/shipping' },
-        { name: 'Terms of Service', href: '/terms' },
-        { name: 'Privacy Policy', href: '/privacy' },
+        { name: 'Centro de Ayuda / FAQ', href: '/help' },
+        { name: 'Contáctanos', href: '/contact' },
+        { name: 'Envíos y Devoluciones', href: '/shipping' },
+        { name: 'Términos de Servicio', href: '/terms' },
+        { name: 'Política de Privacidad', href: '/privacy' },
     ];
 
     const socialLinks = [
@@ -96,12 +96,16 @@ export default function Footer() {
                     <div className="hidden lg:grid lg:grid-cols-4 gap-12 py-16">
                         {/* Col 1: Logo + Descripción */}
                         <div className="space-y-5">
-                            <Link href="/" className="flex items-center group">
+                            <Link href="/" className="flex items-center gap-2.5 group">
                                 <img
                                     src="/images/Logo.png"
                                     alt="TierOne"
                                     className="h-9 w-auto object-contain"
                                 />
+                                <span className="logo-text text-xl">
+                                    <span className="word">TIER</span>
+                                    <span className="word">ONE</span>
+                                </span>
                             </Link>
                             <p className="text-gray-500 text-sm leading-relaxed max-w-[280px]">
                                 ¿Quieres competir mientras juegas a tus juegos favoritos, e incluso comprar merchandising de ellos? Tierone es tu plataforma de confianza donde encontrarás todo lo que buscas.
@@ -112,7 +116,7 @@ export default function Footer() {
                         <div>
                             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-white mb-6">
                                 <span className="w-5 h-[2px] bg-[#e31837] rounded-full" />
-                                SERVICES
+                                PÁGINAS
                             </h3>
                             <ul className="space-y-3.5">
                                 {servicesLinks.map((link) => (
@@ -132,7 +136,7 @@ export default function Footer() {
                         <div>
                             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-white mb-6">
                                 <span className="w-5 h-[2px] bg-[#e31837] rounded-full" />
-                                SUPPORT
+                                SOPORTE
                             </h3>
                             <ul className="space-y-3.5">
                                 {supportLinks.map((link) => (
@@ -152,7 +156,7 @@ export default function Footer() {
                         <div>
                             <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-white mb-6">
                                 <span className="w-5 h-[2px] bg-[#e31837] rounded-full" />
-                                CONNECT
+                                CONECTA
                             </h3>
                             <div className="flex gap-3 mb-5">
                                 {socialLinks.map((social) => (
@@ -170,7 +174,7 @@ export default function Footer() {
                                 ))}
                             </div>
                             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-600">
-                                Join the global elite
+                                Únete a la élite global
                             </p>
                         </div>
                     </div>
@@ -179,12 +183,16 @@ export default function Footer() {
                     <div className="lg:hidden py-12 space-y-10">
                         {/* Logo + Tagline */}
                         <div className="text-center space-y-3">
-                            <Link href="/" className="inline-flex items-center">
+                            <Link href="/" className="inline-flex items-center gap-3">
                                 <img
                                     src="/images/Logo.png"
                                     alt="TierOne"
                                     className="h-12 w-auto object-contain"
                                 />
+                                <span className="logo-text text-2xl">
+                                    <span className="word">TIER</span>
+                                    <span className="word">ONE</span>
+                                </span>
                             </Link>
                             <p className="text-xs font-bold uppercase tracking-[0.25em] text-gray-500">
                                 Elite Gaming & Streetwear
@@ -232,17 +240,17 @@ export default function Footer() {
                         {/* Legal & Support */}
                         <div className="text-center space-y-3">
                             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-600">
-                                Legal & Support
+                                Legal y Soporte
                             </p>
                             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
                                 <Link href="/terms" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Terms of Service
+                                    Términos
                                 </Link>
                                 <Link href="/privacy" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Privacy Policy
+                                    Privacidad
                                 </Link>
                                 <Link href="/contact" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Contact Us
+                                    Contacto
                                 </Link>
                             </div>
                         </div>
@@ -262,7 +270,7 @@ export default function Footer() {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
                                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                                    Secure Checkout Guaranteed
+                                    Pago Seguro Garantizado
                                 </span>
                             </div>
                         </div>
@@ -270,10 +278,10 @@ export default function Footer() {
                         {/* Copyright */}
                         <div className="text-center space-y-1">
                             <p className="text-[11px] text-gray-600 uppercase tracking-wider">
-                                © {currentYear} TierOne Entertainment. All Rights Reserved.
+                                © {currentYear} TierOne Entertainment. Todos los derechos reservados.
                             </p>
                             <p className="text-[10px] text-gray-700 uppercase tracking-widest">
-                                Engineered for the Competitive Edge
+                                Diseñado para la Ventaja Competitiva
                             </p>
                         </div>
                     </div>
@@ -284,7 +292,7 @@ export default function Footer() {
                     <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
                         {/* Copyright */}
                         <p className="text-[11px] text-gray-600 font-medium uppercase tracking-wider">
-                            © {currentYear} TierOne Gaming. All Rights Reserved. Engineered for the elite.
+                            © {currentYear} TierOne Gaming. Todos los derechos reservados. Diseñado para la élite.
                         </p>
 
                         {/* Métodos de pago */}
@@ -293,7 +301,7 @@ export default function Footer() {
 
                             {/* Verified Secure */}
                             <div className="flex items-center gap-1.5 text-gray-600">
-                                <span className="text-[11px] font-bold uppercase tracking-wider">Verified Secure</span>
+                                <span className="text-[11px] font-bold uppercase tracking-wider">Pago Seguro</span>
                                 <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z" />
                                 </svg>

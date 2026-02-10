@@ -22,16 +22,16 @@ export default function Header({ cartCount = 2 }) {
     }, []);
 
     const navItems = [
-        { name: 'HOME', href: '/' },
-        { name: 'MATCHES', href: '/matches' },
-        { name: 'TOURNAMENTS', href: '/tournaments' },
-        { name: 'SHOP', href: '/shop' },
-        { name: 'COMMUNITY', href: '/community' },
+        { name: 'INICIO', href: '/' },
+        { name: 'PARTIDAS', href: '/matches' },
+        { name: 'TORNEOS', href: '/tournaments' },
+        { name: 'TIENDA', href: '/shop' },
+        { name: 'COMUNIDAD', href: '/community' },
     ];
 
     const mobileBottomNav = [
         {
-            name: 'HOME',
+            name: 'INICIO',
             href: '/',
             icon: (
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -40,7 +40,7 @@ export default function Header({ cartCount = 2 }) {
             ),
         },
         {
-            name: 'COMPETE',
+            name: 'COMPETIR',
             href: '/matches',
             icon: (
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -49,7 +49,7 @@ export default function Header({ cartCount = 2 }) {
             ),
         },
         {
-            name: 'SHOP',
+            name: 'TIENDA',
             href: '/shop',
             icon: (
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -58,7 +58,7 @@ export default function Header({ cartCount = 2 }) {
             ),
         },
         {
-            name: 'ACCOUNT',
+            name: 'CUENTA',
             href: '/login',
             icon: (
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -82,12 +82,16 @@ export default function Header({ cartCount = 2 }) {
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* === LOGO === */}
-                        <Link href="/" className="flex items-center group shrink-0">
+                        <Link href="/" className="flex items-center gap-2.5 group shrink-0">
                             <img
                                 src="/images/Logo.png"
                                 alt="TierOne"
                                 className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                             />
+                            <span className="logo-text text-xl">
+                                <span className="word">TIER</span>
+                                <span className="word">ONE</span>
+                            </span>
                         </Link>
 
                         {/* === NAV DESKTOP (hidden en móvil) === */}
@@ -132,7 +136,7 @@ export default function Header({ cartCount = 2 }) {
                                 id="login-button"
                                 className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
                             >
-                                LOGIN
+                                ACCEDER
                             </Link>
 
                             {/* Hamburguesa - solo móvil */}
@@ -181,7 +185,7 @@ export default function Header({ cartCount = 2 }) {
                                 className="block w-full text-center px-4 py-3 bg-[#e31837] hover:bg-[#c2102d] text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                LOGIN
+                                ACCEDER
                             </Link>
                         </div>
                     </div>
