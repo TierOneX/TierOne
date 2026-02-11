@@ -24,6 +24,10 @@ Route::get('/shop', function () {
     ]);
 })->name('shop');
 
+Route::get('/panel-admin-ecommerce', function () {
+    return Inertia::render('PanelAdminEcommerce');
+})->name('panel.ecommerce');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
