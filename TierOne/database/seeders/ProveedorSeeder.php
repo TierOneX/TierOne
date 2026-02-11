@@ -34,7 +34,6 @@ class ProveedorSeeder extends Seeder
 
         Proveedor::create([
             'nombre' => 'Digital Games Store',
-            'slug' => 'digital-games-store',
             'contacto_nombre' => 'Luis Fernández',
             'email' => 'info@digitalgames.com',
             'telefono' => '+54 11 9876 5432',
