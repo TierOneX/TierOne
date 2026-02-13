@@ -88,7 +88,7 @@ export default function Header({ cartCount = 2 }) {
                                 alt="TierOne"
                                 className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                             />
-                            <span className="logo-text text-xl">
+                            <span className="logo-text text-xl !flex-row">
                                 <span className="word">TIER</span>
                                 <span className="word">ONE</span>
                             </span>

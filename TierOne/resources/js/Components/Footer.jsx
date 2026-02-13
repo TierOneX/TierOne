@@ -102,7 +102,7 @@ export default function Footer() {
                                     alt="TierOne"
                                     className="h-9 w-auto object-contain"
                                 />
-                                <span className="logo-text text-xl">
+                                <span className="logo-text text-xl !flex-row">
                                     <span className="word">TIER</span>
                                     <span className="word">ONE</span>
                                 </span>
@@ -189,7 +189,7 @@ export default function Footer() {
                                     alt="TierOne"
                                     className="h-12 w-auto object-contain"
                                 />
-                                <span className="logo-text text-2xl">
+                                <span className="logo-text text-2xl !flex-row">
                                     <span className="word">TIER</span>
                                     <span className="word">ONE</span>
                                 </span>
