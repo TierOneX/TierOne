@@ -32,11 +32,6 @@ Guía paso a paso para implementar la base de datos relacional.
 
 ---
 
-### 🍃 [Integración MongoDB](MongoDB-Integration.md)
-Plan de integración de MongoDB con arquitectura híbrida.
-
----
-
 ## 🎯 Inicio Rápido
 
 ### 1. Entender el Diseño
@@ -49,7 +44,7 @@ Consulta el [Estado del Esquema](Updated-Analysis.md) para ver las últimas modi
 
 ## 📊 Estadísticas (v2)
 
-- **Total de tablas**: 28
+- **Total de tablas**: 25-26
 - **Módulos**: 6
 - **Cambios recientes**: Eliminación de margen, nuevas tablas de reportes, mejora en integridad de transacciones.
 
@@ -62,6 +57,19 @@ Consulta el [Estado del Esquema](Updated-Analysis.md) para ver las últimas modi
 
 ---
 
-**Última actualización**: 2026-01-19  
-**Versión**: 2.0  
+## 📚 Navegación
+
+- **[← Volver al Hub de Documentación](../README.md)**
+- **[🔌 Ver Documentación de API](../api/README.md)**
+- **[📊 Ver Diagramas de Flujo](../diagrams/README.md)**
+
+**Documentos de esta sección:**
+- [📊 Diagrama ER](ER-Diagram.md)
+- [📋 Plan de Implementación](Implementation-Plan.md)
+- [📉 Análisis v2](Analysis-Corrections-v2.md)
+
+---
+
+**Última actualización**: Febrero 2026  
+**Versión**: 2.1  
 **Estado**: ✅ Esquema Actualizado

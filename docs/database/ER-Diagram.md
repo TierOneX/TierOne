@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Este documento describe el modelo de datos actualizado para **TierONE**, incorporando las correcciones solicitadas para la gestión de transacciones, moderación, reportes y dropshipping.
+Este documento describe el modelo de datos actualizado para **TierONE**, incorporando las correcciones solicitadas para la gestión de transacciones, moderación, reportes y dropshipping. El esquema incluye aproximadamente 25-26 tablas personalizadas más 3-4 tablas del sistema Laravel.
 
 ---
 
