@@ -1,63 +1,17 @@
 import { Link } from '@inertiajs/react';
 
-const tournaments = [
-    {
-        id: 1,
-        game: 'League of Legends',
-        name: 'TierOne Champions Cup',
-        date: '22 FEB 2026',
-        time: '18:00 CET',
-        prize: '5.000€',
-        slots: { total: 32, filled: 28 },
-        status: 'INSCRIPCIONES ABIERTAS',
-        statusColor: '#00c853',
-        gameColor: '#C89B3C',
-        gameIcon: '⚔️',
-    },
-    {
-        id: 2,
-        game: 'Valorant',
-        name: 'Ranked Showdown #12',
-        date: '25 FEB 2026',
-        time: '20:00 CET',
-        prize: '2.500€',
-        slots: { total: 16, filled: 12 },
-        status: 'INSCRIPCIONES ABIERTAS',
-        statusColor: '#00c853',
-        gameColor: '#FF4655',
-        gameIcon: '🎯',
-    },
-    {
-        id: 3,
-        game: 'Counter-Strike 2',
-        name: 'CS2 Weekly Battle',
-        date: '01 MAR 2026',
-        time: '19:00 CET',
-        prize: '1.000€',
-        slots: { total: 16, filled: 16 },
-        status: 'COMPLETO',
-        statusColor: '#e31837',
-        gameColor: '#F0B232',
-        gameIcon: '💣',
-    },
-    {
-        id: 4,
-        game: 'Fortnite',
-        name: 'Build & Destroy Open',
-        date: '05 MAR 2026',
-        time: '17:00 CET',
-        prize: '1.500€',
-        slots: { total: 64, filled: 31 },
-        status: 'PRÓXIMAMENTE',
-        statusColor: '#4040ff',
-        gameColor: '#00D4FF',
-        gameIcon: '🏗️',
-    },
-];
+/**
+ * Props esperadas: tournaments = [{
+ *   id, name, game, game_image, date, time, prize,
+ *   slots_total, slots_filled, status, status_color
+ * }]
+ * game_image: ruta de la imagen del juego del torneo
+ */
+export default function TournamentsSection({ tournaments }) {
+    if (!tournaments || tournaments.length === 0) return null;
 
-export default function TournamentsSection() {
     return (
-        <section id="tournaments-section" className="py-12 lg:py-20" style={{ background: '#0d0d0f' }}>
+        <section id="tournaments-section" className="py-14 lg:py-20" style={{ background: '#0a0a0c' }}>
             <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
@@ -70,12 +24,10 @@ export default function TournamentsSection() {
                             TORNEOS <span className="text-[#e31837]">PRÓXIMOS</span>
                         </h2>
                     </div>
-                    <Link
-                        href="/tournaments"
-                        className="text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-[#e31837] transition-colors duration-200 flex items-center gap-2 group"
-                    >
+                    <Link href="/tournaments"
+                        className="text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-[#e31837] transition-colors flex items-center gap-2 group">
                         Ver todos
-                        <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
                     </Link>
@@ -84,103 +36,85 @@ export default function TournamentsSection() {
                 {/* Lista de torneos */}
                 <div className="space-y-4">
                     {tournaments.map((t) => {
-                        const slotsPercent = (t.slots.filled / t.slots.total) * 100;
-                        const isFull = t.slots.filled >= t.slots.total;
+                        const slotsPercent = (t.slots_filled / t.slots_total) * 100;
+                        const isFull = t.slots_filled >= t.slots_total;
 
                         return (
                             <Link
                                 key={t.id}
                                 href={`/tournaments/${t.id}`}
-                                id={`tournament-${t.id}`}
-                                className="group block rounded-xl border border-white/5 hover:border-white/15 transition-all duration-300 overflow-hidden"
-                                style={{ background: '#16161a' }}
+                                className="group block rounded-xl border border-white/5 hover:border-[#e31837]/30 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-red-900/5"
+                                style={{ background: '#141418' }}
                             >
                                 <div className="flex flex-col lg:flex-row items-stretch">
-                                    {/* Barra de color lateral (solo desktop) */}
-                                    <div className="hidden lg:block w-1.5 flex-shrink-0 transition-all duration-300 group-hover:w-2" style={{ background: t.gameColor }} />
+                                    {/* Imagen del juego */}
+                                    <div className="relative lg:w-[200px] h-[120px] lg:h-auto flex-shrink-0 overflow-hidden">
+                                        <img
+                                            src={t.game_image}
+                                            alt={t.game}
+                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#141418] hidden lg:block" />
+                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#141418] lg:hidden" />
+                                        <span className="absolute bottom-3 left-4 lg:bottom-4 text-xs font-black uppercase tracking-wider text-white drop-shadow-lg">
+                                            {t.game}
+                                        </span>
+                                    </div>
 
-                                    {/* Contenido principal */}
+                                    {/* Contenido */}
                                     <div className="flex-1 p-5 lg:p-6">
                                         <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
-                                            {/* Juego + Nombre */}
-                                            <div className="flex items-center gap-4 lg:w-[340px]">
-                                                {/* Icono del juego */}
-                                                <div
-                                                    className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl lg:text-3xl transition-transform duration-300 group-hover:scale-105"
-                                                    style={{ background: `${t.gameColor}15`, border: `1px solid ${t.gameColor}25` }}
-                                                >
-                                                    {t.gameIcon}
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="text-xs font-bold uppercase tracking-wider mb-0.5" style={{ color: t.gameColor }}>
-                                                        {t.game}
-                                                    </p>
-                                                    <h3 className="text-white font-bold text-base lg:text-lg truncate group-hover:text-gray-200 transition-colors">
-                                                        {t.name}
-                                                    </h3>
-                                                </div>
-                                            </div>
-
-                                            {/* Fecha */}
-                                            <div className="flex items-center gap-6 lg:gap-8 text-sm">
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                    <span className="text-gray-400 font-medium">{t.date}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    <span className="text-gray-400 font-medium">{t.time}</span>
+                                            {/* Nombre */}
+                                            <div className="lg:w-[240px] min-w-0">
+                                                <h3 className="text-white font-bold text-lg lg:text-xl truncate group-hover:text-gray-200 transition-colors">
+                                                    {t.name}
+                                                </h3>
+                                                <div className="flex items-center gap-4 mt-1 text-sm">
+                                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        {t.date}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        {t.time}
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             {/* Premio */}
-                                            <div className="lg:text-center lg:w-[100px]">
+                                            <div className="lg:text-center">
                                                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Premio</p>
-                                                <p className="text-white font-black text-lg lg:text-xl">{t.prize}</p>
+                                                <p className="text-[#e31837] font-black text-2xl">{t.prize}</p>
                                             </div>
 
                                             {/* Plazas */}
-                                            <div className="lg:w-[160px]">
+                                            <div className="lg:w-[180px]">
                                                 <div className="flex items-center justify-between mb-1.5">
-                                                    <span className="text-xs text-gray-500 font-medium">
-                                                        {t.slots.filled}/{t.slots.total} equipos
-                                                    </span>
-                                                    <span
-                                                        className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
-                                                        style={{
-                                                            color: t.statusColor,
-                                                            background: `${t.statusColor}15`,
-                                                        }}
-                                                    >
+                                                    <span className="text-xs text-gray-500">{t.slots_filled}/{t.slots_total} equipos</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded"
+                                                        style={{ color: t.status_color || '#00c853', background: `${t.status_color || '#00c853'}15` }}>
                                                         {t.status}
                                                     </span>
                                                 </div>
-                                                {/* Barra de progreso */}
-                                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                                                    <div
-                                                        className="h-full rounded-full transition-all duration-500"
+                                                <div className="h-1.5 rounded-full overflow-hidden bg-white/5">
+                                                    <div className="h-full rounded-full transition-all duration-500"
                                                         style={{
                                                             width: `${slotsPercent}%`,
-                                                            background: isFull
-                                                                ? '#e31837'
-                                                                : `linear-gradient(90deg, ${t.gameColor}, ${t.gameColor}cc)`,
-                                                        }}
-                                                    />
+                                                            background: isFull ? '#e31837' : 'linear-gradient(90deg, #e31837, #ff4444)',
+                                                        }} />
                                                 </div>
                                             </div>
 
                                             {/* Botón */}
                                             <div className="lg:ml-auto flex-shrink-0">
-                                                <span
-                                                    className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-200 ${isFull
-                                                            ? 'bg-white/5 text-gray-500 border border-white/10'
-                                                            : 'bg-[#e31837] text-white hover:bg-[#c2102d] hover:shadow-lg hover:shadow-red-900/20 active:scale-95'
-                                                        }`}
-                                                >
+                                                <span className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${isFull
+                                                        ? 'bg-white/5 text-gray-500 border border-white/10'
+                                                        : 'bg-[#e31837] text-white hover:bg-[#c2102d] hover:shadow-lg hover:shadow-red-900/30 active:scale-95'
+                                                    }`}>
                                                     {isFull ? 'COMPLETO' : 'INSCRIBIRSE'}
                                                     {!isFull && (
                                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
