@@ -41,6 +41,11 @@ class Torneo extends Model
     protected $table = 'torneos';
 
     /**
+     * Deshabilitar timestamps automáticos
+     */
+    public $timestamps = false;
+
+    /**
      * Campos asignables masivamente
      * 
      * Incluye información del torneo: juego, organizador, detalles,
@@ -118,5 +123,37 @@ class Torneo extends Model
     public function transacciones()
     {
         return $this->hasMany(Transaccion::class, 'id_torneo');
+    }
+
+    /**
+     * Relación: Sponsors del torneo
+     */
+    public function sponsors()
+    {
+        return $this->hasMany(SponsorTorneo::class, 'id_torneo');
+    }
+
+    /**
+     * Relación: Inscripciones al torneo
+     */
+    public function inscripciones()
+    {
+        return $this->hasMany(InscripcionTorneo::class, 'id_torneo');
+    }
+
+    /**
+     * Relación: Partidas (encuentros) del torneo
+     */
+    public function partidas()
+    {
+        return $this->hasMany(PartidaTorneo::class, 'id_torneo');
+    }
+
+    /**
+     * Relación: Premios definidos para el torneo
+     */
+    public function premios()
+    {
+        return $this->hasMany(PremioTorneo::class, 'id_torneo');
     }
 }

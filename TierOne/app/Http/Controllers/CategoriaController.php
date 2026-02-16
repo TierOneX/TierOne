@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Traits\ApiResponseTrait;
-use App\Http\Requests\StoreCategoriaRequest;
-use App\Http\Requests\UpdateCategoriaRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class CategoriaController extends Controller
 {
@@ -29,23 +27,31 @@ class CategoriaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    // Metodo create eliminado
+    public function create()
+    {
+
+    }
 
     /**
      * Summary of store
      * @param Request $request
      * @return JsonResponse
      */
-    /**
-     * Summary of store
-     * @param StoreCategoriaRequest $request
-     * @return JsonResponse
-     */
-    public function store(StoreCategoriaRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try {
-            $categoria = Categoria::create($request->validated());
+            $validated = $request->validate([
+                'id_parent' => 'nullable|integer|exists:categorias,id',
+                'nombre' => 'required|string|max:255',
+                'slug' => 'required|string|max:255|unique:categorias,slug',
+                'descripcion' => 'nullable|string',
+                'activa' => 'nullable|boolean',
+            ]);
+
+            $categoria = Categoria::create($validated);
             return $this->successResponse($categoria, 'Categoría creada correctamente', 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear la categoría', $e->getMessage());
         }
@@ -64,14 +70,17 @@ class CategoriaController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener categorías', $e->getMessage());
+            return $this->errorResponse('Error al obtener categoría', $e->getMessage());
         }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    // Metodo edit eliminado
+    public function edit(string $id)
+    {
+        //
+    }
 
     /**
      * Summary of update
@@ -79,20 +88,25 @@ class CategoriaController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    /**
-     * Summary of update
-     * @param UpdateCategoriaRequest $request
-     * @param string $id
-     * @return JsonResponse
-     */
-    public function update(UpdateCategoriaRequest $request, string $id): JsonResponse
+    public function update(Request $request, string $id): JsonResponse
     {
         try {
             $categoria = Categoria::findOrFail($id);
-            $categoria->update($request->validated());
+
+            $validated = $request->validate([
+                'id_parent' => 'nullable|integer|exists:categorias,id',
+                'nombre' => 'sometimes|required|string|max:255',
+                'slug' => 'sometimes|required|string|max:255|unique:categorias,slug,' . $id,
+                'descripcion' => 'nullable|string',
+                'activa' => 'nullable|boolean',
+            ]);
+
+            $categoria->update($validated);
             return $this->successResponse($categoria, 'Categoría actualizada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar la categoría', $e->getMessage());
         }

@@ -11,15 +11,20 @@ Documentación detallada de los endpoints por módulo. Usar estos contratos como
 ### 🔐 Autenticación
 - [Auth API Contract](contracts/Auth-API.md) - Login, Registro, Logout, Recuperar Password.
 
-### 👾 Juegos y Partidas (Pendiente)
+### 👥 Usuarios
+- [Users API Contract](contracts/Users-API.md) - Gestión de usuarios, perfiles, administración.
+
+### 👾 Juegos y Partidas
 - [Games API Contract](contracts/Games-API.md) - Catálogo de juegos, Sincronización.
 - [Matches API Contract](contracts/Matches-API.md) - Creación de partidas, Resultados, Disputas.
 
-### 🏆 Torneos (Pendiente)
+### 🏆 Torneos
 - [Tournaments API Contract](contracts/Tournaments-API.md) - Brackets, Inscripciones, Premios.
 
-### 🛍️ E-Commerce (Pendiente)
+### 🛍️ E-Commerce
 - [Shop API Contract](contracts/Shop-API.md) - Productos, Carrito, Orders.
+- [Cart API Contract](contracts/Cart-API.md) - Gestión del carrito de compras.
+- [Reviews API Contract](contracts/Reviews-API.md) - Reseñas de productos con moderación.
 
 ---
 
@@ -53,5 +58,13 @@ Formato estándar para errores de validación (422):
 
 ---
 
-**Estado**: 🚧 En Construcción  
-**Última actualización**: 2026-01-19
+## 📚 Navegación
+
+- **[← Volver al Hub de Documentación](../README.md)**
+- **[📊 Ver Diagrams de Flujo](../diagrams/README.md)**
+- **[🗄️ Ver Documentación de Base de Datos](../database/README.md)**
+
+---
+
+**Estado**: 🚧 En Desarrollo - 15 controladores implementados  
+**Última actualización**: Febrero 2026

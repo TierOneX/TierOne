@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ItemOrden extends Model
+{
+    use HasFactory;
+
+    protected $table = 'items_orden';
+
+    protected $fillable = [
+        'id_orden',
+        'id_producto',
+        'id_variante',
+        'id_proveedor',
+        'cantidad',
+        'precio_unitario',
+        'subtotal',
+    ];
+
+    protected $casts = [
+        'cantidad' => 'integer',
+        'precio_unitario' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+    ];
+
+    public function orden()
+    {
+        return $this->belongsTo(Orden::class, 'id_orden');
+    }
+
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto');
+    }
+
+    public function variante()
+    {
+        return $this->belongsTo(VarianteProducto::class, 'id_variante');
+    }
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'id_proveedor');
+    }
+}

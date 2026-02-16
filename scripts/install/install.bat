@@ -16,7 +16,7 @@ if not exist "composer.json" (
     exit /b 1
 )
 
-echo [1/6] Verificando PHP y extensiones...
+echo [1/6] Verificando PHP...
 php -v >nul 2>&1
 if errorlevel 1 (
     echo ERROR: PHP no está instalado o no está en el PATH
@@ -24,15 +24,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-php -m | findstr mongodb >nul
-if errorlevel 1 (
-    echo ERROR: La extension MongoDB de PHP no está instalada
-    echo Por favor, sigue la documentacion para instalar php_mongodb.dll
-    pause
-    exit /b 1
-)
-
-echo [OK] PHP y extensiones verificadas
+echo [OK] PHP verificado
 echo.
 
 echo [2/6] Instalando dependencias de Composer...
