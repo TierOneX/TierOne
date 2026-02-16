@@ -22,7 +22,7 @@ export default function Header({ cartCount = 2 }) {
     }, []);
 
     const navItems = [
-        { name: 'INICIO', href: '/' },
+        { name: 'INICIO', href: '/home' },
         { name: 'PARTIDAS', href: '/matches' },
         { name: 'TORNEOS', href: '/tournaments' },
         { name: 'TIENDA', href: '/shop' },
