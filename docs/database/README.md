@@ -30,10 +30,7 @@ Diagrama ER **actualizado (v2)** con todas las tablas y relaciones del sistema.
 Guía paso a paso para implementar la base de datos relacional.
 *(Nota: Pendiente de actualización para reflejar los cambios de la v2)*.
 
----
 
-### 🍃 [Integración MongoDB](MongoDB-Integration.md)
-Plan de integración de MongoDB con arquitectura híbrida.
 
 ---
 

@@ -325,6 +325,34 @@ erDiagram
         string razon_cancelacion
     }
     
+    %% ==========================================
+    %% GESTIÓN DE CARRITO DE COMPRAS
+    %% ==========================================
+    
+    CARRITOS ||--o{ ITEMS_CARRITO : "contiene"
+    USERS ||--o| CARRITOS : "posee"
+    PRODUCTOS ||--o{ ITEMS_CARRITO : "se añade"
+    VARIANTES_PRODUCTO ||--o{ ITEMS_CARRITO : "se añade"
+
+    CARRITOS {
+        int id PK
+        int id_usuario FK
+        decimal subtotal
+        datetime fecha_creacion
+        datetime fecha_actualizacion
+    }
+
+    ITEMS_CARRITO {
+        int id PK
+        int id_carrito FK
+        int id_producto FK
+        int id_variante FK "nullable"
+        int cantidad
+        decimal precio_unitario
+        decimal subtotal
+        datetime fecha_agregado
+    }
+    
     ITEMS_ORDEN {
         int id PK
         int id_orden FK
@@ -432,5 +460,6 @@ erDiagram
 4. **Reseñas (Reviews)**: Se agregaron campos para el flujo de moderación (`aprobado`, `razon_rechazo`, etc.).
 5. **Órdenes**: Se integraron campos para gestionar cancelaciones (`razon_cancelacion`, `id_cancelado_por`).
 6. **Reportes/Disputas**: Se creó una nueva tabla `REPORTES` para gestionar incidencias en partidas.
+7. **Carrito de Compras**: Se añadieron las tablas `CARRITOS` e `ITEMS_CARRITO` para permitir guardar productos antes de finalizar la compra.
 
 ---
