@@ -117,34 +117,4 @@ class Orden extends Model
     {
         return $this->hasMany(Transaccion::class, 'id_orden');
     }
-
-    /**
-     * Relación: Items de la orden
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function items()
-    {
-        return $this->hasMany(ItemOrden::class, 'id_orden');
-    }
-
-    /**
-     * Relación: Dirección de envío
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function direccionEnvio()
-    {
-        return $this->belongsTo(DireccionEnvio::class, 'id_direccion_envio');
-    }
-
-    /**
-     * Relación: Pagos asociados
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function pagos()
-    {
-        return $this->hasMany(Pago::class, 'id_orden');
-    }
 }

@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -13,7 +14,6 @@ return new class extends Migration {
         Schema::create('proveedores', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('slug')->unique()->nullable();
             $table->string('contacto_nombre');
             $table->string('email');
             $table->string('telefono')->nullable();
@@ -21,7 +21,6 @@ return new class extends Migration {
             $table->text('notas')->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamp('fecha_registro')->useCurrent();
-            $table->timestamps();
         });
     }
 

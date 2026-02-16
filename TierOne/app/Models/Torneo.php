@@ -41,11 +41,6 @@ class Torneo extends Model
     protected $table = 'torneos';
 
     /**
-     * Deshabilitar timestamps automáticos
-     */
-    public $timestamps = false;
-
-    /**
      * Campos asignables masivamente
      * 
      * Incluye información del torneo: juego, organizador, detalles,
