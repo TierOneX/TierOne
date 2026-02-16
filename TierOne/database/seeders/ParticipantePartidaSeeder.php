@@ -25,9 +25,9 @@ class ParticipantePartidaSeeder extends Seeder
             ParticipantePartida::create([
                 'id_partida' => $partida->id,
                 'id_usuario' => $usuarios->random()->id,
-                'equipo_asignado' => rand(0, 1) ? 'Equipo A' : 'Equipo B',
+                'equipo_asignado' => rand(0, 1) ? 'team_a' : 'team_b',
                 'pago_entrada' => $partida->buy_in,
-                'confirmado' => (bool)rand(0, 1),
+                'confirmado' => (bool) rand(0, 1),
                 'fecha_union' => now(),
             ]);
         }

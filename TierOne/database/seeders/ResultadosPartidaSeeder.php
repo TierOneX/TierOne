@@ -21,21 +21,25 @@ class ResultadosPartidaSeeder extends Seeder
             $partidas = Partida::all();
         }
 
-        if ($partidas->isEmpty()) return;
+        if ($partidas->isEmpty())
+            return;
 
-        for ($i = 0; $i < self::TOTAL_RECORDS; $i++) {
-            $partida = $partidas->random();
+
+        // Tomamos hasta TOTAL_RECORDS partidas únicas de las disponibles
+        $partidasSeleccionadas = $partidas->shuffle()->take(self::TOTAL_RECORDS);
+
+        foreach ($partidasSeleccionadas as $partida) {
             ResultadosPartida::create([
                 'id_partida' => $partida->id,
                 'id_verificado_por' => $admins->random()->id ?? 1,
-                'ganador' => rand(0, 1) ? 'Equipo A' : 'Equipo B',
+                'ganador' => rand(0, 1) ? 'team_a' : 'team_b',
                 'detalles_json' => [
                     'puntuacion_a' => rand(10, 50),
                     'puntuacion_b' => rand(10, 50),
                     'mvp' => 'Usuario Random',
                 ],
                 'fecha_sincronizacion_api' => now(),
-                'verificado_automaticamente' => (bool)rand(0, 1),
+                'verificado_automaticamente' => (bool) rand(0, 1),
                 'fecha_registro' => now(),
                 'disputado' => false,
             ]);

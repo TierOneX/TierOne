@@ -21,8 +21,8 @@ class ReporteSeeder extends Seeder
             return;
         }
 
-        $tipos = ['toxicidad', 'trampas', 'error_sistema', 'reclamacion_premio'];
-        $estados = ['pendiente', 'investigando', 'resuelto', 'desestimado'];
+        $tipos = ['trampa', 'comportamiento', 'resultado_erroneo', 'otro'];
+        $estados = ['pendiente', 'en_revision', 'resuelta', 'desestimada'];
 
         for ($i = 0; $i < self::TOTAL_RECORDS; $i++) {
             Reporte::create([

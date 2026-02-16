@@ -28,7 +28,7 @@ class InscripcionTorneoSeeder extends Seeder
                 'id_equipo' => null, // Opcional por ahora
                 'pago_cuota' => $torneo->cuota_inscripcion,
                 'fecha_inscripcion' => now()->subDays(rand(0, 5)),
-                'estado' => ['confirmada', 'pendiente', 'cancelada'][rand(0, 2)],
+                'estado' => ['pendiente', 'confirmada', 'rechazada'][rand(0, 2)],
             ]);
         }
     }

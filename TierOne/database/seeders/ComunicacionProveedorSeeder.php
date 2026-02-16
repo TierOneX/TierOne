@@ -20,12 +20,12 @@ class ComunicacionProveedorSeeder extends Seeder
             return;
         }
 
-        $tipos = ['email', 'ticket', 'telefono', 'api'];
+        $tipos = ['pedido', 'seguimiento', 'entrega', 'incidencia'];
 
         for ($i = 0; $i < self::TOTAL_RECORDS; $i++) {
             $orden = $ordenes->random();
             $proveedor = $proveedores->random();
-            
+
             ComunicacionProveedor::create([
                 'id_orden' => $orden->id,
                 'id_proveedor' => $proveedor->id,
@@ -36,7 +36,7 @@ class ComunicacionProveedorSeeder extends Seeder
                 'email_to' => $proveedor->email ?? 'proveedor@test.com',
                 'fecha_respuesta' => rand(0, 1) ? now() : null,
                 'respuesta_contenido' => rand(0, 1) ? 'Su pedido está en camino.' : null,
-                'leido' => (bool)rand(0, 1),
+                'leido' => (bool) rand(0, 1),
             ]);
         }
     }

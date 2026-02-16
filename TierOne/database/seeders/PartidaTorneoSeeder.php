@@ -27,7 +27,7 @@ class PartidaTorneoSeeder extends Seeder
                 'id_siguiente_partida' => null, // Para brackets complejos
                 'ronda' => rand(1, 4),
                 'bracket_posicion' => rand(1, 8),
-                'tipo_bracket' => 'ganadores',
+                'tipo_bracket' => ['winners', 'losers', 'final'][rand(0, 2)],
             ]);
         }
     }

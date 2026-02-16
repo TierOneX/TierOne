@@ -17,19 +17,19 @@ class OrdenSeeder extends Seeder
         $usuarios = User::where('rol', 'player')->get();
         $direcciones = DireccionEnvio::all();
 
-        if ($usuarios->isEmpty()) {
+        if ($direcciones->isEmpty()) {
             return;
         }
 
-        $estados = ['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'];
+        $estados = ['pendiente', 'pagada', 'enviada_proveedor', 'en_transito', 'entregada', 'cancelada'];
 
         for ($i = 1; $i <= self::TOTAL_RECORDS; $i++) {
-            $usuario = $usuarios->random();
-            $direccion = $direcciones->where('id_usuario', $usuario->id)->first();
-            
+            $direccion = $direcciones->random();
+            $usuario = User::find($direccion->id_usuario);
+
             Orden::create([
                 'id_usuario' => $usuario->id,
-                'id_direccion_envio' => $direccion->id ?? null,
+                'id_direccion_envio' => $direccion->id,
                 'numero_orden' => 'ORD-' . strtoupper(Str::random(8)),
                 'subtotal' => rand(50, 200),
                 'impuestos' => rand(10, 40),

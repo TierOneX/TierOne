@@ -19,8 +19,8 @@ class RetiroSeeder extends Seeder
             return;
         }
 
-        $metodos = ['transferencia_bancaria', 'paypal', 'crypto'];
-        $estados = ['pendiente', 'procesado', 'rechazado'];
+        $metodos = ['transferencia', 'paypal', 'cripto'];
+        $estados = ['pendiente', 'procesando', 'completado', 'rechazado'];
 
         for ($i = 0; $i < self::TOTAL_RECORDS; $i++) {
             Retiro::create([

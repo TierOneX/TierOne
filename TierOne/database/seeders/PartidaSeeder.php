@@ -20,8 +20,8 @@ class PartidaSeeder extends Seeder
             return;
         }
 
-        $tipos = ['1v1', '2v2', '5v5', 'FFA'];
-        $estados = ['esperando', 'en_curso', 'finalizada', 'cancelada'];
+        $tipos = ['1v1', '2v2', '5v5', 'custom'];
+        $estados = ['pendiente', 'en_proceso', 'completada', 'cancelada'];
 
         for ($i = 1; $i <= self::TOTAL_RECORDS; $i++) {
             $juego = $juegos->random();
@@ -36,7 +36,7 @@ class PartidaSeeder extends Seeder
                 'fecha_inicio' => now()->addHours(rand(1, 48)),
                 'fecha_fin' => now()->addHours(rand(49, 100)),
                 'estado' => $estados[array_rand($estados)],
-                'origen' => 'plataforma',
+                'origen' => 'manual',
             ]);
         }
     }
