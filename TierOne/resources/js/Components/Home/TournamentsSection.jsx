@@ -78,7 +78,7 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
     return (
         <Link
             href={`/tournaments/${torneo.id}`}
-            className="group block rounded-xl border border-white/5 hover:border-[#e31837]/30 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-red-900/5"
+            className="group block rounded-xl border border-white/5 hover:border-[#e31837]/30 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-red-900/5 transform hover:-translate-y-1"
             style={{ background: '#141418' }}
         >
             <div className="flex flex-col lg:flex-row items-stretch">
@@ -161,8 +161,8 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
                         {/* Botón */}
                         <div className="lg:ml-auto flex-shrink-0">
                             <span className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${isFull || torneo.estado === 'finalizado'
-                                    ? 'bg-white/5 text-gray-500 border border-white/10'
-                                    : 'bg-[#e31837] text-white hover:bg-[#c2102d] hover:shadow-lg hover:shadow-red-900/30 active:scale-95'
+                                ? 'bg-white/5 text-gray-500 border border-white/10'
+                                : 'bg-[#e31837] text-white hover:bg-[#c2102d] hover:shadow-lg hover:shadow-red-900/30 active:scale-95'
                                 }`}>
                                 {isFull ? 'COMPLETO' : torneo.estado === 'finalizado' ? 'FINALIZADO' : 'INSCRIBIRSE'}
                                 {!isFull && torneo.estado !== 'finalizado' && (
