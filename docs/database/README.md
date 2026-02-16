@@ -6,19 +6,6 @@ Documentación completa del diseño, implementación y gestión de la base de da
 
 ## 📋 Documentos Disponibles
 
-
-### 🎉 [Nivel 1 - COMPLETADO](nivel-1/README.md)
-**Hub de documentación del Nivel 1** - Implementación completa de migraciones y seeders.
-
-**Contenido**:
-- 15 migraciones ejecutadas
-- 4 seeders implementados
-- Guías de troubleshooting
-- Comandos de referencia
-- **Estado**: ✅ Completado (2026-02-03)
-
----
-
 ### 📊 [Diagrama Entidad-Relación](ER-Diagram.md)
 Diagrama ER **actualizado (v2)** con todas las tablas y relaciones del sistema.
 
@@ -43,7 +30,10 @@ Diagrama ER **actualizado (v2)** con todas las tablas y relaciones del sistema.
 Guía paso a paso para implementar la base de datos relacional.
 *(Nota: Pendiente de actualización para reflejar los cambios de la v2)*.
 
+---
 
+### 🍃 [Integración MongoDB](MongoDB-Integration.md)
+Plan de integración de MongoDB con arquitectura híbrida.
 
 ---
 
