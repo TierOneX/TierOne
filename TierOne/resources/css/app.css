@@ -1,3 +1,447 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== TIERONE LOGO TEXT ANIMATION ===== */
+.logo-text {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    filter: drop-shadow(0 0 20px rgba(220, 20, 60, 0.8));
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        filter: drop-shadow(0 0 20px rgba(220, 20, 60, 0.8)) drop-shadow(0 0 30px rgba(220, 20, 60, 0.4));
+    }
+
+    to {
+        filter: drop-shadow(0 0 30px rgba(220, 20, 60, 1)) drop-shadow(0 0 40px rgba(220, 20, 60, 0.6));
+    }
+}
+
+/* "TIER" — Gradiente horizontal (como bg-gradient-to-r) */
+.logo-text .word:nth-child(1) {
+    /* from-white via-red-600 to-white */
+    background: linear-gradient(90deg, #ffffff 0%, #dc143c 50%, #ffffff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    /* animate-[shine_3s_linear_infinite] */
+    animation: logoShine 3s linear infinite;
+}
+
+/* "ONE" — rojo sólido */
+.logo-text .word:nth-child(2) {
+    color: #dc143c;
+}
+
+@keyframes logoShine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* ========================================= */
+/*       ESTILOS LANDING PAGE (USER)         */
+/* ========================================= */
+
+:root {
+    --primary-red: #E10600;
+    --secondary-black: #0B0B0B;
+    --dark-bg: #121212;
+    --surface: #1C1C1C;
+    --error: #FF3B3B;
+    --success: #1edad1;
+    --text-white: #ffffff;
+    --text-gray: #b0b0b0;
+    --gradient-bg: linear-gradient(135deg, #E10600 0%, #1C1C1C 100%);
+}
+
+/* HERO SECTION */
+.hero {
+    min-height: 70vh;
+    background: linear-gradient(135deg, #0B0B0B 0%, #E10600 100%);
+    padding: 3rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(225, 6, 0, 0.15) 0%, transparent 70%);
+    animation: float 20s infinite;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translate(-25%, -25%);
+    }
+    50% {
+        transform: translate(-30%, -30%);
+    }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 3rem;
+}
+
+.logo-square {
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+/* SOBREESCRIBIMOS .logo-text para que use el display flex */
+.logo-text {
+    display: flex !important;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.logo-text .brand {
+    font-size: 2.8rem;
+    font-weight: bold;
+    font-style: italic;
+    letter-spacing: 2px;
+}
+
+.logo-text .tagline {
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: var(--text-gray);
+    /* Corrección para que sea visible si había conflicto con estilos anteriores */
+    text-transform: uppercase; 
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(11, 11, 11, 0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(225, 6, 0, 0.3);
+}
+
+.badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--primary-red);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+.hero h1 .highlight {
+    color: var(--primary-red);
+}
+
+.hero p {
+    color: var(--text-gray);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.prize-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.cta-button {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cta-button:hover {
+    background: #c20500;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(225, 6, 0, 0.5);
+}
+
+.prize-amount {
+    text-align: left;
+}
+
+.prize-label {
+    font-size: 0.75rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+}
+
+.prize-value {
+    font-size: 2rem;
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* SECTIONS */
+section {
+    padding: 3rem 1.5rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-label {
+    color: var(--primary-red);
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.section-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.view-all {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.view-all:hover {
+    color: var(--primary-red);
+}
+
+/* INFO CARDS */
+.info-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    border: 1px solid rgba(225, 6, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    border-color: rgba(225, 6, 0, 0.4);
+    box-shadow: 0 10px 40px rgba(225, 6, 0, 0.2);
+}
+
+.info-illustration {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.illustration-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid rgba(225, 6, 0, 0.4);
+}
+
+.illustration-icon {
+    font-size: 5rem;
+    z-index: 2;
+    position: relative;
+    filter: drop-shadow(0 4px 12px rgba(225, 6, 0, 0.5));
+}
+
+.info-content {
+    text-align: center;
+}
+
+.info-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.info-content p {
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.feature-list {
+    list-style: none;
+    text-align: left;
+    display: inline-block;
+}
+
+.feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    color: var(--text-gray);
+}
+
+.check {
+    color: var(--primary-red);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* RESPONSIVE - TABLET */
+@media (min-width: 768px) {
+    .hero h1 {
+        font-size: 3.5rem;
+    }
+
+    .info-card {
+        flex-direction: row;
+        text-align: left;
+        padding: 3rem;
+    }
+
+    .info-card.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .info-illustration {
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        text-align: left;
+    }
+
+    section {
+        padding: 4rem 3rem;
+    }
+
+    .hero {
+        padding: 5rem 3rem;
+    }
+}
+
+/* RESPONSIVE - DESKTOP */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .hero {
+        padding: 8rem 3rem;
+        min-height: 85vh;
+    }
+
+    .hero h1 {
+        font-size: 4.5rem;
+    }
+
+    .hero-content {
+        max-width: 700px;
+    }
+
+    section {
+        padding: 5rem 3rem;
+    }
+
+    .info-illustration {
+        width: 250px;
+        height: 250px;
+    }
+
+    .illustration-icon {
+        font-size: 7rem;
+    }
+
+    .info-content h3 {
+        font-size: 2rem;
+    }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-red);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #c20500;
+}
