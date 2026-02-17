@@ -92,12 +92,24 @@ export default function Shop({ productos = [], categorias = [] }) {
 
                     {/* Panel de filtros desplegable */}
                     <div
-                        className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilter ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilter ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
                             }`}
                     >
                         <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-5">
-                            {/* Ordenar por */}
+                            {/* Categorías */}
                             <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 block">
+                                    Categoría
+                                </label>
+                                <CategoryFilter
+                                    categories={categoryNames}
+                                    activeCategory={activeCategory}
+                                    onCategoryChange={setActiveCategory}
+                                />
+                            </div>
+
+                            {/* Ordenar por */}
+                            <div className="pt-2 border-t border-white/5">
                                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 block">
                                     Ordenar por
                                 </label>
@@ -107,8 +119,8 @@ export default function Shop({ productos = [], categorias = [] }) {
                                             key={option.value}
                                             onClick={() => setSortBy(option.value)}
                                             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${sortBy === option.value
-                                                    ? 'bg-red-600 text-white border-red-600'
-                                                    : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white'
+                                                ? 'bg-red-600 text-white border-red-600'
+                                                : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white'
                                                 }`}
                                         >
                                             {option.label}
@@ -150,12 +162,6 @@ export default function Shop({ productos = [], categorias = [] }) {
                             </div>
                         </div>
                     </div>
-
-                    <CategoryFilter
-                        categories={categoryNames}
-                        activeCategory={activeCategory}
-                        onCategoryChange={setActiveCategory}
-                    />
                 </div>
             </section>
 
