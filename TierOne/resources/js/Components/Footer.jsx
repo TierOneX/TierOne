@@ -102,7 +102,7 @@ export default function Footer() {
                                     alt="TierOne"
                                     className="h-9 w-auto object-contain"
                                 />
-                                <span className="logo-text text-xl">
+                                <span className="logo-text text-xl !flex-row">
                                     <span className="word">TIER</span>
                                     <span className="word">ONE</span>
                                 </span>
@@ -179,17 +179,17 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* ---- MÓVIL: Layout centrado vertical ---- */}
-                    <div className="lg:hidden py-12 space-y-10">
+                    {/* ---- MÓVIL: Layout compacto ---- */}
+                    <div className="lg:hidden py-8 space-y-6">
                         {/* Logo + Tagline */}
-                        <div className="text-center space-y-3">
+                        <div className="text-center space-y-2">
                             <Link href="/" className="inline-flex items-center gap-3">
                                 <img
                                     src="/images/Logo.png"
                                     alt="TierOne"
                                     className="h-12 w-auto object-contain"
                                 />
-                                <span className="logo-text text-2xl">
+                                <span className="logo-text text-2xl !flex-row">
                                     <span className="word">TIER</span>
                                     <span className="word">ONE</span>
                                 </span>
@@ -199,22 +199,19 @@ export default function Footer() {
                             </p>
                         </div>
 
-                        {/* Nav principal en móvil */}
-                        <nav className="flex flex-col items-center gap-5">
+                        {/* Nav — horizontal wrap, texto blanco hover rojo */}
+                        <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2">
                             {[
-                                { name: 'HOME', href: '/' },
+                                { name: 'INICIO', href: '/' },
                                 { name: 'PARTIDAS', href: '/matches' },
-                                { name: 'TORNEOS', href: '/tournaments', highlight: true },
+                                { name: 'TORNEOS', href: '/tournaments' },
                                 { name: 'TIENDA', href: '/shop' },
                                 { name: 'COMUNIDAD', href: '/community' },
                             ].map((item) => (
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`text-xl font-black uppercase tracking-wider transition-colors duration-200 ${item.highlight
-                                        ? 'text-[#e31837]'
-                                        : 'text-white hover:text-[#e31837]'
-                                        }`}
+                                    className="text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors"
                                 >
                                     {item.name}
                                 </Link>
@@ -222,14 +219,14 @@ export default function Footer() {
                         </nav>
 
                         {/* Redes sociales */}
-                        <div className="flex justify-center gap-4">
+                        <div className="flex justify-center gap-3">
                             {socialLinks.map((social) => (
                                 <a
                                     key={social.name}
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/10 transition-all duration-200"
+                                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/10 transition-all duration-200"
                                     aria-label={social.name}
                                 >
                                     {social.icon}
@@ -237,51 +234,18 @@ export default function Footer() {
                             ))}
                         </div>
 
-                        {/* Legal & Support */}
-                        <div className="text-center space-y-3">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-600">
-                                Legal y Soporte
-                            </p>
-                            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                                <Link href="/terms" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Términos
-                                </Link>
-                                <Link href="/privacy" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Privacidad
-                                </Link>
-                                <Link href="/contact" className="text-sm text-gray-500 hover:text-white transition-colors">
-                                    Contacto
-                                </Link>
+                        {/* Legal + Pago + Copyright */}
+                        <div className="text-center space-y-4">
+                            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+                                <Link href="/terms" className="text-[11px] text-gray-600 hover:text-white transition-colors">Términos</Link>
+                                <Link href="/privacy" className="text-[11px] text-gray-600 hover:text-white transition-colors">Privacidad</Link>
+                                <Link href="/contact" className="text-[11px] text-gray-600 hover:text-white transition-colors">Contacto</Link>
                             </div>
-                        </div>
-
-                        {/* Separador */}
-                        <div className="w-3/4 mx-auto h-px bg-white/5" />
-
-                        {/* Métodos de pago */}
-                        <div className="flex justify-center">
-                            <PaymentIcons />
-                        </div>
-
-                        {/* Secure checkout */}
-                        <div className="text-center">
-                            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/5">
-                                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                                    Pago Seguro Garantizado
-                                </span>
+                            <div className="flex justify-center">
+                                <PaymentIcons />
                             </div>
-                        </div>
-
-                        {/* Copyright */}
-                        <div className="text-center space-y-1">
-                            <p className="text-[11px] text-gray-600 uppercase tracking-wider">
-                                © {currentYear} TierOne Entertainment. Todos los derechos reservados.
-                            </p>
-                            <p className="text-[10px] text-gray-700 uppercase tracking-widest">
-                                Diseñado para la Ventaja Competitiva
+                            <p className="text-[10px] text-gray-700 uppercase tracking-wider">
+                                © {currentYear} TierOne. Todos los derechos reservados.
                             </p>
                         </div>
                     </div>

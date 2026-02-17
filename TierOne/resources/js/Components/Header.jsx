@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 
-export default function Header({ cartCount = 2 }) {
+export default function Header({ cartCount = 0 }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -22,7 +22,7 @@ export default function Header({ cartCount = 2 }) {
     }, []);
 
     const navItems = [
-        { name: 'INICIO', href: '/' },
+        { name: 'INICIO', href: '/home' },
         { name: 'PARTIDAS', href: '/matches' },
         { name: 'TORNEOS', href: '/tournaments' },
         { name: 'TIENDA', href: '/shop' },
@@ -40,7 +40,7 @@ export default function Header({ cartCount = 2 }) {
             ),
         },
         {
-            name: 'COMPETIR',
+            name: 'PARTIDAS',
             href: '/matches',
             icon: (
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -73,9 +73,9 @@ export default function Header({ cartCount = 2 }) {
             {/* ========== HEADER PRINCIPAL ========== */}
             <header
                 id="main-header"
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-black/98 shadow-lg shadow-black/50'
-                    : 'bg-[#111111]'
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#111111] ${scrolled
+                    ? 'shadow-lg shadow-black/50'
+                    : ''
                     }`}
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
             >
@@ -88,7 +88,7 @@ export default function Header({ cartCount = 2 }) {
                                 alt="TierOne"
                                 className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                             />
-                            <span className="logo-text text-xl">
+                            <span className="logo-text text-xl !flex-row">
                                 <span className="word">TIER</span>
                                 <span className="word">ONE</span>
                             </span>
@@ -208,7 +208,7 @@ export default function Header({ cartCount = 2 }) {
                         <Link
                             key={item.name}
                             href={item.href}
-                            className="flex flex-col items-center justify-center gap-1 py-1 px-3 text-gray-500 hover:text-[#e31837] transition-colors duration-200 group"
+                            className="flex flex-col items-center justify-center gap-1 py-1 px-3 text-white/70 hover:text-[#e31837] transition-colors duration-200 group"
                         >
                             <span className="group-hover:scale-110 transition-transform duration-200">
                                 {item.icon}

@@ -14,6 +14,23 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/home', function () {
+    return Inertia::render('Home', [
+    'games' => \App\Models\Juego::where('activo', true)->get(),
+    'products' => \App\Models\Producto::with('categoria')
+    ->where('activo', true)
+    ->where('destacado', true)
+    ->take(8)
+    ->get(),
+    'tournaments' => \App\Models\Torneo::with('juego')
+    ->withCount('inscripciones')
+    ->whereIn('estado', ['inscripciones', 'en_curso'])
+    ->orderBy('fecha_inicio')
+    ->take(4)
+    ->get(),
+    ]);
+})->name('home');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
