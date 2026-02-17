@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->foreignId('id_juego')->constrained('juegos')->onDelete('cascade');
             $table->foreignId('id_organizador')->constrained('users');
             $table->string('nombre');
-            $table->string('descripcion');
-            $table->string('imagen_banner');
+            $table->text('descripcion')->nullable();
+            $table->string('imagen_banner')->nullable();
             $table->enum('formato', ['eliminacion_simple', 'doble_eliminacion', 'round_robin', 'swiss']);
             $table->integer('max_participantes');
             $table->decimal('cuota_inscripcion', 10, 2)->comment('0 para torneos gratuitos');
@@ -28,12 +28,12 @@ return new class extends Migration {
             $table->dateTime('fecha_fin');
             $table->dateTime('cierre_inscripciones');
             $table->enum('estado', ['inscripciones', 'en_curso', 'finalizado', 'cancelado']);
-            $table->string('reglas_url');
-            $table->string('stream_url');
+            $table->string('reglas_url')->nullable();
+            $table->string('stream_url')->nullable();
             $table->boolean('verificado');
 
-            // Timestamps opcionales
-            // $table->timestamps();
+            // Timestamps automáticos
+            $table->timestamps();
         });
     }
 
