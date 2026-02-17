@@ -37,9 +37,19 @@ Route::get('/dashboard', function () {
 
 Route::get('/shop', function () {
     return Inertia::render('Shop', [
-    'productos' => []
-    ]);
-})->name('shop');
+    'productos' => \App\Models\Producto::with('categoria')
+    ->where('activo', true)
+    ->orderByDesc('destacado')
+    ->orderByDesc('ventas_totales')
+    ->get(),
+    'categorias' => \App\Models\Categoria::where('activa', true)
+    ->whereHas('productos', function ($q) {
+            $q->where('activo', true);
+        }
+        )
+        ->orderBy('nombre')
+        ->get(),
+        ]);    })->name('shop');
 
 Route::get('/landing', function () {
     return Inertia::render('LandingPage');
