@@ -211,5 +211,15 @@ class ProveedorSeeder extends Seeder
             'notas' => 'Sistemas silent-PC de alta gama',
             'activo' => true,
         ]);
+
+        Proveedor::create([
+            'nombre' => 'TierOne Official Brand',
+            'contacto_nombre' => 'Departamento de Merchandising',
+            'email' => 'merch@tierone.com',
+            'telefono' => '+34 900 123 456',
+            'direccion' => 'Sede TierOne, Madrid, España',
+            'notas' => 'Proveedor oficial de productos de marca propia',
+            'activo' => true,
+        ]);
     }
 }
