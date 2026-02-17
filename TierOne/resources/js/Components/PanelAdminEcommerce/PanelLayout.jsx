@@ -6,7 +6,7 @@ import Sidebar from '@/Components/PanelAdminEcommerce/Sidebar';
 // Importamos el CSS específico del panel
 // Nota: En Vite, esto puede requerir configuración adicional si no es global, 
 // pero al ser CSS puro importado en JS suele funcionar.
-import '../../../../css/panel.css';
+import '../../../css/panel.css';
 
 export default function PanelLayout({ title, menuItems, activeItem, user, children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);

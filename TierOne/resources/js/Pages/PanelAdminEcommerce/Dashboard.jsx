@@ -1,21 +1,21 @@
-
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
+import { Head } from '@inertiajs/react';
 
-export default function PanelAdminEcommerce() {
+export default function Dashboard() {
 
     // Configuración del Menú para este panel específico
     const menuItems = [
         {
             title: 'Catálogo',
             items: [
-                { label: 'Productos', icon: '📦', link: '#' },
+                { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
                 { label: 'Categorías', icon: '🏷️', link: '#' }
             ]
         },
         {
             title: 'Ventas',
             items: [
-                { label: 'Órdenes', icon: '📋', link: '#', badge: '4' }, // Active Item
+                { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders'), badge: '4' },
                 { label: 'Clientes', icon: '👥', link: '#' }
             ]
         },
@@ -29,7 +29,7 @@ export default function PanelAdminEcommerce() {
         {
             title: 'Sistema',
             items: [
-                { label: 'Notificaciones', icon: '🔔', link: '#' },
+                { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
                 { label: 'Configuración', icon: '⚙️', link: '#' }
             ]
         }
@@ -46,9 +46,11 @@ export default function PanelAdminEcommerce() {
         <PanelLayout
             title="Dashboard Ecommerce"
             menuItems={menuItems}
-            activeItem="Órdenes"
+            activeItem="Dashboard"
             user={user}
         >
+            <Head title="Admin Dashboard - TierOne" />
+
             {/* STATS */}
             <div className="stats-grid">
                 <div className="stat-card">
@@ -102,7 +104,7 @@ export default function PanelAdminEcommerce() {
                     <h2 className="section-title">
                         📦 Órdenes Recientes
                     </h2>
-                    <a href="#" className="section-link">Ver todas</a>
+                    <a href={route('panel.ecommerce.orders')} className="section-link">Ver todas</a>
                 </div>
 
                 <div className="table-container">
@@ -142,7 +144,7 @@ export default function PanelAdminEcommerce() {
                                 <td>1 item</td>
                                 <td><strong>€45.00</strong></td>
                                 <td><span className="status-badge sent">Enviado</span></td>
-                                <td><button class="btn-table">Ver</button></td>
+                                <td><button className="btn-table">Ver</button></td>
                             </tr>
                             <tr>
                                 <td><strong>#ORD-2399</strong></td>

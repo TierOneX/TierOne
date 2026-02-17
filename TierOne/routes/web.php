@@ -41,9 +41,23 @@ Route::get('/shop', function () {
     ]);
 })->name('shop');
 
-Route::get('/panel-admin-ecommerce', function () {
-    return Inertia::render('PanelAdminEcommerce');
-})->name('panel.ecommerce');
+Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('PanelAdminEcommerce/Dashboard');
+    })->name('dashboard');
+
+    Route::get('/products', function () {
+        return Inertia::render('PanelAdminEcommerce/Products');
+    })->name('products');
+
+    Route::get('/orders', function () {
+        return Inertia::render('PanelAdminEcommerce/Orders');
+    })->name('orders');
+
+    Route::get('/reports', function () {
+        return Inertia::render('PanelAdminEcommerce/Reports');
+    })->name('reports');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
