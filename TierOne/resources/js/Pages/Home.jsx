@@ -6,6 +6,7 @@ import GamesCarousel from '@/Components/Home/GamesCarousel';
 import MerchSection from '@/Components/Home/MerchSection';
 import TournamentsSection from '@/Components/Home/TournamentsSection';
 
+
 export default function Home({ games, products, tournaments }) {
     return (
         <>
@@ -26,6 +27,7 @@ export default function Home({ games, products, tournaments }) {
 
                 {/* 3. Merchandising */}
                 <MerchSection products={products} />
+
 
                 {/* 4. Torneos próximos */}
                 <TournamentsSection tournaments={tournaments} />

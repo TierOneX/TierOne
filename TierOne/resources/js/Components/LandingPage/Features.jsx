@@ -4,6 +4,7 @@ export default function Features() {
     const features = [
         {
             id: 'partidas',
+            sectionTitle: 'PARTIDAS CLASIFICATORIAS',
             title: 'COMPITE EN TIEMPO REAL',
             description: 'Únete a partidas clasificatorias en tiempo real contra jugadores de tu nivel. Sistema de matchmaking inteligente que te empareja con rivales equilibrados.',
             image: './img/imgPartidas.webp',
@@ -18,10 +19,47 @@ export default function Features() {
         },
         {
             id: 'torneos',
-            label: 'TORNEOS ÉPICOS',
+            sectionTitle: 'TORNEOS Y COMPETICIONES',
             title: 'EVENTOS COMPETITIVOS',
             description: 'Compite por premios en efectivo en torneos organizados semanalmente. Desde ligas amateur hasta competiciones profesionales con premios de hasta 10.000€.',
             image: './img/imgTorneo.jpg',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             reverse: true,
             style: { background: 'var(--surface)' },
             items: [
@@ -33,7 +71,7 @@ export default function Features() {
         },
         {
             id: 'rankings',
-            label: 'CLASIFICACIONES',
+            sectionTitle: 'CLASIFICACIÓN GLOBAL',
             title: 'SISTEMA DE RANKINGS',
             description: 'Sistema de ranking dinámico basado en MMR (Match Making Rating). Cada victoria te acerca a la cima, cada derrota te reta a mejorar.',
             image: './img/imgRanking.jpg',
@@ -48,7 +86,7 @@ export default function Features() {
         },
         {
             id: 'tienda',
-            label: 'TIENDA OFICIAL',
+            sectionTitle: 'NUESTRA TIENDA',
             title: 'MERCHANDISING EXCLUSIVO',
             description: 'Descubre nuestra colección oficial de merchandising gaming. Camisetas, sudaderas, gorras y accesorios diseñados para verdaderos competidores.',
             image: 'merchandising-imagen.jpg',
@@ -72,15 +110,10 @@ export default function Features() {
     );
 }
 
-function FeatureSection({ id, label, title, description, image, reverse, items, style }) {
+function FeatureSection({ id, title, description, image, reverse, items, style }) {
     return (
         <section id={id} style={style}>
             <div className="container">
-                <div className="section-header">
-                    <div className="section-label">{label}</div>
-                    <h2 className="section-title">{title}</h2>
-                </div>
-
                 <div className={`info-card ${reverse ? 'reverse' : ''}`}>
                     <div className="info-illustration">
                         <img src={image} alt={title} className="illustration-image" />
@@ -99,3 +132,4 @@ function FeatureSection({ id, label, title, description, image, reverse, items, 
         </section>
     );
 }
+
