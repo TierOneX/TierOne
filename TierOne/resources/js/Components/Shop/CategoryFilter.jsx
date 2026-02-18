@@ -1,85 +1,64 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function CategoryFilter({ categories, activeCategory, onCategoryChange }) {
-    const scrollRef = useRef(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-    // Comprobar si hay scroll disponible en cada dirección
-    const checkScroll = () => {
-        const el = scrollRef.current;
-        if (!el) return;
-        setCanScrollLeft(el.scrollLeft > 5);
-        setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 5);
-    };
-
+    // Cerrar al hacer clic fuera
     useEffect(() => {
-        checkScroll();
-        const el = scrollRef.current;
-        if (el) {
-            el.addEventListener('scroll', checkScroll, { passive: true });
-            window.addEventListener('resize', checkScroll);
-        }
-        return () => {
-            if (el) el.removeEventListener('scroll', checkScroll);
-            window.removeEventListener('resize', checkScroll);
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setIsOpen(false);
+            }
         };
-    }, [categories]);
-
-    const scroll = (direction) => {
-        const el = scrollRef.current;
-        if (!el) return;
-        const amount = 200;
-        el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-    };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
-        <div className="relative group/filter">
-            {/* Flecha izquierda */}
-            {canScrollLeft && (
-                <button
-                    onClick={() => scroll('left')}
-                    className="absolute left-0 top-0 bottom-4 z-10 w-10 flex items-center justify-center bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity"
-                    aria-label="Desplazar categorías a la izquierda"
-                >
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-            )}
-
-            {/* Lista de categorías */}
-            <div
-                ref={scrollRef}
-                className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth px-1"
+        <div ref={dropdownRef}>
+            {/* Botón del desplegable */}
+            <button
+                id="category-dropdown-toggle"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border text-sm font-semibold transition-all ${isOpen
+                        ? 'border-red-600 bg-white/10 text-white rounded-b-none'
+                        : 'border-gray-700 bg-white/5 text-gray-300 hover:border-gray-500'
+                    }`}
             >
-                {categories.map((category) => (
-                    <button
-                        key={category}
-                        id={`category-pill-${category.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={() => onCategoryChange(category)}
-                        className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all duration-200 border ${activeCategory === category
-                                ? 'bg-white text-black border-white shadow-lg shadow-white/10'
-                                : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white'
-                            }`}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
-
-            {/* Flecha derecha */}
-            {canScrollRight && (
-                <button
-                    onClick={() => scroll('right')}
-                    className="absolute right-0 top-0 bottom-4 z-10 w-10 flex items-center justify-center bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent transition-opacity"
-                    aria-label="Desplazar categorías a la derecha"
+                <span>{activeCategory === 'TODOS' ? 'Todas las categorías' : activeCategory}</span>
+                <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
                 >
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-            )}
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            {/* Lista desplegable (inline, no absolute) */}
+            <div
+                className={`overflow-hidden transition-all duration-200 ease-in-out border-x border-gray-700 ${isOpen ? 'max-h-60 border-b rounded-b-lg' : 'max-h-0 border-b-0'
+                    }`}
+            >
+                <div className="bg-[#1a1a1e] max-h-60 overflow-y-auto custom-scrollbar">
+                    {categories.map((category) => (
+                        <button
+                            key={category}
+                            id={`category-option-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                            onClick={() => {
+                                onCategoryChange(category);
+                                setIsOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors ${activeCategory === category
+                                    ? 'bg-red-600/20 text-red-500'
+                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                }`}
+                        >
+                            {category === 'TODOS' ? 'Todas las categorías' : category}
+                        </button>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }

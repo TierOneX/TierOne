@@ -1,7 +1,7 @@
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 
-export default function MainLayout({ children, cartCount = 2 }) {
+export default function MainLayout({ children, cartCount = 0 }) {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-red-600 selection:text-white">
             <Header cartCount={cartCount} />

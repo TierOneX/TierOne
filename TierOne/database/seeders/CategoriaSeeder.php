@@ -169,6 +169,36 @@ class CategoriaSeeder extends Seeder
         );
 
         Categoria::firstOrCreate(
+            ['slug' => 'sudaderas-tierone'],
+            [
+                'id_parent' => $merchandising->id,
+                'nombre' => 'Sudaderas',
+                'descripcion' => 'Sudaderas y hoodies premium',
+                'activa' => true,
+            ]
+        );
+
+        Categoria::firstOrCreate(
+            ['slug' => 'gorras-tierone'],
+            [
+                'id_parent' => $merchandising->id,
+                'nombre' => 'Gorras',
+                'descripcion' => 'Gorras y headwear exclusivo',
+                'activa' => true,
+            ]
+        );
+
+        Categoria::firstOrCreate(
+            ['slug' => 'complementos-tierone'],
+            [
+                'id_parent' => $merchandising->id,
+                'nombre' => 'Complementos',
+                'descripcion' => 'Mochilas, pulseras y otros accesorios',
+                'activa' => true,
+            ]
+        );
+
+        Categoria::firstOrCreate(
             ['slug' => 'figuras-coleccionables'],
             [
                 'id_parent' => $merchandising->id,
