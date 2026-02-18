@@ -4,7 +4,6 @@ export default function Features() {
     const features = [
         {
             id: 'partidas',
-            label: 'PARTIDAS EN VIVO',
             title: 'COMPITE EN TIEMPO REAL',
             description: 'Únete a partidas clasificatorias en tiempo real contra jugadores de tu nivel. Sistema de matchmaking inteligente que te empareja con rivales equilibrados.',
             image: './img/imgPartidas.webp',
