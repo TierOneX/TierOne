@@ -34,6 +34,8 @@ class Producto extends Model
      */
     protected $table = 'productos';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

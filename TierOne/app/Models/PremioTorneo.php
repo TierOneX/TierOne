@@ -28,6 +28,8 @@ class PremioTorneo extends Model
      */
     protected $table = 'premios_torneo';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

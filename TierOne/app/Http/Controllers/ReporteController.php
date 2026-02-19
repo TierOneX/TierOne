@@ -3,138 +3,69 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reporte;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class ReporteController extends Controller
 {
-    use ApiResponseTrait;
-
     /**
-     * Listar reportes
-     * Admin: ve todos.
-     * Usuario: ve solo los suyos.
+     * Lista todos los reportes con sus relaciones y estadísticas
      */
-    public function index(Request $request): JsonResponse
+    public function index()
     {
-        try {
-            $user = Auth::user();
-            $query = Reporte::with(['partida', 'usuarioReporta', 'resueltoPor']);
+        $filters = request()->only(['id_partida', 'id_usuario_reporta', 'id_resuelto_por', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta']);
 
-            // Si no es admin/staff, filtrar por sus propios reportes
-            // Asumiendo que hay un campo 'rol' o metodo isAdmin() en User, 
-            // si no ajustaremos esta lógica. Por seguridad, filtramos por ID si no es admin.
-            // NOTA: Ajustar lógica de roles según implementación real de User.
-            if ($user->rol !== 'admin') { 
-                $query->where('id_usuario_reporta', $user->id);
-            } else {
-                // Filtros para admin
-                if ($request->has('estado')) {
-                    $query->where('estado', $request->query('estado'));
-                }
-                if ($request->has('tipo')) {
-                    $query->where('tipo', $request->query('tipo'));
-                }
-            }
-
-            $reportes = $query->orderBy('created_at', 'desc')->get();
-
-            return $this->successResponse($reportes, 'Reportes obtenidos');
-
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener reportes', $e->getMessage());
-        }
+        return \Inertia\Inertia::render('PanelAdminEcommerce/Reports', [
+            'reportes' => \App\Models\Reporte::with(['usuarioReporta', 'resueltoPor'])
+                ->when($filters['id_partida'] ?? null, fn($q, $v) => $q->where('id_partida', $v))
+                ->when($filters['id_usuario_reporta'] ?? null, fn($q, $v) => $q->where('id_usuario_reporta', $v))
+                ->when($filters['id_resuelto_por'] ?? null, fn($q, $v) => $q->where('id_resuelto_por', $v))
+                ->when($filters['tipo'] ?? null, fn($q, $v) => $q->where('tipo', $v))
+                ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
+                ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_reporte', '>=', $v))
+                ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_reporte', '<=', $v))
+                ->latest('fecha_reporte')
+                ->get()
+                ->map(fn($r) => [
+                    'id'               => $r->id,
+                    'id_partida'       => $r->id_partida,
+                    'tipo'             => $r->tipo,
+                    'descripcion'      => $r->descripcion,
+                    'estado'           => $r->estado,
+                    'fecha_reporte'    => $r->fecha_reporte?->format('d/m/Y H:i'),
+                    'fecha_resolucion' => $r->fecha_resolucion?->format('d/m/Y H:i'),
+                    'resolucion'       => $r->resolucion,
+                    'evidencia_url'    => $r->evidencia_url,
+                    'usuario_reporta'  => $r->usuarioReporta?->name ?? 'Sistema',
+                    'resuelto_por'     => $r->resueltoPor?->name ?? 'Pendiente',
+                    'id_resuelto_por'  => $r->id_resuelto_por,
+                ]),
+            'stats' => [
+                'total_reportes'    => \App\Models\Reporte::count(),
+                'reportes_abiertos' => \App\Models\Reporte::where('estado', 'abierto')->count(),
+            ],
+            'admins' => \App\Models\User::where('rol', 'admin')->get(['id', 'nombre as name']),
+            'filters' => $filters
+        ]);
     }
 
-    /**
-     * Crear un nuevo reporte
-     */
-    public function store(Request $request): JsonResponse
+    public function update(Request $request, $id)
     {
-        try {
-            $validated = $request->validate([
-                'id_partida' => 'required|exists:partidas,id',
-                'tipo' => 'required|string', // ej: trampa, toxicidad, bug
-                'descripcion' => 'required|string|max:1000',
-                'evidencia_url' => 'nullable|url'
-            ]);
+        $reporte = Reporte::findOrFail($id);
 
-            $reporte = Reporte::create([
-                'id_partida' => $validated['id_partida'],
-                'id_usuario_reporta' => Auth::id(), // ID del usuario autenticado
-                'tipo' => $validated['tipo'],
-                'descripcion' => $validated['descripcion'],
-                'evidencia_url' => $validated['evidencia_url'] ?? null,
-                'estado' => 'pendiente',
-                'fecha_reporte' => now()
-            ]);
+        $request->validate([
+            'estado' => 'required|string|in:abierto,en_proceso,resuelto',
+            'resolucion' => 'nullable|string',
+            'id_resuelto_por' => 'nullable|exists:users,id',
+        ]);
 
-            return $this->successResponse($reporte, 'Reporte enviado correctamente', 201);
+        $reporte->update([
+            'estado' => $request->estado,
+            'resolucion' => $request->resolucion,
+            'id_resuelto_por' => $request->id_resuelto_por,
+            'fecha_resolucion' => $request->estado === 'resuelto' ? now() : $reporte->fecha_resolucion,
+        ]);
 
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e->errors());
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al crear reporte', $e->getMessage());
-        }
-    }
-
-    /**
-     * Ver detalles de un reporte
-     */
-    public function show($id): JsonResponse
-    {
-        try {
-            $reporte = Reporte::with(['partida', 'usuarioReporta', 'resueltoPor'])->findOrFail($id);
-            $user = Auth::user();
-
-            // Verificar permisos: dueño del reporte o admin
-            if ($user->rol !== 'admin' && $reporte->id_usuario_reporta !== $user->id) {
-                return $this->errorResponse('No autorizado', null, 403);
-            }
-
-            return $this->successResponse($reporte, 'Detalle del reporte');
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->notFoundResponse('Reporte no encontrado');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al ver reporte', $e->getMessage());
-        }
-    }
-
-    /**
-     * Actualizar/Resolver un reporte (Admin)
-     */
-    public function update(Request $request, $id): JsonResponse
-    {
-        try {
-            // Verificar rol admin
-            if (Auth::user()->rol !== 'admin') {
-                return $this->errorResponse('No autorizado. Solo administradores pueden resolver reportes.', null, 403);
-            }
-
-            $reporte = Reporte::findOrFail($id);
-
-            $validated = $request->validate([
-                'estado' => 'required|in:pendiente,en_proceso,resuelto,desestimado',
-                'resolucion' => 'nullable|string'
-            ]);
-
-            $reporte->update([
-                'estado' => $validated['estado'],
-                'resolucion' => $validated['resolucion'] ?? $reporte->resolucion,
-                'fecha_resolucion' => ($validated['estado'] === 'resuelto' || $validated['estado'] === 'desestimado') ? now() : null,
-                'id_resuelto_por' => Auth::id()
-            ]);
-
-            return $this->successResponse($reporte, 'Reporte actualizado');
-
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e->errors());
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al actualizar reporte', $e->getMessage());
-        }
+        return back()->with('success', 'Reporte actualizado correctamente');
     }
 }

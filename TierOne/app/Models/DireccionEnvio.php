@@ -11,6 +11,8 @@ class DireccionEnvio extends Model
 
     protected $table = 'direcciones_envio';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_usuario',
         'nombre_completo',

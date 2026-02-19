@@ -11,6 +11,8 @@ class Pago extends Model
 
     protected $table = 'pagos';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_orden',
         'monto',

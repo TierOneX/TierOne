@@ -28,6 +28,8 @@ class SponsorTorneo extends Model
      */
     protected $table = 'sponsors_torneo';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

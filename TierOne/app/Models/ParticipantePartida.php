@@ -29,6 +29,8 @@ class ParticipantePartida extends Model
      */
     protected $table = 'participantes_partida';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

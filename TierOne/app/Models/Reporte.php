@@ -31,6 +31,8 @@ class Reporte extends Model
      */
     protected $table = 'reportes';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

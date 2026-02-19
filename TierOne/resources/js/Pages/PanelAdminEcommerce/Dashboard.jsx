@@ -1,54 +1,42 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
-export default function Dashboard() {
+const menuItems = [
+    {
+        title: 'Catálogo', items: [
+            { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
+            { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
+        ]
+    },
+    {
+        title: 'Ventas', items: [
+            { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
+        ]
+    },
+    {
+        title: 'Sistema', items: [
+            { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
+            { label: 'Configuración', icon: '⚙️', link: '#' },
+        ]
+    },
+];
 
-    // Configuración del Menú para este panel específico
-    const menuItems = [
-        {
-            title: 'Catálogo',
-            items: [
-                { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
-                { label: 'Categorías', icon: '🏷️', link: '#' }
-            ]
-        },
-        {
-            title: 'Ventas',
-            items: [
-                { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders'), badge: '4' },
-                { label: 'Clientes', icon: '👥', link: '#' }
-            ]
-        },
-        {
-            title: 'Logística',
-            items: [
-                { label: 'Proveedores', icon: '🚚', link: '#' },
-                { label: 'Inventario', icon: '📊', link: '#' }
-            ]
-        },
-        {
-            title: 'Sistema',
-            items: [
-                { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
-                { label: 'Configuración', icon: '⚙️', link: '#' }
-            ]
-        }
-    ];
+const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
-    const user = {
-        name: 'Admin User',
-        role: 'Ecommerce Admin',
-        avatar: 'A'
+const estadoBadge = (estado) => {
+    const map = {
+        pendiente: 'bg-orange-100 text-orange-700',
+        procesando: 'bg-blue-100 text-blue-700',
+        enviada: 'bg-purple-100 text-purple-700',
+        entregada: 'bg-green-100 text-green-700',
+        cancelada: 'bg-gray-100 text-gray-700',
     };
+    return map[estado] ?? 'bg-gray-100 text-gray-700';
+};
 
-
+export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
     return (
-        <PanelLayout
-            title="Dashboard Ecommerce"
-            menuItems={menuItems}
-            activeItem="Dashboard"
-            user={user}
-        >
+        <PanelLayout title="Dashboard Ecommerce" menuItems={menuItems} activeItem="Dashboard" user={user}>
             <Head title="Admin Dashboard - TierOne" />
 
             {/* STATS */}
@@ -56,55 +44,41 @@ export default function Dashboard() {
                 <div className="stat-card">
                     <div className="stat-header">
                         <div className="stat-icon green">$</div>
-                        <button className="stat-menu">⋯</button>
                     </div>
-                    <div className="stat-value">€24,580</div>
+                    <div className="stat-value">€{Number(stats.ventas_mes ?? 0).toFixed(2)}</div>
                     <div className="stat-label">Ventas del Mes</div>
-                    <div className="stat-change positive">
-                        ↑ 18% vs mes anterior
-                    </div>
                 </div>
 
                 <div className="stat-card">
                     <div className="stat-header">
                         <div className="stat-icon blue">📦</div>
-                        <button className="stat-menu">⋯</button>
                     </div>
-                    <div className="stat-value">142</div>
+                    <div className="stat-value">{stats.ordenes_activas ?? 0}</div>
                     <div className="stat-label">Órdenes Activas</div>
-                    <div className="stat-note">8 pendientes de envío</div>
                 </div>
 
                 <div className="stat-card">
                     <div className="stat-header">
                         <div className="stat-icon purple">👕</div>
-                        <button className="stat-menu">⋯</button>
                     </div>
-                    <div className="stat-value">1,248</div>
+                    <div className="stat-value">{stats.productos_activos ?? 0}</div>
                     <div className="stat-label">Productos Activos</div>
-                    <div className="stat-change positive">
-                        + 24 nuevos esta semana
-                    </div>
                 </div>
 
                 <div className="stat-card warning">
                     <div className="stat-header">
                         <div className="stat-icon orange">⚠️</div>
-                        <button className="stat-menu">⋯</button>
                     </div>
-                    <div className="stat-value">12</div>
-                    <div className="stat-label">Stock Bajo</div>
-                    <div className="stat-note">Requieren reposición</div>
+                    <div className="stat-value">{stats.stock_bajo ?? 0}</div>
+                    <div className="stat-label">Productos Vendidos</div>
                 </div>
             </div>
 
             {/* RECENT ORDERS */}
             <section className="section">
                 <div className="section-header">
-                    <h2 className="section-title">
-                        📦 Órdenes Recientes
-                    </h2>
-                    <a href={route('panel.ecommerce.orders')} className="section-link">Ver todas</a>
+                    <h2 className="section-title">📦 Órdenes Recientes</h2>
+                    <Link href={route('panel.ecommerce.orders')} className="section-link">Ver todas</Link>
                 </div>
 
                 <div className="table-container">
@@ -113,52 +87,38 @@ export default function Dashboard() {
                             <tr>
                                 <th>ORDEN</th>
                                 <th>CLIENTE</th>
-                                <th>PRODUCTOS</th>
+                                <th>FECHA</th>
                                 <th>TOTAL</th>
                                 <th>ESTADO</th>
-                                <th>ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>#ORD-2401</strong></td>
-                                <td>
-                                    <div className="client-info">
-                                        <div className="client-avatar">JD</div>
-                                        <span>John Doe</span>
-                                    </div>
-                                </td>
-                                <td>3 items</td>
-                                <td><strong>€89.97</strong></td>
-                                <td><span className="status-badge pending">Pendiente</span></td>
-                                <td><button className="btn-table">Ver</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>#ORD-2400</strong></td>
-                                <td>
-                                    <div className="client-info">
-                                        <div className="client-avatar">MS</div>
-                                        <span>María Silva</span>
-                                    </div>
-                                </td>
-                                <td>1 item</td>
-                                <td><strong>€45.00</strong></td>
-                                <td><span className="status-badge sent">Enviado</span></td>
-                                <td><button className="btn-table">Ver</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>#ORD-2399</strong></td>
-                                <td>
-                                    <div className="client-info">
-                                        <div className="client-avatar">PG</div>
-                                        <span>Pedro García</span>
-                                    </div>
-                                </td>
-                                <td>5 items</td>
-                                <td><strong>€124.50</strong></td>
-                                <td><span className="status-badge completed">Completado</span></td>
-                                <td><button className="btn-table">Ver</button></td>
-                            </tr>
+                            {ordenes_recientes.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-8 text-gray-400">
+                                        No hay órdenes recientes
+                                    </td>
+                                </tr>
+                            ) : ordenes_recientes.map((orden) => (
+                                <tr key={orden.id}>
+                                    <td><strong>#{orden.numero}</strong></td>
+                                    <td>
+                                        <div className="client-info">
+                                            <div className="client-avatar">
+                                                {orden.cliente?.charAt(0)?.toUpperCase() ?? '?'}
+                                            </div>
+                                            <span>{orden.cliente}</span>
+                                        </div>
+                                    </td>
+                                    <td>{orden.fecha}</td>
+                                    <td><strong>€{Number(orden.total).toFixed(2)}</strong></td>
+                                    <td>
+                                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge(orden.estado)}`}>
+                                            {orden.estado}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>

@@ -27,6 +27,8 @@ class PartidaTorneo extends Model
      */
     protected $table = 'partidas_torneo';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

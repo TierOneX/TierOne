@@ -39,6 +39,8 @@ class Orden extends Model
      */
     protected $table = 'ordenes';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      * 

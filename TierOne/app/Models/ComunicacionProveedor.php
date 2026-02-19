@@ -11,6 +11,8 @@ class ComunicacionProveedor extends Model
 
     protected $table = 'comunicaciones_proveedor';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_orden',
         'id_proveedor',

@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Orden;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
+
+class OrderController extends Controller
+{
+    /**
+     * Lista todas las órdenes con filtrado y paginación.
+     */
+    public function index(Request $request)
+    {
+        $filters = $request->only(['numero', 'cliente', 'estado', 'fecha_desde', 'fecha_hasta', 'total_min']);
+
+        return Inertia::render('PanelAdminEcommerce/Orders', [
+            'ordenes' => Orden::with('usuario')
+                ->when($filters['numero'] ?? null, fn($q, $v) => $q->where('numero_orden', 'like', "%$v%"))
+                ->when($filters['cliente'] ?? null, fn($q, $v) => $q->whereHas('usuario', fn($sq) => $sq->where('name', 'like', "%$v%")))
+                ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
+                ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_orden', '>=', $v))
+                ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_orden', '<=', $v))
+                ->when($filters['total_min'] ?? null, fn($q, $v) => $q->where('total', '>=', $v))
+                ->latest('fecha_orden')
+                ->paginate(20)
+                ->withQueryString()
+                ->through(fn($o) => [
+                    'id'       => $o->id,
+                    'numero'   => $o->numero_orden,
+                    'cliente'  => $o->usuario?->name ?? 'N/A',
+                    'email'    => $o->usuario?->email ?? '',
+                    'total'    => $o->total,
+                    'estado'   => $o->estado,
+                    'fecha'    => $o->fecha_orden?->format('d/m/Y'),
+                    'tracking' => $o->tracking_number,
+                ]),
+            'filters' => $filters
+        ]);
+    }
+}

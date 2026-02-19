@@ -88,7 +88,9 @@ class Torneo extends Model
 
     /**
      * Timestamps automáticos de Laravel (created_at, updated_at)
+     * Deshabilitados porque la tabla no tiene esas columnas
      */
+    public $timestamps = false;
 
     /**
      * Relación: Juego del torneo

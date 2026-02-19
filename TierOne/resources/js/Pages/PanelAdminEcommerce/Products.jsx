@@ -1,80 +1,138 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
-import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
+import { Head, Link, router } from '@inertiajs/react';
 
-export default function Products() {
-    // Mock Product Data
-    const [products, setProducts] = useState([
-        { id: 1, name: 'TierOne Pro Jersey', category: 'Jerseys', price: 85.00, stock: 120, status: 'Active', image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800&auto=format&fit=crop' },
-        { id: 2, name: 'Stealth Bomber Jacket', category: 'Hoodies', price: 150.00, stock: 45, status: 'Active', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop' },
-        { id: 3, name: 'Elite Joggers', category: 'Bottoms', price: 75.00, stock: 8, status: 'Low Stock', image: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=800&auto=format&fit=crop' },
-        { id: 4, name: 'Championship Cap', category: 'Headwear', price: 35.00, stock: 0, status: 'Out of Stock', image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop' },
-    ]);
+const menuItems = [
+    {
+        title: 'Catálogo', items: [
+            { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
+            { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
+        ]
+    },
+    {
+        title: 'Ventas', items: [
+            { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
+        ]
+    },
+    {
+        title: 'Sistema', items: [
+            { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
+            { label: 'Configuración', icon: '⚙️', link: '#' },
+        ]
+    },
+];
 
-    // Configuración del Menú (Simulada, idealmente vendría de un contexto o prop layout)
-    const menuItems = [
-        { title: 'Catálogo', items: [{ label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') }, { label: 'Categorías', icon: '🏷️', link: '#' }] },
-        { title: 'Ventas', items: [{ label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders'), badge: '4' }, { label: 'Clientes', icon: '👥', link: '#' }] },
-        { title: 'Logística', items: [{ label: 'Proveedores', icon: '🚚', link: '#' }, { label: 'Inventario', icon: '📊', link: '#' }] },
-        { title: 'Sistema', items: [{ label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') }, { label: 'Configuración', icon: '⚙️', link: '#' }] }
+const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
+
+export default function Products({ productos, categorias = [], filters = {} }) {
+    const { data = [], links = [] } = productos ?? {};
+
+    const filtersConfig = [
+        { name: 'nombre', label: 'Nombre', type: 'text' },
+        {
+            name: 'id_categoria',
+            label: 'Categoría',
+            type: 'select',
+            options: categorias.map(c => ({ value: c.id, label: c.nombre }))
+        },
+        {
+            name: 'activo',
+            label: 'Estado',
+            type: 'select',
+            options: [{ value: '1', label: 'Activo' }, { value: '0', label: 'Inactivo' }]
+        },
+        {
+            name: 'destacado',
+            label: 'Destacado',
+            type: 'select',
+            options: [{ value: '1', label: 'Sí' }, { value: '0', label: 'No' }]
+        },
+        { name: 'precio_min', label: 'Precio Min', type: 'number' },
+        { name: 'precio_max', label: 'Precio Max', type: 'number' },
     ];
-
-    const user = { name: 'Admin User', role: 'Ecommerce Admin', avatar: 'A' };
 
     return (
         <PanelLayout title="Gestión de Productos" menuItems={menuItems} activeItem="Productos" user={user}>
-            <Head title="Products - Admin Panel" />
+            <Head title="Productos - Admin Panel" />
 
-            <div className="flex justify-between items-center mb-8">
-                <div className="flex gap-4">
-                    <input type="text" placeholder="Buscar producto..." className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm w-64 focus:outline-none focus:border-blue-500" />
-                    <select className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
-                        <option>Categoría: Todas</option>
-                        <option>Jerseys</option>
-                        <option>Hoodies</option>
-                    </select>
-                </div>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold text-gray-800">Listado de Productos</h2>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2">
                     <span>+</span> Nuevo Producto
                 </button>
             </div>
 
+            {/* BARRA DE FILTROS */}
+            <FilterBar
+                filtersConfig={filtersConfig}
+                currentFilters={filters}
+                routeName="panel.ecommerce.products"
+            />
+
+            {/* Table */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
                             <th className="px-6 py-4">Producto</th>
                             <th className="px-6 py-4">Categoría</th>
-                            <th className="px-6 py-4">Precio</th>
-                            <th className="px-6 py-4">Stock</th>
+                            <th className="px-6 py-4">Precio Venta</th>
+                            <th className="px-6 py-4">Ventas</th>
+                            <th className="px-6 py-4">Rating</th>
                             <th className="px-6 py-4">Estado</th>
                             <th className="px-6 py-4 text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {products.map((product) => (
+                        {data.length === 0 ? (
+                            <tr>
+                                <td colSpan={7} className="text-center py-12 text-gray-400">
+                                    No se encontraron productos con los filtros aplicados
+                                </td>
+                            </tr>
+                        ) : data.map((product) => (
                             <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
-                                        <span className="font-medium text-gray-900">{product.name}</span>
+                                        {product.imagen_principal ? (
+                                            <img
+                                                src={product.imagen_principal}
+                                                alt=""
+                                                className="w-10 h-10 rounded-lg object-cover bg-gray-100"
+                                            />
+                                        ) : (
+                                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-lg">
+                                                📦
+                                            </div>
+                                        )}
+                                        <div>
+                                            <p className="font-medium text-gray-900">{product.nombre}</p>
+                                            {product.destacado && (
+                                                <span className="text-xs text-yellow-600 font-medium">⭐ Destacado</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">${product.price.toFixed(2)}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{product.stock} units</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{product.categoria}</td>
+                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                    €{Number(product.precio_venta).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-600">{product.ventas_totales}</td>
+                                <td className="px-6 py-4 text-sm text-gray-600">
+                                    ⭐ {Number(product.rating_promedio ?? 0).toFixed(1)}
+                                </td>
                                 <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.status === 'Active' ? 'bg-green-100 text-green-800' :
-                                            product.status === 'Low Stock' ? 'bg-yellow-100 text-yellow-800' :
-                                                'bg-red-100 text-red-800'
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.activo
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'
                                         }`}>
-                                        {product.status}
+                                        {product.activo ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="p-1 text-gray-400 hover:text-blue-600">✏️</button>
-                                        <button className="p-1 text-gray-400 hover:text-red-600">🗑️</button>
+                                        <button className="p-1 text-gray-400 hover:text-blue-600" title="Editar">✏️</button>
+                                        <button className="p-1 text-gray-400 hover:text-red-600" title="Eliminar">🗑️</button>
                                     </div>
                                 </td>
                             </tr>
@@ -82,13 +140,23 @@ export default function Products() {
                     </tbody>
                 </table>
             </div>
-            <div className="flex justify-between items-center mt-4 px-2">
-                <span className="text-sm text-gray-500">Mostrando 4 de 24 productos</span>
-                <div className="flex gap-2">
-                    <button className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50" disabled>Anterior</button>
-                    <button className="px-3 py-1 border border-gray-200 rounded text-sm hover:bg-gray-50">Siguiente</button>
+
+            {/* Pagination */}
+            {links.length > 3 && (
+                <div className="flex justify-center gap-1 mt-6">
+                    {links.map((link, i) => (
+                        <Link
+                            key={i}
+                            href={link.url ?? '#'}
+                            className={`px-3 py-1 rounded text-sm border ${link.active
+                                    ? 'bg-blue-600 text-white border-blue-600'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                } ${!link.url ? 'opacity-40 pointer-events-none' : ''}`}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                        />
+                    ))}
                 </div>
-            </div>
+            )}
         </PanelLayout>
     );
 }

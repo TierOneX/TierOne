@@ -11,6 +11,8 @@ class Review extends Model
 
     protected $table = 'reviews';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_producto',
         'id_usuario',

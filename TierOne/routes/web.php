@@ -42,21 +42,13 @@ Route::get('/shop', function () {
 })->name('shop');
 
 Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('PanelAdminEcommerce/Dashboard');
-    })->name('dashboard');
+    Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products');
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
+    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
+    Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
 
-    Route::get('/products', function () {
-        return Inertia::render('PanelAdminEcommerce/Products');
-    })->name('products');
-
-    Route::get('/orders', function () {
-        return Inertia::render('PanelAdminEcommerce/Orders');
-    })->name('orders');
-
-    Route::get('/reports', function () {
-        return Inertia::render('PanelAdminEcommerce/Reports');
-    })->name('reports');
+    Route::post('/reports/{id}', [App\Http\Controllers\ReporteController::class, 'update'])->name('reports.update');
 });
 
 Route::middleware('auth')->group(function () {

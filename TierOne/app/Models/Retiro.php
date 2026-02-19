@@ -31,6 +31,8 @@ class Retiro extends Model
      */
     protected $table = 'retiros';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      * 
