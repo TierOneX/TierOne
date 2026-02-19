@@ -8,6 +8,7 @@ const menuItems = [
         title: 'Catálogo', items: [
             { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
             { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
+            { label: 'Proveedores', icon: '🚚', link: route('panel.ecommerce.proveedores') },
         ]
     },
     {
