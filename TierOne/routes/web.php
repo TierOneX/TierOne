@@ -52,6 +52,15 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::put('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'update'])->name('proveedores.update');
     Route::delete('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'destroy'])->name('proveedores.destroy');
 
+    // Finanzas
+    Route::get('/finanzas/pagos', [App\Http\Controllers\FinanzaController::class, 'pagos'])->name('finanzas.pagos');
+    Route::get('/finanzas/transacciones', [App\Http\Controllers\FinanzaController::class, 'transacciones'])->name('finanzas.transacciones');
+    Route::get('/finanzas/retiros', [App\Http\Controllers\FinanzaController::class, 'retiros'])->name('finanzas.retiros');
+
+    // Reviews
+    Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
     Route::post('/reports/{id}', [App\Http\Controllers\ReporteController::class, 'update'])->name('reports.update');
 });
 

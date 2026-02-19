@@ -1,6 +1,7 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
 import { Head, Link, router } from '@inertiajs/react';
+import React, { useState } from 'react';
 
 const menuItems = [
     {
@@ -13,6 +14,10 @@ const menuItems = [
     {
         title: 'Ventas', items: [
             { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
+            { label: 'Pagos', icon: '💳', link: route('panel.ecommerce.finanzas.pagos') },
+            { label: 'Transacciones', icon: '📊', link: route('panel.ecommerce.finanzas.transacciones') },
+            { label: 'Retiros', icon: '🏦', link: route('panel.ecommerce.finanzas.retiros') },
+            { label: 'Reseñas', icon: '⭐', link: route('panel.ecommerce.reviews') },
         ]
     },
     {
@@ -27,6 +32,7 @@ const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
 export default function Products({ productos, categorias = [], filters = {} }) {
     const { data = [], links = [] } = productos ?? {};
+    const [expandedProduct, setExpandedProduct] = useState(null);
 
     const toggleSort = () => {
         const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
@@ -108,54 +114,104 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                                 </td>
                             </tr>
                         ) : data.map((product) => (
-                            <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        {product.imagen_principal ? (
-                                            <img
-                                                src={product.imagen_principal}
-                                                alt=""
-                                                className="w-10 h-10 rounded-lg object-cover bg-gray-100"
-                                            />
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-lg">
-                                                📦
-                                            </div>
-                                        )}
-                                        <div>
-                                            <p className="font-medium text-gray-900">{product.nombre}</p>
-                                            {product.destacado && (
-                                                <span className="text-xs text-yellow-600 font-medium">⭐ Destacado</span>
+                            <React.Fragment key={product.id}>
+                                <tr className="hover:bg-gray-50 transition-colors group">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)}
+                                                className="text-gray-400 hover:text-blue-600 transition-colors w-4"
+                                            >
+                                                {expandedProduct === product.id ? '▼' : '▶'}
+                                            </button>
+                                            {product.imagen_principal ? (
+                                                <img
+                                                    src={product.imagen_principal}
+                                                    alt=""
+                                                    className="w-10 h-10 rounded-lg object-cover bg-gray-100"
+                                                />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-lg">
+                                                    📦
+                                                </div>
                                             )}
+                                            <div>
+                                                <p className="font-medium text-gray-900">{product.nombre}</p>
+                                                {product.variantes?.length > 0 && (
+                                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100 uppercase font-bold">
+                                                        {product.variantes.length} Variantes
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{product.categoria}</td>
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                    €{Number(product.precio_venta).toFixed(2)}
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{product.ventas_totales}</td>
-                                <td className="px-6 py-4 text-sm text-gray-600">
-                                    ⭐ {Number(product.rating_promedio ?? 0).toFixed(1)}
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-500">
-                                    {product.fecha_creacion}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.activo
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
-                                        }`}>
-                                        {product.activo ? 'Activo' : 'Inactivo'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="p-1 text-gray-400 hover:text-blue-600" title="Editar">✏️</button>
-                                        <button className="p-1 text-gray-400 hover:text-red-600" title="Eliminar">🗑️</button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{product.categoria}</td>
+                                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                        €{Number(product.precio_venta).toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{product.ventas_totales}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                        ⭐ {Number(product.rating_promedio ?? 0).toFixed(1)}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                        {product.fecha_creacion}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.activo
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'
+                                            }`}>
+                                            {product.activo ? 'Activo' : 'Inactivo'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button className="p-1 text-gray-400 hover:text-blue-600" title="Editar">✏️</button>
+                                            <button className="p-1 text-gray-400 hover:text-red-600" title="Eliminar">🗑️</button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {/* Fila expandida para Variantes */}
+                                {expandedProduct === product.id && (
+                                    <tr className="bg-gray-50/50">
+                                        <td colSpan={8} className="px-12 py-4">
+                                            <div className="border-l-4 border-blue-500 pl-4 py-2">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Variantes de {product.nombre}</h3>
+                                                    <button className="text-xs font-bold text-blue-600 hover:underline">+ Añadir Variante</button>
+                                                </div>
+                                                {product.variantes?.length === 0 ? (
+                                                    <p className="text-sm text-gray-400 italic">Este producto no tiene variantes registradas.</p>
+                                                ) : (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                        {product.variantes.map((v) => (
+                                                            <div key={v.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between">
+                                                                <div className="flex justify-between items-start mb-2">
+                                                                    <div>
+                                                                        <p className="font-bold text-gray-900">{v.nombre}</p>
+                                                                        <p className="text-[10px] font-mono text-gray-400 uppercase tracking-tighter">{v.sku || 'SIN SKU'}</p>
+                                                                    </div>
+                                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${v.disponible ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                                        {v.disponible ? 'OK' : 'AGOTADO'}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between items-center mt-2 border-t border-gray-50 pt-2">
+                                                                    <span className="text-sm font-bold text-blue-600">€{Number(v.precio).toFixed(2)}</span>
+                                                                    <div className="flex gap-2">
+                                                                        <button className="text-gray-400 hover:text-gray-600">✏️</button>
+                                                                        <button className="text-gray-400 hover:text-red-500">🗑️</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
                         ))}
                     </tbody>
                 </table>

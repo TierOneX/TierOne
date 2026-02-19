@@ -14,6 +14,10 @@ const menuItems = [
     {
         title: 'Ventas', items: [
             { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
+            { label: 'Pagos', icon: '💳', link: route('panel.ecommerce.finanzas.pagos') },
+            { label: 'Transacciones', icon: '📊', link: route('panel.ecommerce.finanzas.transacciones') },
+            { label: 'Retiros', icon: '🏦', link: route('panel.ecommerce.finanzas.retiros') },
+            { label: 'Reseñas', icon: '⭐', link: route('panel.ecommerce.reviews') },
         ]
     },
     {

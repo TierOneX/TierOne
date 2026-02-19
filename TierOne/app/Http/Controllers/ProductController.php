@@ -19,7 +19,7 @@ class ProductController extends Controller
         $filters['sort_dir'] = $filters['sort_dir'] ?? 'desc';
         
         return Inertia::render('PanelAdminEcommerce/Products', [
-            'productos' => Producto::with('categoria')
+            'productos' => Producto::with(['categoria', 'variantes'])
                 ->when($filters['search'] ?? null, function($q, $v) {
                     $q->where(function($sq) use ($v) {
                         $sq->where('id', 'like', "%$v%")
@@ -49,6 +49,7 @@ class ProductController extends Controller
                     'ventas_totales'  => $p->ventas_totales,
                     'rating_promedio' => $p->rating_promedio,
                     'fecha_creacion'  => $p->fecha_creacion?->format('d/m/Y'),
+                    'variantes'       => $p->variantes,
                 ]),
             'categorias' => Categoria::where('activa', true)->get(['id', 'nombre']),
             'filters' => $filters

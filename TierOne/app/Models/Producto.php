@@ -87,4 +87,14 @@ class Producto extends Model
     {
         return $this->belongsTo(Proveedor::class , 'id_proveedor');
     }
+
+    /**
+     * Relación: Variantes del producto
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function variantes()
+    {
+        return $this->hasMany(VarianteProducto::class, 'id_producto');
+    }
 }

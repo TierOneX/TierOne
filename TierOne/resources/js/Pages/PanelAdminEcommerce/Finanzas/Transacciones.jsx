@@ -1,7 +1,6 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
 
 const menuItems = [
     {
@@ -30,69 +29,69 @@ const menuItems = [
 
 const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
-const estadoBadge = (estado) => {
+const tipoBadge = (tipo) => {
     const map = {
-        pendiente: 'bg-orange-50 text-orange-700 border-orange-200',
-        procesando: 'bg-blue-50 text-blue-700 border-blue-200',
-        enviada: 'bg-purple-50 text-purple-700 border-purple-200',
-        entregada: 'bg-green-50 text-green-700 border-green-200',
-        cancelada: 'bg-gray-100 text-gray-800 border-gray-200',
+        deposito: 'bg-green-50 text-green-700 border-green-200',
+        retiro: 'bg-red-50 text-red-700 border-red-200',
+        premio: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        compra: 'bg-blue-50 text-blue-700 border-blue-200',
+        reembolso: 'bg-gray-50 text-gray-700 border-gray-200',
+        comision: 'bg-purple-50 text-purple-700 border-purple-200',
     };
-    return map[estado] ?? 'bg-gray-100 text-gray-800 border-gray-200';
+    return map[tipo] ?? 'bg-gray-100 text-gray-800 border-gray-200';
 };
 
-export default function Orders({ ordenes, filters = {} }) {
-    const { data = [], links = [] } = ordenes ?? {};
+export default function Transacciones({ transacciones, filters = {} }) {
+    const { data = [], links = [] } = transacciones ?? {};
 
     const toggleSort = () => {
         const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
-        router.get(route('panel.ecommerce.orders'), { ...filters, sort_dir: newDir }, {
+        router.get(route('panel.ecommerce.finanzas.transacciones'), { ...filters, sort_dir: newDir }, {
             preserveState: true,
             replace: true
         });
     };
 
     const filtersConfig = [
-        { name: 'numero', label: 'Número de Orden', type: 'text' },
-        { name: 'cliente', label: 'Cliente', type: 'text' },
         {
-            name: 'estado',
-            label: 'Estado',
+            name: 'tipo',
+            label: 'Tipo',
             type: 'select',
             options: [
-                { value: 'pendiente', label: 'Pendiente' },
-                { value: 'procesando', label: 'Procesando' },
-                { value: 'enviada', label: 'Enviada' },
-                { value: 'entregada', label: 'Entregada' },
-                { value: 'cancelada', label: 'Cancelada' },
+                { value: '', label: 'Todos' },
+                { value: 'deposito', label: 'Depósito' },
+                { value: 'retiro', label: 'Retiro' },
+                { value: 'premio', label: 'Premio' },
+                { value: 'compra', label: 'Compra' },
+                { value: 'reembolso', label: 'Reembolso' },
+                { value: 'comision', label: 'Comisión' },
             ]
         },
-        { name: 'fecha_desde', label: 'Desde Fecha', type: 'date' },
-        { name: 'fecha_hasta', label: 'Hasta Fecha', type: 'date' },
-        { name: 'total_min', label: 'Monto Mínimo', type: 'number' },
+        { name: 'fecha_desde', label: 'Desde', type: 'date' },
+        { name: 'fecha_hasta', label: 'Hasta', type: 'date' },
     ];
 
     return (
-        <PanelLayout title="Gestión de Órdenes" menuItems={menuItems} activeItem="Órdenes" user={user}>
-            <Head title="Órdenes - Admin Panel" />
+        <PanelLayout title="Historial de Transacciones" menuItems={menuItems} activeItem="Transacciones" user={user}>
+            <Head title="Transacciones - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Listado de Órdenes</h2>
+                <h2 className="text-lg font-bold text-gray-800">Libro de Movimientos</h2>
             </div>
 
-            {/* BARRA DE FILTROS */}
             <FilterBar
                 filtersConfig={filtersConfig}
                 currentFilters={filters}
-                routeName="panel.ecommerce.orders"
+                routeName="panel.ecommerce.finanzas.transacciones"
             />
 
-            {/* Table */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Orden</th>
+                            <th className="px-6 py-4">Usuario</th>
+                            <th className="px-6 py-4">Tipo</th>
+                            <th className="px-6 py-4">Descripción</th>
                             <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
                                 <div className="flex items-center gap-1">
                                     Fecha
@@ -101,41 +100,32 @@ export default function Orders({ ordenes, filters = {} }) {
                                     </span>
                                 </div>
                             </th>
-                            <th className="px-6 py-4">Cliente</th>
-                            <th className="px-6 py-4">Estado</th>
-                            <th className="px-6 py-4">Tracking</th>
-                            <th className="px-6 py-4 text-right">Total</th>
+                            <th className="px-6 py-4 text-right">Monto</th>
+                            <th className="px-6 py-4 text-right">Balance Nuevo</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {data.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="text-center py-12 text-gray-400">
-                                    No se encontraron órdenes con estos filtros
+                                    No se encontraron transacciones
                                 </td>
                             </tr>
-                        ) : data.map((orden) => (
-                            <tr key={orden.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-bold text-gray-900">
-                                    #{orden.numero}
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{orden.fecha}</td>
+                        ) : data.map((t) => (
+                            <tr key={t.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 text-sm font-medium text-gray-900">{t.usuario}</td>
                                 <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-gray-900">{orden.cliente}</span>
-                                        <span className="text-xs text-gray-500">{orden.email}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${estadoBadge(orden.estado)}`}>
-                                        {orden.estado}
+                                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium border ${tipoBadge(t.tipo)}`}>
+                                        {t.tipo}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-500 font-mono">
-                                    {orden.tracking ?? '—'}
+                                <td className="px-6 py-4 text-sm text-gray-500">{t.descripcion}</td>
+                                <td className="px-6 py-4 text-sm text-gray-500">{t.fecha}</td>
+                                <td className={`px-6 py-4 text-right font-bold ${t.monto < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                    {t.monto > 0 && '+'}{Number(t.monto).toFixed(2)}€
                                 </td>
-                                <td className="px-6 py-4 text-right font-medium text-gray-900">
-                                    €{Number(orden.total).toFixed(2)}
+                                <td className="px-6 py-4 text-right font-mono text-sm text-gray-900">
+                                    {Number(t.balance_nuevo).toFixed(2)}€
                                 </td>
                             </tr>
                         ))}
@@ -143,7 +133,6 @@ export default function Orders({ ordenes, filters = {} }) {
                 </table>
             </div>
 
-            {/* Pagination */}
             {links.length > 3 && (
                 <div className="flex justify-center gap-1 mt-6">
                     {links.map((link, i) => (
