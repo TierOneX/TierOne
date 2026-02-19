@@ -368,6 +368,12 @@ section {
 }
 
 /* INFO CARDS */
+.info-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .info-card {
     background: var(--surface);
     border-radius: 12px;
@@ -377,12 +383,14 @@ section {
     gap: 2rem;
     align-items: center;
     border: 1px solid rgba(225, 6, 0, 0.2);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
 }
 
 .info-card:hover {
-    border-color: rgba(225, 6, 0, 0.4);
-    box-shadow: 0 10px 40px rgba(225, 6, 0, 0.2);
+    border-color: rgba(225, 6, 0, 0.6);
+    box-shadow: 0 15px 45px rgba(225, 6, 0, 0.3);
+    transform: translateY(-8px) scale(1.01);
 }
 
 .info-illustration {

@@ -1,13 +1,15 @@
+import { Link } from '@inertiajs/react';
 
 export default function Features() {
 
     const features = [
         {
             id: 'partidas',
+            url: '/matches',
             sectionTitle: 'PARTIDAS CLASIFICATORIAS',
             title: 'COMPITE EN TIEMPO REAL',
             description: 'Únete a partidas clasificatorias en tiempo real contra jugadores de tu nivel. Sistema de matchmaking inteligente que te empareja con rivales equilibrados.',
-            image: './img/imgPartidas.webp',
+            image: '/images/landing/Partidas.jpg',
             reverse: false,
             style: {},
             items: [
@@ -19,6 +21,7 @@ export default function Features() {
         },
         {
             id: 'torneos',
+            url: '/tournaments',
             sectionTitle: 'TORNEOS Y COMPETICIONES',
             title: 'EVENTOS COMPETITIVOS',
             description: 'Compite por premios en efectivo en torneos organizados semanalmente. Desde ligas amateur hasta competiciones profesionales con premios de hasta 10.000€.',
@@ -35,6 +38,7 @@ export default function Features() {
         },
         {
             id: 'rankings',
+            url: '/community',
             sectionTitle: 'CLASIFICACIÓN GLOBAL',
             title: 'SISTEMA DE RANKINGS',
             description: 'Sistema de ranking dinámico basado en MMR (Match Making Rating). Cada victoria te acerca a la cima, cada derrota te reta a mejorar.',
@@ -50,6 +54,7 @@ export default function Features() {
         },
         {
             id: 'tienda',
+            url: '/shop',
             sectionTitle: 'NUESTRA TIENDA',
             title: 'MERCHANDISING EXCLUSIVO',
             description: 'Descubre nuestra colección oficial de merchandising gaming. Camisetas, sudaderas, gorras y accesorios diseñados para verdaderos competidores.',
@@ -74,62 +79,27 @@ export default function Features() {
     );
 }
 
-function FeatureSection({ id, title, description, image, reverse, items, style }) {
+function FeatureSection({ id, url, title, description, image, reverse, items, style }) {
     return (
         <section id={id} style={style}>
             <div className="container">
-                <div className={`info-card ${reverse ? 'reverse' : ''}`}>
-                    <div className="info-illustration">
-                        <img src={image} alt={title} className="illustration-image" />
+                <Link href={url} className="info-card-link">
+                    <div className={`info-card ${reverse ? 'reverse' : ''}`}>
+                        <div className="info-illustration">
+                            <img src={image} alt={title} className="illustration-image" />
+                        </div>
+                        <div className="info-content">
+                            <h3>{title}</h3>
+                            <p>{description}</p>
+                            <ul className="feature-list">
+                                {items.map((item, idx) => (
+                                    <li key={idx}><span className="check">✓</span> {item}</li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
-                    <div className="info-content">
-                        <h3>{title}</h3>
-                        <p>{description}</p>
-                        <ul className="feature-list">
-                            {items.map((item, idx) => (
-                                <li key={idx}><span className="check">✓</span> {item}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
+                </Link>
             </div>
         </section>
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
