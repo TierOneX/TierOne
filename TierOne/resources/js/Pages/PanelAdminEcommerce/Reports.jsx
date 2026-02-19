@@ -1,6 +1,6 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 const menuItems = [
@@ -52,6 +52,14 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
         resolucion: '',
         id_resuelto_por: ''
     });
+
+    const toggleSort = () => {
+        const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+        router.get(route('panel.ecommerce.reports'), { ...filters, sort_dir: newDir }, {
+            preserveState: true,
+            replace: true
+        });
+    };
 
     const openDetails = (reporte) => {
         setSelectedReport(reporte);
@@ -142,7 +150,14 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
                             <th className="px-6 py-4">Reportado por</th>
                             <th className="px-6 py-4">Estado</th>
                             <th className="px-6 py-4">Resuelto por</th>
-                            <th className="px-6 py-4">Fecha</th>
+                            <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
+                                <div className="flex items-center gap-1">
+                                    Fecha
+                                    <span className="text-gray-400 group-hover:text-blue-600">
+                                        {filters.sort_dir === 'asc' ? '🔼' : '🔽'}
+                                    </span>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

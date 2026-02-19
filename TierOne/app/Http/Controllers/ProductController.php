@@ -14,7 +14,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max', 'search']);
+        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max', 'search', 'sort_dir']);
+        $sortDir = $request->input('sort_dir', 'desc');
+        $filters['sort_dir'] = $filters['sort_dir'] ?? 'desc';
         
         return Inertia::render('PanelAdminEcommerce/Products', [
             'productos' => Producto::with('categoria')
@@ -32,7 +34,7 @@ class ProductController extends Controller
                 ->when($filters['destacado'] ?? null, fn($q, $v) => $q->where('destacado', $v === '1'))
                 ->when($filters['precio_min'] ?? null, fn($q, $v) => $q->where('precio_venta', '>=', $v))
                 ->when($filters['precio_max'] ?? null, fn($q, $v) => $q->where('precio_venta', '<=', $v))
-                ->orderBy('id', 'desc')
+                ->orderBy('fecha_creacion', $sortDir)
                 ->paginate(15)
                 ->withQueryString()
                 ->through(fn($p) => [
@@ -46,6 +48,7 @@ class ProductController extends Controller
                     'destacado'       => $p->destacado,
                     'ventas_totales'  => $p->ventas_totales,
                     'rating_promedio' => $p->rating_promedio,
+                    'fecha_creacion'  => $p->fecha_creacion?->format('d/m/Y'),
                 ]),
             'categorias' => Categoria::where('activa', true)->get(['id', 'nombre']),
             'filters' => $filters

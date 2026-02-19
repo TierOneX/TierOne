@@ -1,6 +1,6 @@
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 const menuItems = [
@@ -38,6 +38,14 @@ const estadoBadge = (estado) => {
 
 export default function Orders({ ordenes, filters = {} }) {
     const { data = [], links = [] } = ordenes ?? {};
+
+    const toggleSort = () => {
+        const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+        router.get(route('panel.ecommerce.orders'), { ...filters, sort_dir: newDir }, {
+            preserveState: true,
+            replace: true
+        });
+    };
 
     const filtersConfig = [
         { name: 'numero', label: 'Número de Orden', type: 'text' },
@@ -80,7 +88,14 @@ export default function Orders({ ordenes, filters = {} }) {
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
                             <th className="px-6 py-4">Orden</th>
-                            <th className="px-6 py-4">Fecha</th>
+                            <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
+                                <div className="flex items-center gap-1">
+                                    Fecha
+                                    <span className="text-gray-400 group-hover:text-blue-600">
+                                        {filters.sort_dir === 'asc' ? '🔼' : '🔽'}
+                                    </span>
+                                </div>
+                            </th>
                             <th className="px-6 py-4">Cliente</th>
                             <th className="px-6 py-4">Estado</th>
                             <th className="px-6 py-4">Tracking</th>
@@ -131,8 +146,8 @@ export default function Orders({ ordenes, filters = {} }) {
                             key={i}
                             href={link.url ?? '#'}
                             className={`px-3 py-1 rounded text-sm border ${link.active
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                                 } ${!link.url ? 'opacity-40 pointer-events-none' : ''}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />

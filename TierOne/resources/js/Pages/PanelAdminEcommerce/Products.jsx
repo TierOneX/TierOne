@@ -27,6 +27,14 @@ const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 export default function Products({ productos, categorias = [], filters = {} }) {
     const { data = [], links = [] } = productos ?? {};
 
+    const toggleSort = () => {
+        const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+        router.get(route('panel.ecommerce.products'), { ...filters, sort_dir: newDir }, {
+            preserveState: true,
+            replace: true
+        });
+    };
+
     const filtersConfig = [
         { name: 'nombre', label: 'Nombre', type: 'text' },
         {
@@ -79,6 +87,14 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             <th className="px-6 py-4">Precio Venta</th>
                             <th className="px-6 py-4">Ventas</th>
                             <th className="px-6 py-4">Rating</th>
+                            <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
+                                <div className="flex items-center gap-1">
+                                    Registro
+                                    <span className="text-gray-400 group-hover:text-blue-600">
+                                        {filters.sort_dir === 'asc' ? '🔼' : '🔽'}
+                                    </span>
+                                </div>
+                            </th>
                             <th className="px-6 py-4">Estado</th>
                             <th className="px-6 py-4 text-right">Acciones</th>
                         </tr>
@@ -86,7 +102,7 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                     <tbody className="divide-y divide-gray-100">
                         {data.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="text-center py-12 text-gray-400">
+                                <td colSpan={8} className="text-center py-12 text-gray-400">
                                     No se encontraron productos con los filtros aplicados
                                 </td>
                             </tr>
@@ -121,10 +137,13 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                                 <td className="px-6 py-4 text-sm text-gray-600">
                                     ⭐ {Number(product.rating_promedio ?? 0).toFixed(1)}
                                 </td>
+                                <td className="px-6 py-4 text-sm text-gray-500">
+                                    {product.fecha_creacion}
+                                </td>
                                 <td className="px-6 py-4">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.activo
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-red-100 text-red-800'
                                         }`}>
                                         {product.activo ? 'Activo' : 'Inactivo'}
                                     </span>
@@ -149,8 +168,8 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             key={i}
                             href={link.url ?? '#'}
                             className={`px-3 py-1 rounded text-sm border ${link.active
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                                 } ${!link.url ? 'opacity-40 pointer-events-none' : ''}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
