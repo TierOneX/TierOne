@@ -57,11 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // ===================================
     // CATÁLOGO (Admin/Staff)
     // ===================================
-    Route::middleware('role:admin, staff')->group(function () {
+    Route::middleware('role:admin,staff')->group(function () {
         Route::apiResource('categorias', CategoriaController::class) -> except(['index', 'show']); //? Utilizamos except(['index', 'show']) por que ver productos es público 
         Route::apiResource('productos', ProductoController::class) ->except(['index', 'show']);
         Route::apiResource('juegos', JuegoController::class)->except((['index', 'show']));
     });
+
     // ===================================
     // TORNEOS
     // ===================================
@@ -76,9 +77,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('carritos', CarritoController::class);
     Route::apiResource('direcciones-envio', DireccionEnvioController::class);
     Route::apiResource('reviews', ReviewController::class);
-
-    // ===================================
-    // REPORTES
-    // ===================================
-    Route::apiResource('reportes', ReporteController::class);
 });
