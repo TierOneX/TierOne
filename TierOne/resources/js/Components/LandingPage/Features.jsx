@@ -24,42 +24,6 @@ export default function Features() {
             description: 'Compite por premios en efectivo en torneos organizados semanalmente. Desde ligas amateur hasta competiciones profesionales con premios de hasta 10.000€.',
             image: './img/imgTorneo.jpg',
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             reverse: true,
             style: { background: 'var(--surface)' },
             items: [
@@ -132,4 +96,40 @@ function FeatureSection({ id, title, description, image, reverse, items, style }
         </section>
     );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
