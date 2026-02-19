@@ -13,10 +13,18 @@ class ReporteController extends Controller
      */
     public function index()
     {
-        $filters = request()->only(['id_partida', 'id_usuario_reporta', 'id_resuelto_por', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta']);
+        $filters = request()->only(['id_partida', 'id_usuario_reporta', 'id_resuelto_por', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta', 'search']);
 
         return \Inertia\Inertia::render('PanelAdminEcommerce/Reports', [
             'reportes' => \App\Models\Reporte::with(['usuarioReporta', 'resueltoPor'])
+                ->when($filters['search'] ?? null, function($q, $v) {
+                    $q->where(function($sq) use ($v) {
+                        $sq->where('id', 'like', "%$v%")
+                           ->orWhere('tipo', 'like', "%$v%")
+                           ->orWhere('descripcion', 'like', "%$v%")
+                           ->orWhere('resolucion', 'like', "%$v%");
+                    });
+                })
                 ->when($filters['id_partida'] ?? null, fn($q, $v) => $q->where('id_partida', $v))
                 ->when($filters['id_usuario_reporta'] ?? null, fn($q, $v) => $q->where('id_usuario_reporta', $v))
                 ->when($filters['id_resuelto_por'] ?? null, fn($q, $v) => $q->where('id_resuelto_por', $v))
@@ -42,7 +50,7 @@ class ReporteController extends Controller
                 ]),
             'stats' => [
                 'total_reportes'    => \App\Models\Reporte::count(),
-                'reportes_abiertos' => \App\Models\Reporte::where('estado', 'abierto')->count(),
+                'reportes_abiertos' => \App\Models\Reporte::whereIn('estado', ['pendiente', 'en_revision'])->count(),
             ],
             'admins' => \App\Models\User::where('rol', 'admin')->get(['id', 'nombre as name']),
             'filters' => $filters
@@ -54,7 +62,7 @@ class ReporteController extends Controller
         $reporte = Reporte::findOrFail($id);
 
         $request->validate([
-            'estado' => 'required|string|in:abierto,en_proceso,resuelto',
+            'estado' => 'required|string|in:pendiente,en_revision,resuelta,desestimada',
             'resolucion' => 'nullable|string',
             'id_resuelto_por' => 'nullable|exists:users,id',
         ]);
@@ -63,7 +71,7 @@ class ReporteController extends Controller
             'estado' => $request->estado,
             'resolucion' => $request->resolucion,
             'id_resuelto_por' => $request->id_resuelto_por,
-            'fecha_resolucion' => $request->estado === 'resuelto' ? now() : $reporte->fecha_resolucion,
+            'fecha_resolucion' => in_array($request->estado, ['resuelta', 'desestimada']) ? now() : $reporte->fecha_resolucion,
         ]);
 
         return back()->with('success', 'Reporte actualizado correctamente');

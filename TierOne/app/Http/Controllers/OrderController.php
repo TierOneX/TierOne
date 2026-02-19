@@ -13,12 +13,23 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['numero', 'cliente', 'estado', 'fecha_desde', 'fecha_hasta', 'total_min']);
+        $filters = $request->only(['numero', 'cliente', 'estado', 'fecha_desde', 'fecha_hasta', 'total_min', 'search']);
 
         return Inertia::render('PanelAdminEcommerce/Orders', [
             'ordenes' => Orden::with('usuario')
+                ->when($filters['search'] ?? null, function($q, $v) {
+                    $q->where(function($sq) use ($v) {
+                        $sq->where('numero_orden', 'like', "%$v%")
+                           ->orWhere('tracking_number', 'like', "%$v%")
+                           ->orWhere('transportista', 'like', "%$v%")
+                           ->orWhereHas('usuario', function($uq) use ($v) {
+                               $uq->where('nombre', 'like', "%$v%")
+                                  ->orWhere('email', 'like', "%$v%");
+                           });
+                    });
+                })
                 ->when($filters['numero'] ?? null, fn($q, $v) => $q->where('numero_orden', 'like', "%$v%"))
-                ->when($filters['cliente'] ?? null, fn($q, $v) => $q->whereHas('usuario', fn($sq) => $sq->where('name', 'like', "%$v%")))
+                ->when($filters['cliente'] ?? null, fn($q, $v) => $q->whereHas('usuario', fn($sq) => $sq->where('nombre', 'like', "%$v%")))
                 ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
                 ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_orden', '>=', $v))
                 ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_orden', '<=', $v))

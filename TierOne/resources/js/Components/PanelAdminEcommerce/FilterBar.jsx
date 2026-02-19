@@ -60,6 +60,23 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
 
             {isExpanded && (
                 <form onSubmit={handleApply} className="p-6">
+                    {/* Búsqueda Global */}
+                    <div className="mb-6">
+                        <label className="text-xs font-bold text-black mb-1 ml-1 uppercase tracking-wider flex items-center gap-2">
+                            <span>🔍</span> Búsqueda Global
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Buscar en todas las columnas..."
+                            value={values.search || ''}
+                            onChange={(e) => handleChange('search', e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-black focus:outline-none focus:border-blue-500 shadow-sm"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-1 ml-1 italic">
+                            * Escribe cualquier dato (ID, nombre, email...) para buscar de forma general.
+                        </p>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {filtersConfig.map((filter) => (
                             <div key={filter.name} className="flex flex-col">

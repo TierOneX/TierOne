@@ -13,10 +13,18 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'activa', 'id_parent']);
+        $filters = $request->only(['nombre', 'activa', 'id_parent', 'search']);
 
         return Inertia::render('PanelAdminEcommerce/Categories', [
             'categorias' => Categoria::withCount('subcategorias')
+                ->when($filters['search'] ?? null, function($q, $v) {
+                    $q->where(function($sq) use ($v) {
+                        $sq->where('id', 'like', "%$v%")
+                           ->orWhere('nombre', 'like', "%$v%")
+                           ->orWhere('slug', 'like', "%$v%")
+                           ->orWhere('descripcion', 'like', "%$v%");
+                    });
+                })
                 ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
                 ->when($filters['activa'] ?? null, fn($q, $v) => $q->where('activa', $v === '1'))
                 ->when($filters['id_parent'] ?? null, fn($q, $v) => $q->where('id_parent', $v))

@@ -27,9 +27,10 @@ const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
 const estadoBadge = (estado) => {
     const map = {
-        abierto: 'bg-red-100 text-red-700',
-        en_proceso: 'bg-yellow-100 text-yellow-700',
-        resuelto: 'bg-green-100 text-green-700',
+        pendiente: 'bg-red-100 text-red-700',
+        en_revision: 'bg-yellow-100 text-yellow-700',
+        resuelta: 'bg-green-100 text-green-700',
+        desestimada: 'bg-gray-100 text-gray-700',
     };
     return map[estado] ?? 'bg-gray-100 text-gray-700';
 };
@@ -93,9 +94,10 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
             label: 'Estado',
             type: 'select',
             options: [
-                { value: 'abierto', label: 'Abierto' },
-                { value: 'en_proceso', label: 'En Proceso' },
-                { value: 'resuelto', label: 'Resuelto' },
+                { value: 'pendiente', label: 'Pendiente' },
+                { value: 'en_revision', label: 'En Revisión' },
+                { value: 'resuelta', label: 'Resuelta' },
+                { value: 'desestimada', label: 'Desestimada' },
             ]
         },
         { name: 'fecha_desde', label: 'Desde Fecha', type: 'date' },
@@ -243,9 +245,10 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
                                             onChange={e => setFormData('estado', e.target.value)}
                                             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-blue-500"
                                         >
-                                            <option value="abierto">Abierto</option>
-                                            <option value="en_proceso">En Proceso</option>
-                                            <option value="resuelto">Resuelto</option>
+                                            <option value="pendiente">Pendiente</option>
+                                            <option value="en_revision">En Revisión</option>
+                                            <option value="resuelta">Resuelta</option>
+                                            <option value="desestimada">Desestimada</option>
                                         </select>
                                     </div>
                                     <div>

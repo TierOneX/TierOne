@@ -14,10 +14,18 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max']);
+        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max', 'search']);
         
         return Inertia::render('PanelAdminEcommerce/Products', [
             'productos' => Producto::with('categoria')
+                ->when($filters['search'] ?? null, function($q, $v) {
+                    $q->where(function($sq) use ($v) {
+                        $sq->where('id', 'like', "%$v%")
+                           ->orWhere('nombre', 'like', "%$v%")
+                           ->orWhere('slug', 'like', "%$v%")
+                           ->orWhere('descripcion', 'like', "%$v%");
+                    });
+                })
                 ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
                 ->when($filters['id_categoria'] ?? null, fn($q, $v) => $q->where('id_categoria', $v))
                 ->when($filters['activo'] ?? null, fn($q, $v) => $q->where('activo', $v === '1'))
