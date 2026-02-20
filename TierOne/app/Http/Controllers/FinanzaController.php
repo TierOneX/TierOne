@@ -15,8 +15,16 @@ class FinanzaController extends Controller
      */
     public function pagos(Request $request)
     {
-        $filters = $request->only(['search', 'metodo', 'estado', 'fecha_desde', 'fecha_hasta', 'sort_dir']);
+        $filters = $request->only(['search', 'metodo', 'estado', 'fecha_desde', 'fecha_hasta', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_pago');
         $sortDir = $request->input('sort_dir', 'desc');
+
+        $sortMap = [
+            'fecha' => 'fecha_pago',
+            'monto' => 'monto'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_pago';
 
         $pagos = Pago::with('orden.usuario')
             ->when($filters['search'] ?? null, function($q, $v) {
@@ -30,7 +38,7 @@ class FinanzaController extends Controller
             ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
             ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_pago', '>=', $v))
             ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_pago', '<=', $v))
-            ->orderBy('fecha_pago', $sortDir)
+            ->orderBy($orderCol, $sortDir)
             ->paginate(20)
             ->withQueryString()
             ->through(fn($p) => [
@@ -56,8 +64,16 @@ class FinanzaController extends Controller
      */
     public function transacciones(Request $request)
     {
-        $filters = $request->only(['search', 'tipo', 'fecha_desde', 'fecha_hasta', 'sort_dir']);
+        $filters = $request->only(['search', 'tipo', 'fecha_desde', 'fecha_hasta', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_transaccion');
         $sortDir = $request->input('sort_dir', 'desc');
+
+        $sortMap = [
+            'fecha' => 'fecha_transaccion',
+            'monto' => 'monto'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_transaccion';
 
         $transacciones = Transaccion::with('usuario')
             ->when($filters['search'] ?? null, function($q, $v) {
@@ -67,7 +83,7 @@ class FinanzaController extends Controller
             ->when($filters['tipo'] ?? null, fn($q, $v) => $q->where('tipo', $v))
             ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_transaccion', '>=', $v))
             ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_transaccion', '<=', $v))
-            ->orderBy('fecha_transaccion', $sortDir)
+            ->orderBy($orderCol, $sortDir)
             ->paginate(20)
             ->withQueryString()
             ->through(fn($t) => [
@@ -92,8 +108,16 @@ class FinanzaController extends Controller
      */
     public function retiros(Request $request)
     {
-        $filters = $request->only(['search', 'estado', 'metodo', 'sort_dir']);
+        $filters = $request->only(['search', 'estado', 'metodo', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_solicitud');
         $sortDir = $request->input('sort_dir', 'desc');
+
+        $sortMap = [
+            'fecha_solicitud' => 'fecha_solicitud',
+            'monto' => 'monto'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_solicitud';
 
         $retiros = Retiro::with(['usuario', 'procesadoPor'])
             ->when($filters['search'] ?? null, function($q, $v) {
@@ -101,7 +125,7 @@ class FinanzaController extends Controller
             })
             ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
             ->when($filters['metodo'] ?? null, fn($q, $v) => $q->where('metodo', $v))
-            ->orderBy('fecha_solicitud', $sortDir)
+            ->orderBy($orderCol, $sortDir)
             ->paginate(20)
             ->withQueryString()
             ->through(fn($r) => [

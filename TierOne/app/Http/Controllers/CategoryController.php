@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -13,7 +14,15 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'activa', 'id_parent', 'search']);
+        $filters = $request->only(['nombre', 'activa', 'id_parent', 'search', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'nombre');
+        $sortDir = $request->input('sort_dir', 'asc');
+
+        $sortMap = [
+            'nombre' => 'nombre'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'nombre';
 
         return Inertia::render('PanelAdminEcommerce/Categories', [
             'categorias' => Categoria::withCount('subcategorias')
@@ -28,7 +37,7 @@ class CategoryController extends Controller
                 ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
                 ->when($filters['activa'] ?? null, fn($q, $v) => $q->where('activa', $v === '1'))
                 ->when($filters['id_parent'] ?? null, fn($q, $v) => $q->where('id_parent', $v))
-                ->orderBy('nombre')
+                ->orderBy($orderCol, $sortDir)
                 ->get()
                 ->map(fn($c) => [
                     'id'               => $c->id,
@@ -39,7 +48,58 @@ class CategoryController extends Controller
                     'subcategorias'    => $c->subcategorias_count,
                     'padre'            => $c->id_parent,
                 ]),
-            'filters' => $filters
+            'filters' => $filters,
+            'todas_categorias' => Categoria::where('id_parent', null)->get(['id', 'nombre'])
         ]);
+    }
+
+    /**
+     * Crea una nueva categoría.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'id_parent'   => 'nullable|exists:categorias,id',
+            'activa'      => 'boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['nombre']);
+        $validated['activa'] = $request->boolean('activa', true);
+
+        Categoria::create($validated);
+
+        return redirect()->back()->with('success', 'Categoría creada correctamente.');
+    }
+
+    /**
+     * Actualiza una categoría existente.
+     */
+    public function update(Request $request, Categoria $categoria)
+    {
+        $validated = $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'id_parent'   => 'nullable|exists:categorias,id',
+            'activa'      => 'boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['nombre']);
+        $validated['activa'] = $request->boolean('activa');
+
+        $categoria->update($validated);
+
+        return redirect()->back()->with('success', 'Categoría actualizada correctamente.');
+    }
+
+    /**
+     * Elimina una categoría.
+     */
+    public function destroy(Categoria $categoria)
+    {
+        // Podríamos verificar si tiene productos asociados aquí
+        $categoria->delete();
+        return redirect()->back()->with('success', 'Categoría eliminada correctamente.');
     }
 }

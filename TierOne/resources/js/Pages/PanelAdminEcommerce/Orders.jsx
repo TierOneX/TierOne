@@ -1,34 +1,9 @@
+
+import React from 'react';
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
+import AdminTable from '@/Components/PanelAdminEcommerce/AdminTable';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
-
-const menuItems = [
-    {
-        title: 'Catálogo', items: [
-            { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
-            { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
-            { label: 'Proveedores', icon: '🚚', link: route('panel.ecommerce.proveedores') },
-        ]
-    },
-    {
-        title: 'Ventas', items: [
-            { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
-            { label: 'Pagos', icon: '💳', link: route('panel.ecommerce.finanzas.pagos') },
-            { label: 'Transacciones', icon: '📊', link: route('panel.ecommerce.finanzas.transacciones') },
-            { label: 'Retiros', icon: '🏦', link: route('panel.ecommerce.finanzas.retiros') },
-            { label: 'Reseñas', icon: '⭐', link: route('panel.ecommerce.reviews') },
-        ]
-    },
-    {
-        title: 'Sistema', items: [
-            { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
-            { label: 'Configuración', icon: '⚙️', link: '#' },
-        ]
-    },
-];
-
-const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
 const estadoBadge = (estado) => {
     const map = {
@@ -43,14 +18,6 @@ const estadoBadge = (estado) => {
 
 export default function Orders({ ordenes, filters = {} }) {
     const { data = [], links = [] } = ordenes ?? {};
-
-    const toggleSort = () => {
-        const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
-        router.get(route('panel.ecommerce.orders'), { ...filters, sort_dir: newDir }, {
-            preserveState: true,
-            replace: true
-        });
-    };
 
     const filtersConfig = [
         { name: 'numero', label: 'Número de Orden', type: 'text' },
@@ -72,76 +39,74 @@ export default function Orders({ ordenes, filters = {} }) {
         { name: 'total_min', label: 'Monto Mínimo', type: 'number' },
     ];
 
+    const columns = [
+        { label: 'Orden', key: 'numero', sortable: false },
+        { label: 'Fecha', key: 'fecha', sortable: true },
+        { label: 'Cliente', key: 'cliente', sortable: false },
+        { label: 'Estado', key: 'estado', sortable: false },
+        { label: 'Tracking', key: 'tracking', sortable: false },
+        { label: 'Total', key: 'total', sortable: true },
+    ];
+
+    const handleSort = (key) => {
+        let newDir = 'asc';
+        if (filters.sort_by === key) {
+            newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+        }
+        router.get(route('panel.ecommerce.orders'), { ...filters, sort_by: key, sort_dir: newDir }, {
+            preserveState: true,
+            replace: true
+        });
+    };
+
+    const renderRow = (orden) => (
+        <tr key={orden.id} className="hover:bg-gray-50 transition-colors">
+            <td className="px-6 py-4 font-bold text-gray-900">
+                #{orden.numero}
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-500">{orden.fecha}</td>
+            <td className="px-6 py-4">
+                <div className="flex flex-col">
+                    <span className="font-medium text-gray-900">{orden.cliente}</span>
+                    <span className="text-xs text-gray-500">{orden.email}</span>
+                </div>
+            </td>
+            <td className="px-6 py-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${estadoBadge(orden.estado)}`}>
+                    {orden.estado}
+                </span>
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                {orden.tracking ?? '—'}
+            </td>
+            <td className="px-6 py-4 text-right font-medium text-gray-900">
+                €{Number(orden.total).toFixed(2)}
+            </td>
+        </tr>
+    );
+
     return (
-        <PanelLayout title="Gestión de Órdenes" menuItems={menuItems} activeItem="Órdenes" user={user}>
+        <PanelLayout title="Gestión de Órdenes" activeItem="Órdenes">
             <Head title="Órdenes - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-gray-800">Listado de Órdenes</h2>
             </div>
 
-            {/* BARRA DE FILTROS */}
             <FilterBar
                 filtersConfig={filtersConfig}
                 currentFilters={filters}
                 routeName="panel.ecommerce.orders"
             />
 
-            {/* Table */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Orden</th>
-                            <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
-                                <div className="flex items-center gap-1">
-                                    Fecha
-                                    <span className="text-gray-400 group-hover:text-blue-600">
-                                        {filters.sort_dir === 'asc' ? '🔼' : '🔽'}
-                                    </span>
-                                </div>
-                            </th>
-                            <th className="px-6 py-4">Cliente</th>
-                            <th className="px-6 py-4">Estado</th>
-                            <th className="px-6 py-4">Tracking</th>
-                            <th className="px-6 py-4 text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {data.length === 0 ? (
-                            <tr>
-                                <td colSpan={6} className="text-center py-12 text-gray-400">
-                                    No se encontraron órdenes con estos filtros
-                                </td>
-                            </tr>
-                        ) : data.map((orden) => (
-                            <tr key={orden.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-bold text-gray-900">
-                                    #{orden.numero}
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{orden.fecha}</td>
-                                <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-gray-900">{orden.cliente}</span>
-                                        <span className="text-xs text-gray-500">{orden.email}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${estadoBadge(orden.estado)}`}>
-                                        {orden.estado}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-500 font-mono">
-                                    {orden.tracking ?? '—'}
-                                </td>
-                                <td className="px-6 py-4 text-right font-medium text-gray-900">
-                                    €{Number(orden.total).toFixed(2)}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <AdminTable
+                columns={columns}
+                data={data}
+                filters={filters}
+                onSort={handleSort}
+                renderRow={renderRow}
+                emptyMessage="No se encontraron órdenes con estos filtros."
+            />
 
             {/* Pagination */}
             {links.length > 3 && (

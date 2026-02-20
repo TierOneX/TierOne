@@ -1,33 +1,9 @@
+
+import React from 'react';
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
+import AdminTable from '@/Components/PanelAdminEcommerce/AdminTable';
 import { Head, Link, router } from '@inertiajs/react';
-
-const menuItems = [
-    {
-        title: 'Catálogo', items: [
-            { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
-            { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
-            { label: 'Proveedores', icon: '🚚', link: route('panel.ecommerce.proveedores') },
-        ]
-    },
-    {
-        title: 'Ventas', items: [
-            { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
-            { label: 'Pagos', icon: '💳', link: route('panel.ecommerce.finanzas.pagos') },
-            { label: 'Transacciones', icon: '📊', link: route('panel.ecommerce.finanzas.transacciones') },
-            { label: 'Retiros', icon: '🏦', link: route('panel.ecommerce.finanzas.retiros') },
-            { label: 'Reseñas', icon: '⭐', link: route('panel.ecommerce.reviews') },
-        ]
-    },
-    {
-        title: 'Sistema', items: [
-            { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
-            { label: 'Configuración', icon: '⚙️', link: '#' },
-        ]
-    },
-];
-
-const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
 const estadoBadge = (estado) => {
     const map = {
@@ -41,14 +17,6 @@ const estadoBadge = (estado) => {
 
 export default function Pagos({ pagos, filters = {} }) {
     const { data = [], links = [] } = pagos ?? {};
-
-    const toggleSort = () => {
-        const newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
-        router.get(route('panel.ecommerce.finanzas.pagos'), { ...filters, sort_dir: newDir }, {
-            preserveState: true,
-            replace: true
-        });
-    };
 
     const filtersConfig = [
         {
@@ -79,8 +47,51 @@ export default function Pagos({ pagos, filters = {} }) {
         { name: 'fecha_hasta', label: 'Hasta', type: 'date' },
     ];
 
+    const columns = [
+        { label: 'Transacción ID', key: 'id_transaccion', sortable: false },
+        { label: 'Orden', key: 'numero_orden', sortable: false },
+        { label: 'Cliente', key: 'cliente', sortable: false },
+        { label: 'Método', key: 'metodo', sortable: false },
+        { label: 'Fecha', key: 'fecha', sortable: true },
+        { label: 'Estado', key: 'estado', sortable: false },
+        { label: 'Monto', key: 'monto', sortable: true },
+    ];
+
+    const handleSort = (key) => {
+        let newDir = 'asc';
+        if (filters.sort_by === key) {
+            newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+        }
+        router.get(route('panel.ecommerce.finanzas.pagos'), { ...filters, sort_by: key, sort_dir: newDir }, {
+            preserveState: true,
+            replace: true
+        });
+    };
+
+    const renderRow = (pago) => (
+        <tr key={pago.id} className="hover:bg-gray-50 transition-colors">
+            <td className="px-6 py-4 font-mono text-xs text-gray-600">
+                {pago.id_transaccion}
+            </td>
+            <td className="px-6 py-4">
+                <span className="font-bold text-gray-900">#{pago.numero_orden}</span>
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-600">{pago.cliente}</td>
+            <td className="px-6 py-4 text-sm text-gray-500 capitalize">{pago.metodo}</td>
+            <td className="px-6 py-4 text-sm text-gray-500">{pago.fecha}</td>
+            <td className="px-6 py-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${estadoBadge(pago.estado)}`}>
+                    {pago.estado}
+                </span>
+            </td>
+            <td className="px-6 py-4 text-right font-bold text-gray-900">
+                €{Number(pago.monto).toFixed(2)}
+            </td>
+        </tr>
+    );
+
     return (
-        <PanelLayout title="Gestión de Pagos" menuItems={menuItems} activeItem="Pagos" user={user}>
+        <PanelLayout title="Gestión de Pagos" activeItem="Pagos">
             <Head title="Pagos - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
@@ -93,57 +104,13 @@ export default function Pagos({ pagos, filters = {} }) {
                 routeName="panel.ecommerce.finanzas.pagos"
             />
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Transacción ID</th>
-                            <th className="px-6 py-4">Orden</th>
-                            <th className="px-6 py-4">Cliente</th>
-                            <th className="px-6 py-4">Método</th>
-                            <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors group" onClick={toggleSort}>
-                                <div className="flex items-center gap-1">
-                                    Fecha
-                                    <span className="text-gray-400 group-hover:text-blue-600">
-                                        {filters.sort_dir === 'asc' ? '🔼' : '🔽'}
-                                    </span>
-                                </div>
-                            </th>
-                            <th className="px-6 py-4">Estado</th>
-                            <th className="px-6 py-4 text-right">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {data.length === 0 ? (
-                            <tr>
-                                <td colSpan={7} className="text-center py-12 text-gray-400">
-                                    No se encontraron pagos
-                                </td>
-                            </tr>
-                        ) : data.map((pago) => (
-                            <tr key={pago.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-mono text-xs text-gray-600">
-                                    {pago.id_transaccion}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className="font-bold text-gray-900">#{pago.numero_orden}</span>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-600">{pago.cliente}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500 capitalize">{pago.metodo}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{pago.fecha}</td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${estadoBadge(pago.estado)}`}>
-                                        {pago.estado}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-right font-bold text-gray-900">
-                                    €{Number(pago.monto).toFixed(2)}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <AdminTable
+                columns={columns}
+                data={data}
+                filters={filters}
+                onSort={handleSort}
+                renderRow={renderRow}
+            />
 
             {links.length > 3 && (
                 <div className="flex justify-center gap-1 mt-6">

@@ -45,6 +45,9 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products');
     Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
+    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
     Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');

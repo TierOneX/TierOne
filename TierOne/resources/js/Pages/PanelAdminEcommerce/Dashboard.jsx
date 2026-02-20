@@ -1,27 +1,6 @@
+
 import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import { Head, Link } from '@inertiajs/react';
-
-const menuItems = [
-    {
-        title: 'Catálogo', items: [
-            { label: 'Productos', icon: '📦', link: route('panel.ecommerce.products') },
-            { label: 'Categorías', icon: '🏷️', link: route('panel.ecommerce.categories') },
-        ]
-    },
-    {
-        title: 'Ventas', items: [
-            { label: 'Órdenes', icon: '📋', link: route('panel.ecommerce.orders') },
-        ]
-    },
-    {
-        title: 'Sistema', items: [
-            { label: 'Reportes', icon: '⚠️', link: route('panel.ecommerce.reports') },
-            { label: 'Configuración', icon: '⚙️', link: '#' },
-        ]
-    },
-];
-
-const user = { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
 const estadoBadge = (estado) => {
     const map = {
@@ -36,7 +15,7 @@ const estadoBadge = (estado) => {
 
 export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
     return (
-        <PanelLayout title="Dashboard Ecommerce" menuItems={menuItems} activeItem="Dashboard" user={user}>
+        <PanelLayout title="Dashboard Ecommerce" activeItem="Dashboard">
             <Head title="Admin Dashboard - TierOne" />
 
             {/* STATS */}
@@ -70,7 +49,7 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                         <div className="stat-icon orange">⚠️</div>
                     </div>
                     <div className="stat-value">{stats.stock_bajo ?? 0}</div>
-                    <div className="stat-label">Productos Vendidos</div>
+                    <div className="stat-label">Stock Bajo</div>
                 </div>
             </div>
 

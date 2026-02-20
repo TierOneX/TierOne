@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Head, Link } from '@inertiajs/react'; // Importamos Inertia Link por si acaso
+import { Head, Link, usePage } from '@inertiajs/react'; // Añadimos usePage
 import Sidebar from '@/Components/PanelAdminEcommerce/Sidebar';
 
 // Importamos el CSS específico del panel
@@ -8,8 +8,12 @@ import Sidebar from '@/Components/PanelAdminEcommerce/Sidebar';
 // pero al ser CSS puro importado en JS suele funcionar.
 import '../../../css/panel.css';
 
-export default function PanelLayout({ title, menuItems, activeItem, user, children }) {
+export default function PanelLayout({ title, activeItem, children }) {
+    const { menu_admin, auth } = usePage().props; // Atrapamos el menú y el user del servidor
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Mock para user si no está logueado aún, o usar auth.user
+    const userDisplay = auth.user || { name: 'Admin', role: 'Ecommerce Admin', avatar: 'A' };
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -21,9 +25,9 @@ export default function PanelLayout({ title, menuItems, activeItem, user, childr
 
             {/* SIDEBAR */}
             <Sidebar
-                menuItems={menuItems}
+                menuItems={menu_admin}
                 activeItem={activeItem}
-                user={user}
+                user={userDisplay}
                 isSidebarOpen={isSidebarOpen}
             />
 

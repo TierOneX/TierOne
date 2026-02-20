@@ -14,9 +14,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max', 'search', 'sort_dir']);
+        $filters = $request->only(['nombre', 'id_categoria', 'activo', 'destacado', 'precio_min', 'precio_max', 'search', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_creacion');
         $sortDir = $request->input('sort_dir', 'desc');
-        $filters['sort_dir'] = $filters['sort_dir'] ?? 'desc';
+
+        // Mapeo de campos permitidos para evitar inyección SQL y problemas de nombres
+        $sortMap = [
+            'nombre'         => 'nombre',
+            'precio'         => 'precio_venta',
+            'stock'          => 'stock',
+            'activo'         => 'activo',
+            'fecha_creacion' => 'fecha_creacion'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_creacion';
         
         return Inertia::render('PanelAdminEcommerce/Products', [
             'productos' => Producto::with(['categoria', 'variantes'])
@@ -34,7 +45,7 @@ class ProductController extends Controller
                 ->when($filters['destacado'] ?? null, fn($q, $v) => $q->where('destacado', $v === '1'))
                 ->when($filters['precio_min'] ?? null, fn($q, $v) => $q->where('precio_venta', '>=', $v))
                 ->when($filters['precio_max'] ?? null, fn($q, $v) => $q->where('precio_venta', '<=', $v))
-                ->orderBy('fecha_creacion', $sortDir)
+                ->orderBy($orderCol, $sortDir)
                 ->paginate(15)
                 ->withQueryString()
                 ->through(fn($p) => [

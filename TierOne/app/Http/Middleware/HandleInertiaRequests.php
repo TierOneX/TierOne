@@ -34,6 +34,33 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'menu_admin' => [
+                [
+                    'title' => 'Catálogo',
+                    'items' => [
+                        ['label' => 'Productos', 'icon' => '📦', 'link' => route('panel.ecommerce.products')],
+                        ['label' => 'Categorías', 'icon' => '🏷️', 'link' => route('panel.ecommerce.categories')],
+                        ['label' => 'Proveedores', 'icon' => '🚚', 'link' => route('panel.ecommerce.proveedores')],
+                    ]
+                ],
+                [
+                    'title' => 'Ventas',
+                    'items' => [
+                        ['label' => 'Órdenes', 'icon' => '📋', 'link' => route('panel.ecommerce.orders')],
+                        ['label' => 'Pagos', 'icon' => '💳', 'link' => route('panel.ecommerce.finanzas.pagos')],
+                        ['label' => 'Transacciones', 'icon' => '📊', 'link' => route('panel.ecommerce.finanzas.transacciones')],
+                        ['label' => 'Retiros', 'icon' => '🏦', 'link' => route('panel.ecommerce.finanzas.retiros')],
+                        ['label' => 'Reseñas', 'icon' => '⭐', 'link' => route('panel.ecommerce.reviews')],
+                    ]
+                ],
+                [
+                    'title' => 'Sistema',
+                    'items' => [
+                        ['label' => 'Reportes', 'icon' => '⚠️', 'link' => route('panel.ecommerce.reports')],
+                        ['label' => 'Configuración', 'icon' => '⚙️', 'link' => '#'],
+                    ]
+                ],
+            ],
         ];
     }
 }

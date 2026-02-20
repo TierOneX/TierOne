@@ -13,8 +13,15 @@ class ReporteController extends Controller
      */
     public function index()
     {
-        $filters = request()->only(['id_partida', 'id_usuario_reporta', 'id_resuelto_por', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta', 'search', 'sort_dir']);
+        $filters = request()->only(['id_partida', 'id_usuario_reporta', 'id_resuelto_por', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta', 'search', 'sort_by', 'sort_dir']);
+        $sortBy = request()->input('sort_by', 'fecha_reporte');
         $sortDir = request()->input('sort_dir', 'desc');
+
+        $sortMap = [
+            'fecha' => 'fecha_reporte'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_reporte';
 
         return \Inertia\Inertia::render('PanelAdminEcommerce/Reports', [
             'reportes' => \App\Models\Reporte::with(['usuarioReporta', 'resueltoPor'])
@@ -33,7 +40,7 @@ class ReporteController extends Controller
                 ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
                 ->when($filters['fecha_desde'] ?? null, fn($q, $v) => $q->whereDate('fecha_reporte', '>=', $v))
                 ->when($filters['fecha_hasta'] ?? null, fn($q, $v) => $q->whereDate('fecha_reporte', '<=', $v))
-                ->orderBy('fecha_reporte', $sortDir)
+                ->orderBy($orderCol, $sortDir)
                 ->get()
                 ->map(fn($r) => [
                     'id'               => $r->id,

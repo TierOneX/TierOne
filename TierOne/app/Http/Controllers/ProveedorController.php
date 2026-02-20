@@ -13,9 +13,16 @@ class ProveedorController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['nombre', 'email', 'activo', 'search', 'sort_dir']);
+        $filters = $request->only(['nombre', 'email', 'activo', 'search', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_registro');
         $sortDir = $request->input('sort_dir', 'desc');
-        $filters['sort_dir'] = $sortDir;
+
+        $sortMap = [
+            'fecha_registro' => 'fecha_registro',
+            'activo'         => 'activo'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_registro';
 
         return Inertia::render('PanelAdminEcommerce/Proveedores', [
             'proveedores' => Proveedor::query()
@@ -35,7 +42,7 @@ class ProveedorController extends Controller
                         $q->where('activo', $v === '1');
                     }
                 })
-                ->orderBy('fecha_registro', $sortDir)
+                ->orderBy($orderCol, $sortDir)
                 ->paginate(15)
                 ->withQueryString(),
             'filters' => $filters
