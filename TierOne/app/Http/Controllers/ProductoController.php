@@ -6,6 +6,7 @@ use App\Models\Producto;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductoRequest;
 
 class ProductoController extends Controller
 {
@@ -28,24 +29,13 @@ class ProductoController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     * @param StoreProductoRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreProductoRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'id_categoria' => 'required|exists:categorias,id',
-                'id_proveedor' => 'required|exists:proveedores,id',
-                'nombre' => 'required|string|max:255',
-                'slug' => 'required|string|max:255|unique:productos,slug',
-                'descripcion' => 'nullable|string',
-                'precio_proveedor' => 'required|numeric|min:0',
-                'precio_venta' => 'required|numeric|min:0',
-                'imagen_principal' => 'nullable|string|max:255', // En futuro podría ser 'image' validación si se sube archivo
-                'destacado' => 'nullable|boolean',
-                'activo' => 'nullable|boolean',
-            ]);
+            $validated = $request->validated();
 
             $producto = Producto::create($validated);
 

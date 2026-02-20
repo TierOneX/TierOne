@@ -40,7 +40,7 @@ Route::get('/torneos/{id}', [TorneoController::class, 'show']);
 // ===================================
 // RUTAS PROTEGIDAS (Auth:Sanctum)
 // ===================================
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Usuario autentificado
     Route::get('/user', function (Request $request) {
         return $request->user();

@@ -11,6 +11,11 @@ class ReviewController extends Controller
 {
     use ApiResponseTrait;
 
+    /**
+     * Display a listing of reviews, filterable by product or user.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
         try {
@@ -30,6 +35,11 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         try {
@@ -55,6 +65,11 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     * @param string $id
+     * @return JsonResponse
+     */
     public function show(string $id): JsonResponse
     {
         try {
@@ -65,7 +80,11 @@ class ReviewController extends Controller
         }
     }
 
-    // Update y Destroy...
+    /**
+     * Remove the specified resource from storage.
+     * @param string $id
+     * @return JsonResponse
+     */
     public function destroy(string $id): JsonResponse
     {
         try {

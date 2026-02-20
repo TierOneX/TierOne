@@ -87,6 +87,10 @@ class PartidaController extends Controller
             default => 100 // Sin limite estricto definido
         };
     }
+    /**
+     * Display a listing of the resource.
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         try {
