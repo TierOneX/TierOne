@@ -11,6 +11,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProveedor, setEditingProveedor] = useState(null);
+    const [isReadOnly, setIsReadOnly] = useState(false);
 
     const { data: formData, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         nombre: '',
@@ -30,7 +31,6 @@ export default function Proveedores({ proveedores, filters = {} }) {
             label: 'Estado',
             type: 'select',
             options: [
-                { value: 'all', label: 'Todos' },
                 { value: '1', label: 'Activo' },
                 { value: '0', label: 'Inactivo' }
             ]
@@ -60,6 +60,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
     const openCreateModal = () => {
         setEditingProveedor(null);
+        setIsReadOnly(false);
         reset();
         clearErrors();
         setIsModalOpen(true);
@@ -67,6 +68,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
     const openEditModal = (prov) => {
         setEditingProveedor(prov);
+        setIsReadOnly(false);
         setData({
             nombre: prov.nombre || '',
             contacto_nombre: prov.contacto_nombre || '',
@@ -77,6 +79,21 @@ export default function Proveedores({ proveedores, filters = {} }) {
             activo: !!prov.activo
         });
         clearErrors();
+        setIsModalOpen(true);
+    };
+
+    const openDetailsModal = (prov) => {
+        setEditingProveedor(prov);
+        setIsReadOnly(true);
+        setData({
+            nombre: prov.nombre || '',
+            contacto_nombre: prov.contacto_nombre || '',
+            email: prov.email || '',
+            telefono: prov.telefono || '',
+            direccion: prov.direccion || '',
+            notas: prov.notas || '',
+            activo: !!prov.activo
+        });
         setIsModalOpen(true);
     };
 
@@ -103,30 +120,37 @@ export default function Proveedores({ proveedores, filters = {} }) {
     };
 
     const renderRow = (prov) => (
-        <tr key={prov.id} className="hover:bg-gray-50 transition-colors group">
+        <tr key={prov.id} className="hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => openDetailsModal(prov)}>
             <td className="px-6 py-4 font-mono text-xs text-gray-400">#{prov.id}</td>
             <td className="px-6 py-4 font-bold text-gray-900">{prov.nombre}</td>
-            <td className="px-6 py-4 text-sm text-gray-600">{prov.contacto_nombre}</td>
-            <td className="px-6 py-4 text-sm text-gray-500">{prov.email}</td>
-            <td className="px-6 py-4 text-sm text-gray-500">
+            <td className="px-6 py-4 text-sm text-gray-600 font-medium">{prov.contacto_nombre}</td>
+            <td className="px-6 py-4 text-sm text-gray-900">{prov.email}</td>
+            <td className="px-6 py-4 text-sm text-gray-500 font-medium">
                 {new Date(prov.fecha_registro).toLocaleDateString()}
             </td>
             <td className="px-6 py-4">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${prov.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${prov.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {prov.activo ? 'Activo' : 'Inactivo'}
                 </span>
             </td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                        onClick={() => openEditModal(prov)}
+                        onClick={(e) => { e.stopPropagation(); openDetailsModal(prov); }}
                         className="p-1 text-gray-400 hover:text-blue-600"
+                        title="Ver Detalles"
+                    >
+                        👁️
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); openEditModal(prov); }}
+                        className="p-1 text-gray-400 hover:text-yellow-600"
                         title="Editar"
                     >
                         ✏️
                     </button>
                     <button
-                        onClick={() => handleDelete(prov.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(prov.id); }}
                         className="p-1 text-gray-400 hover:text-red-600"
                         title="Eliminar"
                     >
@@ -182,30 +206,31 @@ export default function Proveedores({ proveedores, filters = {} }) {
                 </div>
             )}
 
-            {/* Modal de Creación/Edición */}
             <AdminModal
                 show={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={editingProveedor ? 'Editar Proveedor' : 'Nuevo Proveedor'}
+                title={isReadOnly ? 'Detalles del Proveedor' : (editingProveedor ? 'Editar Proveedor' : 'Nuevo Proveedor')}
                 maxWidth="max-w-xl"
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Nombre Empresa</label>
+                            <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Nombre Empresa</label>
                             <input
                                 type="text"
-                                className={`w-full p-2 border rounded-lg outline-none ${errors.nombre ? 'border-red-500' : 'border-gray-200'}`}
+                                readOnly={isReadOnly}
+                                className={`w-full p-2 border rounded-lg outline-none font-bold text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : (errors.nombre ? 'border-red-500' : 'border-gray-300')}`}
                                 value={formData.nombre}
                                 onChange={e => setData('nombre', e.target.value)}
                             />
                             {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Nombre Contacto</label>
+                            <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Nombre Contacto</label>
                             <input
                                 type="text"
-                                className={`w-full p-2 border rounded-lg outline-none ${errors.contacto_nombre ? 'border-red-500' : 'border-gray-200'}`}
+                                readOnly={isReadOnly}
+                                className={`w-full p-2 border rounded-lg outline-none text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : 'border-gray-300'}`}
                                 value={formData.contacto_nombre}
                                 onChange={e => setData('contacto_nombre', e.target.value)}
                             />
@@ -214,19 +239,21 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
+                            <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Email</label>
                             <input
                                 type="email"
-                                className={`w-full p-2 border rounded-lg outline-none ${errors.email ? 'border-red-500' : 'border-gray-200'}`}
+                                readOnly={isReadOnly}
+                                className={`w-full p-2 border rounded-lg outline-none text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : (errors.email ? 'border-red-500' : 'border-gray-300')}`}
                                 value={formData.email}
                                 onChange={e => setData('email', e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Teléfono</label>
+                            <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Teléfono</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border border-gray-200 rounded-lg outline-none"
+                                readOnly={isReadOnly}
+                                className={`w-full p-2 border rounded-lg outline-none text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : 'border-gray-300'}`}
                                 value={formData.telefono}
                                 onChange={e => setData('telefono', e.target.value)}
                             />
@@ -234,42 +261,48 @@ export default function Proveedores({ proveedores, filters = {} }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Dirección</label>
+                        <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Dirección</label>
                         <input
                             type="text"
-                            className="w-full p-2 border border-gray-200 rounded-lg outline-none"
+                            readOnly={isReadOnly}
+                            className={`w-full p-2 border rounded-lg outline-none text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : 'border-gray-300'}`}
                             value={formData.direccion}
                             onChange={e => setData('direccion', e.target.value)}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Notas Internas</label>
+                        <label className="block text-sm font-black text-black mb-1 uppercase tracking-tight">Notas Internas</label>
                         <textarea
-                            className="w-full p-2 border border-gray-200 rounded-lg outline-none"
+                            readOnly={isReadOnly}
+                            className={`w-full p-2 border rounded-lg outline-none text-gray-900 ${isReadOnly ? 'bg-gray-50 border-gray-100' : 'border-gray-300'}`}
                             rows="3"
                             value={formData.notas}
                             onChange={e => setData('notas', e.target.value)}
                         ></textarea>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="p_activo"
-                            checked={formData.activo}
-                            onChange={e => setData('activo', e.target.checked)}
-                        />
-                        <label htmlFor="p_activo" className="text-sm font-medium text-gray-700">Proveedor Activo</label>
-                    </div>
+                    {!isReadOnly && (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="p_activo"
+                                checked={formData.activo}
+                                onChange={e => setData('activo', e.target.checked)}
+                            />
+                            <label htmlFor="p_activo" className="text-sm font-bold text-black uppercase">Proveedor Activo</label>
+                        </div>
+                    )}
 
-                    <div className="flex justify-end gap-3 mt-6">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg">
-                            Cancelar
+                    <div className="flex justify-end gap-3 mt-6 border-t pt-4">
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg">
+                            {isReadOnly ? 'Cerrar' : 'Cancelar'}
                         </button>
-                        <button type="submit" disabled={processing} className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                            {editingProveedor ? 'Guardar Cambios' : 'Crear Proveedor'}
-                        </button>
+                        {!isReadOnly && (
+                            <button type="submit" disabled={processing} className="px-6 py-2 bg-blue-600 text-white text-sm font-black rounded-lg hover:bg-blue-700 disabled:opacity-50 shadow-md">
+                                {editingProveedor ? 'Guardar Cambios' : 'Crear Proveedor'}
+                            </button>
+                        )}
                     </div>
                 </form>
             </AdminModal>

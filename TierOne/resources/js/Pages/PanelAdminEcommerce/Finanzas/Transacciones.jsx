@@ -26,7 +26,6 @@ export default function Transacciones({ transacciones, filters = {} }) {
             label: 'Tipo',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'deposito', label: 'Depósito' },
                 { value: 'retiro', label: 'Retiro' },
                 { value: 'premio', label: 'Premio' },
@@ -45,7 +44,7 @@ export default function Transacciones({ transacciones, filters = {} }) {
         { label: 'Descripción', key: 'descripcion', sortable: false },
         { label: 'Fecha', key: 'fecha', sortable: true },
         { label: 'Monto', key: 'monto', sortable: true },
-        { label: 'Balance Nuevo', key: 'balance_nuevo', sortable: false },
+        { label: 'Balance Nuevo', key: 'balance_nuevo', sortable: true },
     ];
 
     const handleSort = (key) => {

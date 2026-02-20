@@ -24,7 +24,6 @@ export default function Retiros({ retiros, filters = {} }) {
             label: 'Estado',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'pendiente', label: 'Pendiente' },
                 { value: 'procesando', label: 'Procesando' },
                 { value: 'completado', label: 'Completado' },
@@ -36,7 +35,6 @@ export default function Retiros({ retiros, filters = {} }) {
             label: 'Método',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'paypal', label: 'PayPal' },
                 { value: 'transferencia', label: 'Transferencia' },
                 { value: 'cripto', label: 'Cripto' },

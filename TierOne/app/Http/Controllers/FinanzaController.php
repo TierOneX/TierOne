@@ -69,8 +69,9 @@ class FinanzaController extends Controller
         $sortDir = $request->input('sort_dir', 'desc');
 
         $sortMap = [
-            'fecha' => 'fecha_transaccion',
-            'monto' => 'monto'
+            'fecha'         => 'fecha_transaccion',
+            'monto'         => 'monto',
+            'balance_nuevo' => 'balance_nuevo'
         ];
 
         $orderCol = $sortMap[$sortBy] ?? 'fecha_transaccion';
@@ -121,7 +122,8 @@ class FinanzaController extends Controller
 
         $retiros = Retiro::with(['usuario', 'procesadoPor'])
             ->when($filters['search'] ?? null, function($q, $v) {
-                $q->whereHas('usuario', fn($sq) => $sq->where('nombre', 'like', "%$v%"));
+                $q->whereHas('usuario', fn($sq) => $sq->where('nombre', 'like', "%$v%"))
+                  ->orWhere('detalles_cuenta', 'like', "%$v%");
             })
             ->when($filters['estado'] ?? null, fn($q, $v) => $q->where('estado', $v))
             ->when($filters['metodo'] ?? null, fn($q, $v) => $q->where('metodo', $v))

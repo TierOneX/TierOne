@@ -24,7 +24,6 @@ export default function Pagos({ pagos, filters = {} }) {
             label: 'Método',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'tarjeta', label: 'Tarjeta' },
                 { value: 'paypal', label: 'PayPal' },
                 { value: 'transferencia', label: 'Transferencia' },
@@ -36,7 +35,6 @@ export default function Pagos({ pagos, filters = {} }) {
             label: 'Estado',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'pendiente', label: 'Pendiente' },
                 { value: 'completado', label: 'Completado' },
                 { value: 'fallido', label: 'Fallido' },

@@ -14,7 +14,6 @@ export default function Reviews({ reviews, filters = {} }) {
             label: 'Estrellas',
             type: 'select',
             options: [
-                { value: '', label: 'Todas' },
                 { value: '5', label: '5 Estrellas' },
                 { value: '4', label: '4 Estrellas' },
                 { value: '3', label: '3 Estrellas' },
@@ -27,7 +26,6 @@ export default function Reviews({ reviews, filters = {} }) {
             label: 'Compra Verificada',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: '1', label: 'Sí' },
                 { value: '0', label: 'No' },
             ]
@@ -81,7 +79,7 @@ export default function Reviews({ reviews, filters = {} }) {
             <td className="px-6 py-4 text-sm text-gray-500 max-w-md">
                 <p className="line-clamp-2">{r.comentario}</p>
             </td>
-            <td className="px-6 py-4 text-sm text-gray-500">{r.fecha}</td>
+            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{r.fecha}</td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button

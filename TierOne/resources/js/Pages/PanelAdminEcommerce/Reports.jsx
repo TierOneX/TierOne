@@ -43,7 +43,6 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
             label: 'Tipo',
             type: 'select',
             options: [
-                { value: '', label: 'Todos' },
                 { value: 'trampa', label: 'Trampa' },
                 { value: 'insulto', label: 'Insulto' },
                 { value: 'bug', label: 'Bug' },
@@ -55,7 +54,6 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
             label: 'Estado',
             type: 'select',
             options: [
-                { value: '', label: 'Cualquiera' },
                 { value: 'pendiente', label: 'Pendiente' },
                 { value: 'en_revision', label: 'En Revisión' },
                 { value: 'resuelta', label: 'Resuelta' },
@@ -66,11 +64,11 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
 
     const columns = [
         { label: 'ID', key: 'id', sortable: false },
+        { label: 'Partida', key: 'id_partida', sortable: false },
         { label: 'Tipo', key: 'tipo', sortable: false },
+        { label: 'Reportado por', key: 'usuario_reporta', sortable: false },
         { label: 'Estado', key: 'estado', sortable: false },
         { label: 'Fecha', key: 'fecha', sortable: true },
-        { label: 'Reportado por', key: 'usuario_reporta', sortable: false },
-        { label: 'Resuelto por', key: 'resuelto_por', sortable: false },
         { label: 'Acciones', key: 'acciones', sortable: false },
     ];
 
@@ -166,34 +164,39 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
             >
                 {selectedReport && (
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-4 shadow-inner text-gray-900">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Partida</label>
-                                    <p className="font-bold text-blue-600 font-mono">#{selectedReport.id_partida || '—'}</p>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Partida Relacionada</label>
+                                    <p className="font-bold text-blue-700 font-mono text-lg">#{selectedReport.id_partida || '—'}</p>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Reportado por</label>
-                                    <p className="font-bold text-gray-900">{selectedReport.usuario_reporta}</p>
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Usuario que Reporta</label>
+                                    <p className="font-bold text-black">{selectedReport.usuario_reporta}</p>
                                 </div>
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold text-gray-400 uppercase">Descripción del Problema</label>
-                                <p className="text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-100 mt-1 italic">
-                                    "{selectedReport.descripcion}"
-                                </p>
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic flex items-center gap-1">
+                                    <span>📝</span> Descripción del Problema
+                                </label>
+                                <div className="text-sm text-gray-900 bg-white p-4 rounded-xl border border-gray-200 mt-2 shadow-sm leading-relaxed">
+                                    {selectedReport.descripcion}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <h4 className="font-bold text-gray-900 border-b pb-2">Resolución Administrativa</h4>
+                        <div className="space-y-4 px-1">
+                            <h4 className="font-black text-black border-b border-gray-100 pb-3 flex items-center gap-2">
+                                <span className="bg-blue-100 text-blue-600 p-1 rounded">🛡️</span>
+                                Gestión Administrativa
+                            </h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Nuevo Estado</label>
+                                    <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Estado del Reporte</label>
                                     <select
                                         value={formData.estado}
                                         onChange={e => setData('estado', e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                                     >
                                         <option value="pendiente">Pendiente</option>
                                         <option value="en_revision">En Revisión</option>
@@ -202,11 +205,11 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Asignado a Administrativo</label>
+                                    <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Administrador Asignado</label>
                                     <select
                                         value={formData.id_resuelto_por}
                                         onChange={e => setData('id_resuelto_por', e.target.value)}
-                                        className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                                     >
                                         <option value="">Sin Asignar</option>
                                         {admins.map(admin => <option key={admin.id} value={admin.id}>{admin.name}</option>)}
@@ -214,13 +217,12 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Notas de Resolución</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Resolución / Comentarios</label>
                                 <textarea
-                                    className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                                    rows="4"
+                                    className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-black outline-none focus:ring-2 focus:ring-blue-500 shadow-sm min-h-[120px]"
                                     value={formData.resolucion}
                                     onChange={e => setData('resolucion', e.target.value)}
-                                    placeholder="Explica qué se ha hecho para resolver el reporte..."
+                                    placeholder="Detalla las acciones tomadas o el motivo de la resolución..."
                                 ></textarea>
                             </div>
                         </div>
