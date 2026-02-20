@@ -64,17 +64,21 @@ export default function Features() {
     return (
         <div className="features-container">
             {features.map((feature, index) => (
-                <FeatureSection key={index} {...feature} />
+                <FeatureSection
+                    key={index}
+                    {...feature}
+                    isReversed={index % 2 !== 0}
+                />
             ))}
         </div>
     );
 }
 
-function FeatureSection({ id, url, title, description, image, items, sectionTitle }) {
+function FeatureSection({ id, url, title, description, image, items, sectionTitle, isReversed }) {
     return (
         <section
             id={id}
-            className="feature-bg-section"
+            className={`feature-bg-section ${isReversed ? 'is-reversed' : ''}`}
             style={{ backgroundImage: `url(${image})` }}
         >
             <div className="section-overlay"></div>

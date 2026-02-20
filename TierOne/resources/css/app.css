@@ -376,9 +376,7 @@ section {
     position: relative;
     min-height: 500px;
     background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    /* Optional: adds a nice parallax touch */
+    background-position: center right;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -406,6 +404,23 @@ section {
 
 .feature-text-content {
     max-width: 600px;
+}
+
+.feature-bg-section.is-reversed {
+    background-position: center left;
+}
+
+.feature-bg-section.is-reversed .section-overlay {
+    background: linear-gradient(270deg, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.7) 30%, rgba(10, 10, 10, 0.2) 100%);
+}
+
+.feature-bg-section.is-reversed .feature-container {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.feature-bg-section.is-reversed .feature-text-content {
+    margin-left: auto;
 }
 
 .feature-text-content h3 {
