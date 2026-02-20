@@ -7,6 +7,7 @@ use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductoRequest;
+use App\Http\Requests\UpdateProductoRequest;
 
 class ProductoController extends Controller
 {
@@ -69,33 +70,17 @@ class ProductoController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     * @param UpdateProductoRequest $request
      * @param string $id
      * @return JsonResponse
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateProductoRequest $request, string $id): JsonResponse
     {
         try {
             $producto = Producto::findOrFail($id);
-
-            $validated = $request->validate([
-                'id_categoria' => 'sometimes|exists:categorias,id',
-                'id_proveedor' => 'sometimes|exists:proveedores,id',
-                'nombre' => 'sometimes|string|max:255',
-                'slug' => 'sometimes|string|max:255|unique:productos,slug,' . $id,
-                'descripcion' => 'nullable|string',
-                'precio_proveedor' => 'sometimes|numeric|min:0',
-                'precio_venta' => 'sometimes|numeric|min:0',
-                'imagen_principal' => 'nullable|string|max:255',
-                'destacado' => 'nullable|boolean',
-                'activo' => 'nullable|boolean',
-            ]);
-
+            $validated = $request->validated();
             $producto->update($validated);
-
-            // Refresh relationships
             $producto->load(['categoria', 'proveedor']);
-
             return $this->successResponse($producto, 'Producto actualizado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Producto no encontrado');
