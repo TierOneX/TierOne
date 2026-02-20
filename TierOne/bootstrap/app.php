@@ -20,7 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'torneo.owner' => \App\Http\Middleware\CheckTorneoOwner::class,
+            'orden.owner'=> \App\Http\Middleware\CheckOrdenOwner::class,
         ]);
+
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

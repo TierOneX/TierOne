@@ -59,18 +59,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // CATÁLOGO (Admin/Staff)
     // ===================================
     Route::middleware('role:admin,staff')->group(function () {
-        Route::apiResource('categorias', CategoriaController::class) -> except(['index', 'show']); //? Utilizamos except(['index', 'show']) por que ver productos es público 
-        Route::apiResource('productos', ProductoController::class) ->except(['index', 'show']);
+        Route::apiResource('categorias', CategoriaController::class)->except(['index', 'show']); //? Utilizamos except(['index', 'show']) por que ver productos es público 
+        Route::apiResource('productos', ProductoController::class)->except(['index', 'show']);
         Route::apiResource('juegos', JuegoController::class)->except((['index', 'show']));
     });
 
     // ===================================
     // TORNEOS
     // ===================================
-    Route::post('/torneos', [TorneoController::class,'store']);
-    Route::middleware('torneo.owner')->group(function(){
-        Route::put('/torneos/{torneo}', [TorneoController::class,'update']);
-        Route::delete('/torneos/{torneo}', [TorneoController::class,'destroy']);
+    Route::post('/torneos', [TorneoController::class, 'store']);
+    Route::middleware('torneo.owner')->group(function () {
+        Route::put('/torneos/{torneo}', [TorneoController::class, 'update']);
+        Route::delete('/torneos/{torneo}', [TorneoController::class, 'destroy']);
     });
     Route::apiResource('partidas', PartidaController::class);
     Route::apiResource('inscripciones-torneo', InscripcionTorneoController::class);
@@ -78,7 +78,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // ===================================
     // E-COMMERCE
     // ===================================
-    Route::apiResource('ordenes', OrdenController::class);
+    Route::get('/ordenes', [OrdenController::class, 'index']);
+    Route::get('/ordenes/{orden}', [OrdenController::class, 'show']);
+    Route::post('/ordenes', [OrdenController::class, 'store']);
+    Route::middleware('orden.owner')->group(function () {
+        Route::put('/ordenes/{orden}', [OrdenController::class, 'update']);
+        Route::delete('/ordenes/{orden}', [OrdenController::class, 'destroy']);
+    });
     Route::apiResource('carritos', CarritoController::class);
     Route::apiResource('direcciones-envio', DireccionEnvioController::class);
     Route::apiResource('reviews', ReviewController::class);
