@@ -35,6 +35,7 @@ Route::get('/productos/{id}', [ProductoController::class, 'show']);
 Route::get('/categorias', [CategoriaController::class, 'index']);
 Route::get('/juegos', [JuegoController::class, 'index']);
 Route::get('/torneos', [TorneoController::class, 'index']);
+Route::get('/torneos/{id}', [TorneoController::class, 'show']);
 
 // ===================================
 // RUTAS PROTEGIDAS (Auth:Sanctum)
@@ -66,7 +67,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // ===================================
     // TORNEOS
     // ===================================
-    Route::apiResource('torneos', TorneoController::class);
+    Route::post('/torneos', [TorneoController::class,'store']);
+    Route::middleware('torneo.owner')->group(function(){
+        Route::put('/torneos/{torneo}', [TorneoController::class,'update']);
+        Route::delete('/torneos/{torneo}', [TorneoController::class,'destroy']);
+    });
     Route::apiResource('partidas', PartidaController::class);
     Route::apiResource('inscripciones-torneo', InscripcionTorneoController::class);
 
