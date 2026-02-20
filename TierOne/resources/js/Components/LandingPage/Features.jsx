@@ -23,7 +23,7 @@ export default function Features() {
             sectionTitle: 'TORNEOS Y COMPETICIONES',
             title: 'EVENTOS COMPETITIVOS',
             description: 'Compite por premios en efectivo en torneos organizados semanalmente. Desde ligas amateur hasta competiciones profesionales con premios de hasta 10.000€.',
-            image: './img/imgTorneo.jpg',
+            image: '/images/landing/torneos.jpg',
             items: [
                 'Torneos semanales y mensuales',
                 'Premios en efectivo garantizados',

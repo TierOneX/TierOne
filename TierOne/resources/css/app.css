@@ -453,14 +453,14 @@ section {
 .feature-cta {
     display: inline-flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
     color: var(--primary-red);
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-decoration: none;
     margin-top: 1rem;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
 }
 
@@ -475,6 +475,38 @@ section {
 
 .feature-cta:hover span {
     transform: translateX(5px);
+}
+
+/* SECTION SPECIFIC ADJUSTMENTS */
+@media (min-width: 768px) {
+    #torneos {
+        /* x=20% shifts image content left, y=30% shifts content down */
+        background-position: 20% 30% !important;
+    }
+}
+
+/* MOBILE FIXES */
+@media (max-width: 767px) {
+    .feature-bg-section {
+        min-height: 450px;
+        background-position: center !important;
+    }
+
+    .feature-bg-section.is-reversed .feature-container,
+    .feature-bg-section.is-reversed .feature-text-content {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
+    .section-overlay,
+    .feature-bg-section.is-reversed .section-overlay {
+        /* Gradiente vertical más sólido para legibilidad en móvil */
+        background: linear-gradient(0deg, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0.6) 100%) !important;
+    }
+
+    .feature-text-content h3 {
+        font-size: 2.2rem;
+    }
 }
 
 /* RESPONSIVE */
