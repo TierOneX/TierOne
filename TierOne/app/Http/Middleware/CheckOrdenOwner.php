@@ -33,7 +33,7 @@ class CheckOrdenOwner
         }
 
         if ($request->user()->id !== $orden->id_usuario && $request->user()->rol !== 'admin') {
-            return $this->forbiddenResponse('No tienes permiso paa modificar esta Orden');
+            return $this->forbiddenResponse('No tienes permiso para modificar esta Orden');
         }
         return $next($request);
     }
