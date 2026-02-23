@@ -51,8 +51,8 @@ export default function Pagos({ pagos, filters = {} }) {
         { label: 'Cliente', key: 'cliente', sortable: false },
         { label: 'Método', key: 'metodo', sortable: false },
         { label: 'Fecha', key: 'fecha', sortable: true },
-        { label: 'Estado', key: 'estado', sortable: false },
-        { label: 'Monto', key: 'monto', sortable: true },
+        { label: 'Estado', key: 'estado', sortable: false, align: 'center' },
+        { label: 'Monto', key: 'monto', sortable: true, align: 'right' },
     ];
 
     const handleSort = (key) => {
@@ -82,7 +82,7 @@ export default function Pagos({ pagos, filters = {} }) {
                     {pago.estado}
                 </span>
             </td>
-            <td className="px-6 py-4 text-right font-bold text-gray-900">
+            <td className="px-6 py-4 font-bold text-gray-900">
                 €{Number(pago.monto).toFixed(2)}
             </td>
         </tr>

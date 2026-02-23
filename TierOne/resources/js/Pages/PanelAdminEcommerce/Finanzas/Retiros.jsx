@@ -47,9 +47,9 @@ export default function Retiros({ retiros, filters = {} }) {
         { label: 'Método', key: 'metodo', sortable: false },
         { label: 'Detalles', key: 'detalles', sortable: false },
         { label: 'Solicitud', key: 'fecha_solicitud', sortable: true },
-        { label: 'Estado', key: 'estado', sortable: false },
-        { label: 'Monto', key: 'monto', sortable: true },
-        { label: 'Acciones', key: 'acciones', sortable: false },
+        { label: 'Estado', key: 'estado', sortable: false, align: 'center' },
+        { label: 'Monto', key: 'monto', sortable: true, align: 'right' },
+        { label: 'Acciones', key: 'acciones', sortable: false, align: 'right' },
     ];
 
     const handleSort = (key) => {
@@ -78,10 +78,10 @@ export default function Retiros({ retiros, filters = {} }) {
                     {r.estado}
                 </span>
             </td>
-            <td className="px-6 py-4 text-right font-bold text-gray-900">
+            <td className="px-6 py-4 font-bold text-gray-900">
                 {Number(r.monto).toFixed(2)}€
             </td>
-            <td className="px-6 py-4 text-right">
+            <td className="px-6 py-4">
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {r.estado === 'pendiente' && (
                         <>

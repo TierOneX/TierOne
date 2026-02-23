@@ -40,11 +40,11 @@ export default function Transacciones({ transacciones, filters = {} }) {
 
     const columns = [
         { label: 'Usuario', key: 'usuario', sortable: false },
-        { label: 'Tipo', key: 'tipo', sortable: false },
+        { label: 'Tipo', key: 'tipo', sortable: false, align: 'center' },
         { label: 'Descripción', key: 'descripcion', sortable: false },
         { label: 'Fecha', key: 'fecha', sortable: true },
-        { label: 'Monto', key: 'monto', sortable: true },
-        { label: 'Balance Nuevo', key: 'balance_nuevo', sortable: true },
+        { label: 'Monto', key: 'monto', sortable: true, align: 'right' },
+        { label: 'Balance Nuevo', key: 'balance_nuevo', sortable: true, align: 'right' },
     ];
 
     const handleSort = (key) => {
@@ -68,10 +68,10 @@ export default function Transacciones({ transacciones, filters = {} }) {
             </td>
             <td className="px-6 py-4 text-sm text-gray-500">{t.descripcion}</td>
             <td className="px-6 py-4 text-sm text-gray-500">{t.fecha}</td>
-            <td className={`px-6 py-4 text-right font-bold ${t.monto < 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <td className={`px-6 py-4 font-bold ${t.monto < 0 ? 'text-red-600' : 'text-green-600'}`}>
                 {t.monto > 0 && '+'}{Number(t.monto).toFixed(2)}€
             </td>
-            <td className="px-6 py-4 text-right font-mono text-sm text-gray-900">
+            <td className="px-6 py-4 font-mono text-sm text-gray-900">
                 {Number(t.balance_nuevo).toFixed(2)}€
             </td>
         </tr>

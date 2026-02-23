@@ -38,13 +38,13 @@ export default function Proveedores({ proveedores, filters = {} }) {
     ];
 
     const columns = [
-        { label: 'ID', key: 'id', sortable: false },
+        { label: 'ID', key: 'id', sortable: false, align: 'right' },
         { label: 'Nombre', key: 'nombre', sortable: false },
         { label: 'Contacto', key: 'contacto_nombre', sortable: false },
         { label: 'Email', key: 'email', sortable: false },
         { label: 'Registro', key: 'fecha_registro', sortable: true },
-        { label: 'Estado', key: 'activo', sortable: true },
-        { label: 'Acciones', key: 'acciones', sortable: false },
+        { label: 'Estado', key: 'activo', sortable: true, align: 'center' },
+        { label: 'Acciones', key: 'acciones', sortable: false, align: 'right' },
     ];
 
     const handleSort = (key) => {

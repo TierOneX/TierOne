@@ -35,10 +35,10 @@ export default function Products({ productos, categorias = [], filters = {} }) {
     const columns = [
         { label: 'Producto', key: 'nombre', sortable: false },
         { label: 'Categoría', key: 'id_categoria', sortable: false },
-        { label: 'Precio Base', key: 'precio', sortable: true },
-        { label: 'Stock', key: 'stock', sortable: true },
-        { label: 'Estado', key: 'activo', sortable: true },
-        { label: 'Acciones', key: 'acciones', sortable: false },
+        { label: 'Precio Base', key: 'precio', sortable: true, align: 'right' },
+        { label: 'Stock', key: 'stock', sortable: true, align: 'right' },
+        { label: 'Estado', key: 'activo', sortable: true, align: 'center' },
+        { label: 'Acciones', key: 'acciones', sortable: false, align: 'right' },
     ];
 
     const handleSort = (key) => {
@@ -52,6 +52,35 @@ export default function Products({ productos, categorias = [], filters = {} }) {
             sort_by: key,
             sort_dir: newDir
         }, { preserveState: true });
+    };
+
+    const { data: formData, setData, post, processing, errors, reset, clearErrors } = useForm({
+        nombre: '',
+        id_categoria: '',
+        precio_venta: '',
+        precio_proveedor: '',
+        stock: '0',
+        activo: true,
+        destacado: false,
+        descripcion: '',
+    });
+
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const openCreateModal = () => {
+        reset();
+        clearErrors();
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCreateSubmit = (e) => {
+        e.preventDefault();
+        post(route('panel.ecommerce.products.store'), {
+            onSuccess: () => {
+                setIsCreateModalOpen(false);
+                reset();
+            }
+        });
     };
 
     const renderRow = (product) => (
@@ -158,7 +187,10 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                     <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors">
                         📦 Importar CSV
                     </button>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2">
+                    <button
+                        onClick={openCreateModal}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
                         <span>+</span> Nuevo Producto
                     </button>
                 </div>
@@ -178,6 +210,128 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                 renderRow={renderRow}
                 emptyMessage="No se encontraron productos."
             />
+
+            {/* Modal de Creación */}
+            <AdminModal
+                show={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title="Nuevo Producto"
+                maxWidth="max-w-2xl"
+            >
+                <form onSubmit={handleCreateSubmit} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="col-span-2">
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre del Producto</label>
+                            <input
+                                type="text"
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.nombre ? 'border-red-500' : 'border-gray-200'}`}
+                                value={formData.nombre}
+                                onChange={e => setData('nombre', e.target.value)}
+                                placeholder="Ej: PlayStation 5 Slim"
+                            />
+                            {errors.nombre && <p className="text-red-500 text-[10px] mt-1 uppercase font-bold">{errors.nombre}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Categoría</label>
+                            <select
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.id_categoria ? 'border-red-500' : 'border-gray-200'}`}
+                                value={formData.id_categoria}
+                                onChange={e => setData('id_categoria', e.target.value)}
+                            >
+                                <option value="">Seleccionar Categoría</option>
+                                {categorias.map(c => (
+                                    <option key={c.id} value={c.id}>{c.nombre}</option>
+                                ))}
+                            </select>
+                            {errors.id_categoria && <p className="text-red-500 text-[10px] mt-1 uppercase font-bold">{errors.id_categoria}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Stock Inicial</label>
+                            <input
+                                type="number"
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.stock ? 'border-red-500' : 'border-gray-200'}`}
+                                value={formData.stock}
+                                onChange={e => setData('stock', e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Precio Venta (€)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.precio_venta ? 'border-red-500' : 'border-gray-200'}`}
+                                value={formData.precio_venta}
+                                onChange={e => setData('precio_venta', e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Precio Proveedor (€)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                                value={formData.precio_proveedor}
+                                onChange={e => setData('precio_proveedor', e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+
+                        <div className="col-span-2">
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Descripción</label>
+                            <textarea
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                rows="3"
+                                value={formData.descripcion}
+                                onChange={e => setData('descripcion', e.target.value)}
+                                placeholder="Breve descripción del producto..."
+                            ></textarea>
+                        </div>
+
+                        <div className="flex items-center gap-4 py-2">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    checked={formData.activo}
+                                    onChange={e => setData('activo', e.target.checked)}
+                                />
+                                <span className="text-xs font-bold text-gray-700 uppercase group-hover:text-blue-600">Activo</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    checked={formData.destacado}
+                                    onChange={e => setData('destacado', e.target.checked)}
+                                />
+                                <span className="text-xs font-bold text-gray-700 uppercase group-hover:text-blue-600">Destacado</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end gap-3 border-t pt-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsCreateModalOpen(false)}
+                            className="px-4 py-2 text-xs font-black text-gray-500 uppercase hover:bg-gray-100 rounded-lg"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-6 py-2 bg-blue-600 text-white text-xs font-black uppercase rounded-lg hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50"
+                        >
+                            {processing ? 'Guardando...' : 'Crear Producto'}
+                        </button>
+                    </div>
+                </form>
+            </AdminModal>
 
             {/* Pagination */}
             {links.length > 3 && (

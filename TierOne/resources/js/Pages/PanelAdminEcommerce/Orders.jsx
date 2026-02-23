@@ -43,9 +43,9 @@ export default function Orders({ ordenes, filters = {} }) {
         { label: 'Orden', key: 'numero', sortable: false },
         { label: 'Fecha', key: 'fecha', sortable: true },
         { label: 'Cliente', key: 'cliente', sortable: false },
-        { label: 'Estado', key: 'estado', sortable: false },
+        { label: 'Estado', key: 'estado', sortable: false, align: 'center' },
         { label: 'Tracking', key: 'tracking', sortable: false },
-        { label: 'Total', key: 'total', sortable: true },
+        { label: 'Total', key: 'total', sortable: true, align: 'right' },
     ];
 
     const handleSort = (key) => {
@@ -56,6 +56,30 @@ export default function Orders({ ordenes, filters = {} }) {
         router.get(route('panel.ecommerce.orders'), { ...filters, sort_by: key, sort_dir: newDir }, {
             preserveState: true,
             replace: true
+        });
+    };
+
+    const { data: formData, setData, post, processing, errors, reset, clearErrors } = useForm({
+        id_usuario: '',
+        estado: 'pendiente',
+        total: '',
+    });
+
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const openCreateModal = () => {
+        reset();
+        clearErrors();
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCreateSubmit = (e) => {
+        e.preventDefault();
+        post(route('panel.ecommerce.orders.store'), {
+            onSuccess: () => {
+                setIsCreateModalOpen(false);
+                reset();
+            }
         });
     };
 
@@ -91,6 +115,12 @@ export default function Orders({ ordenes, filters = {} }) {
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-gray-800">Listado de Órdenes</h2>
+                <button
+                    onClick={openCreateModal}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                    <span>+</span> Nuevo Pedido
+                </button>
             </div>
 
             <FilterBar
@@ -107,6 +137,74 @@ export default function Orders({ ordenes, filters = {} }) {
                 renderRow={renderRow}
                 emptyMessage="No se encontraron órdenes con estos filtros."
             />
+
+            {/* Modal de Creación Manual */}
+            <AdminModal
+                show={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title="Nueva Orden Manual"
+                maxWidth="max-w-md"
+            >
+                <form onSubmit={handleCreateSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Cliente / Usuario</label>
+                        <select
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.id_usuario ? 'border-red-500' : 'border-gray-200'}`}
+                            value={formData.id_usuario}
+                            onChange={e => setData('id_usuario', e.target.value)}
+                        >
+                            <option value="">Seleccionar Usuario</option>
+                            {usuarios.map(u => (
+                                <option key={u.id} value={u.id}>{u.nombre} ({u.email})</option>
+                            ))}
+                        </select>
+                        {errors.id_usuario && <p className="text-red-500 text-[10px] mt-1 font-bold uppercase">{errors.id_usuario}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Estado Inicial</label>
+                        <select
+                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold"
+                            value={formData.estado}
+                            onChange={e => setData('estado', e.target.value)}
+                        >
+                            <option value="pendiente">Pendiente</option>
+                            <option value="procesando">Procesando</option>
+                            <option value="entregada">Entregada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Total Orden (€)</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold ${errors.total ? 'border-red-500' : 'border-gray-200'}`}
+                            value={formData.total}
+                            onChange={e => setData('total', e.target.value)}
+                            placeholder="0.00"
+                        />
+                        {errors.total && <p className="text-red-500 text-[10px] mt-1 font-bold uppercase">{errors.total}</p>}
+                    </div>
+
+                    <div className="mt-6 flex justify-end gap-3 border-t pt-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsCreateModalOpen(false)}
+                            className="px-4 py-2 text-xs font-black text-gray-500 uppercase hover:bg-gray-100 rounded-lg"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-6 py-2 bg-blue-600 text-white text-xs font-black uppercase rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {processing ? 'Creando...' : 'Crear Orden'}
+                        </button>
+                    </div>
+                </form>
+            </AdminModal>
 
             {/* Pagination */}
             {links.length > 3 && (

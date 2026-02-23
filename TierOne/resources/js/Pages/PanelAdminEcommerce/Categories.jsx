@@ -31,9 +31,9 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
         { label: 'Nombre', key: 'nombre', sortable: true },
         { label: 'Slug', key: 'slug', sortable: false },
         { label: 'Descripción', key: 'descripcion', sortable: false },
-        { label: 'Subcategorías', key: 'subcategorias', sortable: false },
-        { label: 'Estado', key: 'activa', sortable: true },
-        { label: 'Acciones', key: 'acciones', sortable: false },
+        { label: 'Subcategorías', key: 'subcategorias', sortable: false, align: 'center' },
+        { label: 'Estado', key: 'activa', sortable: true, align: 'center' },
+        { label: 'Acciones', key: 'acciones', sortable: false, align: 'right' },
     ];
 
     const openCreateModal = () => {

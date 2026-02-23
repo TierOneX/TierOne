@@ -66,4 +66,28 @@ class ProductController extends Controller
             'filters' => $filters
         ]);
     }
+
+    /**
+     * Guarda un nuevo producto.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre'           => 'required|string|max:255',
+            'id_categoria'    => 'required|exists:categorias,id',
+            'precio_venta'     => 'required|numeric|min:0',
+            'precio_proveedor' => 'nullable|numeric|min:0',
+            'stock'            => 'required|integer|min:0',
+            'activo'           => 'boolean',
+            'destacado'        => 'boolean',
+            'descripcion'      => 'nullable|string',
+        ]);
+
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['nombre']);
+        $validated['fecha_creacion'] = now();
+
+        Producto::create($validated);
+
+        return redirect()->back()->with('success', 'Producto creado correctamente');
+    }
 }

@@ -22,9 +22,10 @@ export default function AdminTable({
     renderRow,
     emptyMessage = "No se encontraron resultados."
 }) {
-    const renderSortIcon = (key) => {
-        if (!filters.sort_by || filters.sort_by !== key) return '↕️';
-        return filters.sort_dir === 'asc' ? '🔼' : '🔽';
+    const getAlignClass = (align) => {
+        if (align === 'right') return 'text-right justify-end';
+        if (align === 'center') return 'text-center justify-center';
+        return 'text-left justify-start';
     };
 
     return (
@@ -36,10 +37,10 @@ export default function AdminTable({
                             {columns.map((col, idx) => (
                                 <th
                                     key={idx}
-                                    className={`px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider ${col.sortable ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''}`}
+                                    className={`px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider ${col.sortable ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''} ${getAlignClass(col.align).split(' ')[0]}`}
                                     onClick={() => col.sortable && onSort && onSort(col.key)}
                                 >
-                                    <div className="flex items-center gap-1.5">
+                                    <div className={`flex items-center gap-1.5 ${getAlignClass(col.align).split(' ')[1]}`}>
                                         {col.label}
                                         {col.sortable && (
                                             <span className="inline-flex flex-col text-[10px] leading-[0.5] text-gray-300">
@@ -63,7 +64,34 @@ export default function AdminTable({
                                 </td>
                             </tr>
                         ) : (
-                            data.map((item, index) => renderRow(item, index))
+                            data.map((item, index) => {
+                                const row = renderRow(item, index);
+
+                                const injectAlign = (element) => {
+                                    if (!React.isValidElement(element)) return element;
+
+                                    if (element.type === 'tr') {
+                                        return React.cloneElement(element, {
+                                            children: React.Children.map(element.props.children, (child, i) => {
+                                                if (!child || !columns[i]) return child;
+                                                return React.cloneElement(child, {
+                                                    className: `${child.props.className || ''} ${getAlignClass(columns[i].align).split(' ')[0]}`
+                                                });
+                                            })
+                                        });
+                                    }
+
+                                    if (element.type === React.Fragment || !element.type) {
+                                        return React.cloneElement(element, {
+                                            children: React.Children.map(element.props.children, (child) => injectAlign(child))
+                                        });
+                                    }
+
+                                    return element;
+                                };
+
+                                return injectAlign(row);
+                            })
                         )}
                     </tbody>
                 </table>

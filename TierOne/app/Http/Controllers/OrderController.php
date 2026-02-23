@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Orden;
+use App\Models\User;
+use App\Models\Producto;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -58,7 +60,32 @@ class OrderController extends Controller
                     'fecha'    => $o->fecha_orden?->format('d/m/Y'),
                     'tracking' => $o->tracking_number,
                 ]),
-            'filters' => $filters
+            'filters' => $filters,
+            'usuarios' => User::all(['id', 'nombre', 'email']),
+            'productos' => Producto::where('activo', true)->get(['id', 'nombre', 'precio_venta'])
         ]);
+    }
+
+    /**
+     * Crea una orden manualmente.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_usuario' => 'required|exists:users,id',
+            'estado'     => 'required|string',
+            'total'      => 'required|numeric|min:0',
+        ]);
+
+        $validated['numero_orden'] = 'ORD-' . strtoupper(uniqid());
+        $validated['fecha_orden'] = now();
+        $validated['subtotal'] = $validated['total']; // Simplificación para orden manual
+        $validated['impuestos'] = 0;
+        $validated['costo_envio'] = 0;
+        $validated['descuento'] = 0;
+
+        \App\Models\Orden::create($validated);
+
+        return redirect()->back()->with('success', 'Orden creada manualmente');
     }
 }
