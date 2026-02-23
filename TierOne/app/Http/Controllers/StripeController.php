@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Orden;
+use App\Models\Carrito;
+use App\Models\ItemCarrito;
 use App\Models\ItemOrden;
 use App\Models\Pago;
 use App\Models\Producto;
 use App\Models\VarianteProducto;
+use App\Models\Orden;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -114,11 +116,14 @@ class StripeController extends Controller
 
                 // 2. Crear los ItemOrden
                 foreach ($itemsData as $item) {
+                    // Obtener el id_proveedor real del producto
+                    $productoOriginal = Producto::find($item['id_producto']);
+
                     ItemOrden::create([
                         'id_orden' => $orden->id,
                         'id_producto' => $item['id_producto'],
                         'id_variante' => $item['id_variante'],
-                        'id_proveedor' => 1, // placeholder — ajustar según lógica de proveedor
+                        'id_proveedor' => $productoOriginal->id_proveedor ?? 1,
                         'cantidad' => $item['cantidad'],
                         'precio_unitario' => $item['precio_unitario'],
                         'subtotal' => $item['subtotal'],
@@ -269,22 +274,8 @@ class StripeController extends Controller
                 return $this->notFoundResponse('Orden no encontrada para este pago.');
             }
 
-            // 3. Actualizar orden y pago en la BD
-            DB::transaction(function () use ($orden, $paymentIntent) {
-                $orden->update(['estado' => 'pagada']);
-
-                $pago = Pago::where('id_transaccion', $paymentIntent->id)->first();
-                if ($pago) {
-                    $pago->update([
-                        'estado' => 'completado',
-                        'detalles_json' => array_merge($pago->detalles_json ?? [], [
-                            'status' => 'succeeded',
-                            'payment_method' => $paymentIntent->payment_method ?? null,
-                            'confirmed_at' => now()->toISOString(),
-                        ]),
-                    ]);
-                }
-            });
+            // 3. Procesar el éxito de la orden de forma centralizada
+            $this->procesarExitoOrden($orden, $paymentIntent);
 
             Log::info("Orden #{$orden->numero_orden} confirmada directamente (sin webhook).");
 
@@ -341,11 +332,22 @@ class StripeController extends Controller
             return;
         }
 
+        $this->procesarExitoOrden($orden, $paymentIntent);
+
+        Log::info("Orden #{$orden->numero_orden} marcada como PAGADA.");
+    }
+
+    private function procesarExitoOrden(Orden $orden, object $paymentIntent): void
+    {
+        // Evitar procesar dos veces si ya está pagada
+        if ($orden->estado === 'pagada')
+            return;
+
         DB::transaction(function () use ($orden, $paymentIntent) {
-            // Actualizar Orden
+            // 1. Actualizar Orden
             $orden->update(['estado' => 'pagada']);
 
-            // Actualizar Pago
+            // 2. Actualizar Pago asociado
             $pago = Pago::where('id_transaccion', $paymentIntent->id)->first();
             if ($pago) {
                 $pago->update([
@@ -357,9 +359,29 @@ class StripeController extends Controller
                     ]),
                 ]);
             }
+
+            // 3. Incrementar ventas totales de los productos
+            $items = ItemOrden::where('id_orden', $orden->id)->get();
+            foreach ($items as $item) {
+                $producto = Producto::find($item->id_producto);
+                if ($producto) {
+                    $producto->increment('ventas_totales', $item->cantidad);
+                }
+            }
+
+            // 4. Limpiar el carrito en la base de datos para este usuario
+            if ($orden->id_usuario) {
+                $carrito = Carrito::where('id_usuario', $orden->id_usuario)->first();
+                if ($carrito) {
+                    // Eliminar todos los items del carrito
+                    ItemCarrito::where('id_carrito', $carrito->id)->delete();
+                    // Reiniciar el subtotal del carrito
+                    $carrito->update(['subtotal' => 0]);
+                }
+            }
         });
 
-        Log::info("Orden #{$orden->numero_orden} marcada como PAGADA.");
+        Log::info("Orden #{$orden->numero_orden} procesada con éxito. Ventas incrementadas.");
     }
 
     private function handlePaymentIntentFailed(object $paymentIntent): void
