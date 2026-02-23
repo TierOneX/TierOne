@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import { useCart } from '@/Contexts/CartContext';
 
@@ -18,10 +19,14 @@ export default function CartMobileFooter() {
                     <span className="text-2xl font-black text-white">${total.toFixed(2)}</span>
                 </div>
 
-                <button className="flex-grow bg-[#e31837] text-white py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-red-900/20">
+                <Link
+                    href="/checkout"
+                    id="btn-pagar-movil"
+                    className="flex-grow bg-[#e31837] text-white py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-red-900/20"
+                >
                     PAGAR
                     <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -80,5 +81,29 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
 });
+
+// =========================================================================
+// RUTAS DE STRIPE / PAGOS
+// =========================================================================
+
+// Webhook de Stripe (sin auth, CSRF ya excluido en bootstrap/app.php)
+Route::post('/stripe/webhook', [StripeController::class , 'webhook'])->name('stripe.webhook');
+
+// Crear PaymentIntent (requiere que el carrito tenga items)
+Route::post('/stripe/create-intent', [StripeController::class , 'crearPaymentIntent'])->name('stripe.create-intent');
+
+// Obtener estado de una orden (para página de confirmación)
+Route::get('/stripe/orden/{orderId}', [StripeController::class , 'obtenerOrden'])->name('stripe.orden');
+
+// Rutas frontend del proceso de pago
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout', [
+    'stripeKey' => config('stripe.key'),
+    ]);
+})->name('checkout');
+
+Route::get('/checkout/success', function () {
+    return Inertia::render('CheckoutSuccess');
+})->name('checkout.success');
 
 require __DIR__ . '/auth.php';

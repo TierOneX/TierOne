@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { useCart } from '@/Contexts/CartContext';
 
@@ -47,10 +48,14 @@ export default function CartSummary({ hideButton = false }) {
                 </div>
 
                 {!hideButton && (
-                    <button className="w-full bg-[#e31837] hover:bg-[#c2102d] text-white py-5 rounded-xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-red-900/20">
+                    <Link
+                        href="/checkout"
+                        id="btn-proceder-pago"
+                        className="w-full bg-[#e31837] hover:bg-[#c2102d] text-white py-5 rounded-xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-red-900/20"
+                    >
                         PROCEDER AL PAGO
                         <ArrowRight className="w-5 h-5" />
-                    </button>
+                    </Link>
                 )}
 
                 <div className="flex items-center justify-center gap-4 mt-8 opacity-40 grayscale hover:grayscale-0 transition-all">
