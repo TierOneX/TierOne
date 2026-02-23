@@ -29,7 +29,7 @@ class OrderController extends Controller
         $orderCol = $sortMap[$sortBy] ?? 'fecha_orden';
 
         return Inertia::render('PanelAdminEcommerce/Orders', [
-            'ordenes' => Orden::with('usuario')
+            'ordenes' => Orden::with(['usuario', 'items.producto'])
                 ->when($filters['search'] ?? null, function($q, $v) {
                     $q->where(function($sq) use ($v) {
                         $sq->where('numero_orden', 'like', "%$v%")
@@ -59,6 +59,13 @@ class OrderController extends Controller
                     'estado'   => $o->estado,
                     'fecha'    => $o->fecha_orden?->format('d/m/Y'),
                     'tracking' => $o->tracking_number,
+                    'items'    => $o->items->map(fn($i) => [
+                        'id' => $i->id,
+                        'producto' => $i->producto?->nombre ?? 'Producto eliminado',
+                        'cantidad' => $i->cantidad,
+                        'precio'   => $i->precio_unitario,
+                        'subtotal' => $i->subtotal,
+                    ]),
                 ]),
             'filters' => $filters,
             'usuarios' => User::all(['id', 'nombre', 'email']),

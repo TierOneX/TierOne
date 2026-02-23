@@ -139,12 +139,40 @@ class FinanzaController extends Controller
                 'estado' => $r->estado,
                 'fecha_solicitud' => $r->fecha_solicitud?->format('d/m/Y H:i'),
                 'procesado_por' => $r->procesadoPor?->nombre,
+                'id_procesado_por' => $r->id_procesado_por,
                 'fecha_procesado' => $r->fecha_procesado?->format('d/m/Y H:i'),
+                'notas_admin' => $r->notas_admin,
             ]);
 
         return Inertia::render('PanelAdminEcommerce/Finanzas/Retiros', [
             'retiros' => $retiros,
-            'filters' => $filters
+            'filters' => $filters,
+            'admins' => \App\Models\User::where('rol', 'admin')->get(['id', 'nombre as name']),
         ]);
+    }
+
+    /**
+     * Actualizar estado de un retiro.
+     */
+    public function updateRetiro(Request $request, $id)
+    {
+        $retiro = Retiro::findOrFail($id);
+
+        $request->validate([
+            'estado' => 'required|in:pendiente,procesando,completado,rechazado',
+            'metodo' => 'required|in:paypal,transferencia,cripto',
+            'notas_admin' => 'nullable|string',
+            'id_procesado_por' => 'nullable|exists:users,id',
+        ]);
+
+        $retiro->update([
+            'estado' => $request->estado,
+            'metodo' => $request->metodo,
+            'notas_admin' => $request->notas_admin,
+            'id_procesado_por' => $request->id_procesado_por ?? auth()->id(),
+            'fecha_procesado' => in_array($request->estado, ['completado', 'rechazado']) ? now() : $retiro->fecha_procesado,
+        ]);
+
+        return back()->with('success', 'Solicitud de retiro actualizada.');
     }
 }

@@ -44,11 +44,13 @@ Route::get('/shop', function () {
 Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products');
+    Route::post('/products', [App\Http\Controllers\ProductController::class, 'store'])->name('products.store');
     Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
     Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
+    Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
     Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');
     Route::post('/proveedores', [App\Http\Controllers\ProveedorController::class, 'store'])->name('proveedores.store');
@@ -59,6 +61,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::get('/finanzas/pagos', [App\Http\Controllers\FinanzaController::class, 'pagos'])->name('finanzas.pagos');
     Route::get('/finanzas/transacciones', [App\Http\Controllers\FinanzaController::class, 'transacciones'])->name('finanzas.transacciones');
     Route::get('/finanzas/retiros', [App\Http\Controllers\FinanzaController::class, 'retiros'])->name('finanzas.retiros');
+    Route::post('/finanzas/retiros/{id}', [App\Http\Controllers\FinanzaController::class, 'updateRetiro'])->name('finanzas.retiros.update');
 
     // Reviews
     Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');

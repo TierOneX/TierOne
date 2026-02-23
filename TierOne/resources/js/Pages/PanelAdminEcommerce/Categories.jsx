@@ -4,11 +4,12 @@ import PanelLayout from '@/Components/PanelAdminEcommerce/PanelLayout';
 import FilterBar from '@/Components/PanelAdminEcommerce/FilterBar';
 import AdminTable from '@/Components/PanelAdminEcommerce/AdminTable';
 import AdminModal from '@/Components/PanelAdminEcommerce/AdminModal';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
 
 export default function Categories({ categorias = [], filters = {}, todas_categorias = [] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [isReadOnly, setIsReadOnly] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         nombre: '',
@@ -38,6 +39,7 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
 
     const openCreateModal = () => {
         setEditingCategory(null);
+        setIsReadOnly(false);
         reset();
         clearErrors();
         setIsModalOpen(true);
@@ -45,6 +47,7 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
 
     const openEditModal = (cat) => {
         setEditingCategory(cat);
+        setIsReadOnly(false);
         setData({
             nombre: cat.nombre || '',
             descripcion: cat.descripcion || '',
@@ -52,6 +55,18 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
             activa: !!cat.activa
         });
         clearErrors();
+        setIsModalOpen(true);
+    };
+
+    const openDetailsModal = (cat) => {
+        setEditingCategory(cat);
+        setIsReadOnly(true);
+        setData({
+            nombre: cat.nombre || '',
+            descripcion: cat.descripcion || '',
+            id_parent: cat.padre || '',
+            activa: !!cat.activa
+        });
         setIsModalOpen(true);
     };
 
@@ -86,43 +101,50 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
             ...filters,
             sort_by: key,
             sort_dir: newDir
-        }, { preserveState: true });
+        }, { preserveState: true, replace: true });
     };
 
     const renderRow = (cat) => (
-        <tr key={cat.id} className="hover:bg-gray-50 transition-colors group">
+        <tr key={cat.id} className="hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => openDetailsModal(cat)}>
             <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                     {cat.padre && <span className="text-gray-300">└</span>}
-                    <span className="font-medium text-gray-900">{cat.nombre}</span>
+                    <span className="font-bold text-gray-900">{cat.nombre}</span>
                 </div>
             </td>
-            <td className="px-6 py-4 text-xs text-gray-500 font-mono">{cat.slug}</td>
+            <td className="px-6 py-4 text-xs text-gray-400 font-mono italic tracking-tight">{cat.slug}</td>
             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                 {cat.descripcion ?? '—'}
             </td>
-            <td className="px-6 py-4 text-sm text-gray-600">
+            <td className="px-6 py-4 text-center">
                 {cat.subcategorias > 0
-                    ? <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">{cat.subcategorias}</span>
-                    : <span className="text-gray-400">—</span>
+                    ? <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full text-[10px] font-black">{cat.subcategorias}</span>
+                    : <span className="text-gray-300">—</span>
                 }
             </td>
-            <td className="px-6 py-4">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cat.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <td className="px-6 py-4 text-center">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${cat.activa ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
                     {cat.activa ? 'Activa' : 'Inactiva'}
                 </span>
             </td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                        onClick={() => openEditModal(cat)}
+                        onClick={(e) => { e.stopPropagation(); openDetailsModal(cat); }}
                         className="p-1 text-gray-400 hover:text-blue-600"
+                        title="Ver Detalles"
+                    >
+                        👁️
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); openEditModal(cat); }}
+                        className="p-1 text-gray-400 hover:text-amber-600"
                         title="Editar"
                     >
                         ✏️
                     </button>
                     <button
-                        onClick={() => handleDelete(cat.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(cat.id); }}
                         className="p-1 text-gray-400 hover:text-red-600"
                         title="Eliminar"
                     >
@@ -138,12 +160,12 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
             <Head title="Categorías - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Listado de Categorías</h2>
+                <h2 className="text-lg font-bold text-white">Listado de Categorías</h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 tracking-widest"
                 >
-                    <span>+</span> Nueva Categoría
+                    + Nueva Categoría
                 </button>
             </div>
 
@@ -162,33 +184,35 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
                 emptyMessage="No se encontraron categorías."
             />
 
-            {/* Modal de Creación/Edición */}
+            {/* Modal de Creación/Edición/Detalles */}
             <AdminModal
                 show={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}
+                title={isReadOnly ? 'Detalles de Categoría' : (editingCategory ? 'Editar Categoría' : 'Nueva Categoría')}
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
+                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Nombre</label>
                         <input
                             type="text"
-                            className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${errors.nombre ? 'border-red-500' : 'border-gray-200'}`}
+                            readOnly={isReadOnly}
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 ${isReadOnly ? 'border-gray-100 bg-gray-100' : (errors.nombre ? 'border-red-500' : 'border-gray-200')}`}
                             value={data.nombre}
                             onChange={e => setData('nombre', e.target.value)}
                             placeholder="Ej: Camisetas"
                         />
-                        {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
+                        {errors.nombre && <p className="text-red-500 text-[10px] mt-1 font-bold uppercase">{errors.nombre}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Categoría Padre (Opcional)</label>
+                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Categoría Padre (Opcional)</label>
                         <select
-                            className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            disabled={isReadOnly}
+                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             value={data.id_parent}
                             onChange={e => setData('id_parent', e.target.value)}
                         >
-                            <option value="">— Sin Padre (Categoría Principal) —</option>
+                            <option value="">— Ninguna (Categoría Principal) —</option>
                             {todas_categorias.map(cat => (
                                 <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                             ))}
@@ -196,9 +220,10 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Descripción</label>
                         <textarea
-                            className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            readOnly={isReadOnly}
+                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black focus:ring-2 focus:ring-blue-500 min-h-[100px]"
                             rows="3"
                             value={data.descripcion}
                             onChange={e => setData('descripcion', e.target.value)}
@@ -206,32 +231,36 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
                         ></textarea>
                     </div>
 
-                    <div className="flex items-center gap-2 py-2">
-                        <input
-                            type="checkbox"
-                            id="activa"
-                            className="w-4 h-4 text-blue-600 rounded"
-                            checked={data.activa}
-                            onChange={e => setData('activa', e.target.checked)}
-                        />
-                        <label htmlFor="activa" className="text-sm font-medium text-gray-700">Categoría Activa</label>
-                    </div>
+                    {!isReadOnly && (
+                        <div className="flex items-center gap-2 py-2">
+                            <input
+                                type="checkbox"
+                                id="activa"
+                                className="w-4 h-4 bg-white border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+                                checked={data.activa}
+                                onChange={e => setData('activa', e.target.checked)}
+                            />
+                            <label htmlFor="activa" className="text-xs font-bold text-gray-500 uppercase tracking-wide cursor-pointer">Estado Activo</label>
+                        </div>
+                    )}
 
-                    <div className="flex justify-end gap-3 mt-6">
+                    <div className="flex justify-end gap-3 mt-6 border-t border-gray-100 pt-4">
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="px-4 py-2 text-xs font-black text-gray-400 uppercase hover:bg-gray-50 rounded-lg transition-colors"
                         >
-                            Cancelar
+                            {isReadOnly ? 'Cerrar' : 'Cancelar'}
                         </button>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                        >
-                            {editingCategory ? 'Guardar Cambios' : 'Crear Categoría'}
-                        </button>
+                        {!isReadOnly && (
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="px-6 py-2 bg-blue-600 text-white text-xs font-black uppercase rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-md shadow-blue-200"
+                            >
+                                {editingCategory ? 'Guardar Cambios' : 'Crear Categoría'}
+                            </button>
+                        )}
                     </div>
                 </form>
             </AdminModal>

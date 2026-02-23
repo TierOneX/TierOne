@@ -64,27 +64,27 @@ export default function Reviews({ reviews, filters = {} }) {
                 <div className="text-sm font-bold text-gray-900">{r.producto}</div>
             </td>
             <td className="px-6 py-4">
-                <div className="text-sm text-gray-600 flex items-center gap-1">
+                <div className="text-sm text-gray-600 flex items-center gap-1 font-medium">
                     {r.usuario}
-                    {r.verificado && <span className="text-blue-500" title="Compra verificada">✅</span>}
+                    {r.verificado && <span className="text-blue-600 text-[10px] font-bold" title="Compra verificada">● VERIFICADO</span>}
                 </div>
             </td>
             <td className="px-6 py-4">
-                <div className="flex text-yellow-400">
+                <div className="flex text-amber-500">
                     {[...Array(5)].map((_, i) => (
-                        <span key={i}>{i < r.calificacion ? '⭐' : '☆'}</span>
+                        <span key={i} className="text-lg">{i < r.calificacion ? '★' : '☆'}</span>
                     ))}
                 </div>
             </td>
             <td className="px-6 py-4 text-sm text-gray-500 max-w-md">
-                <p className="line-clamp-2">{r.comentario}</p>
+                <p className="line-clamp-2 leading-relaxed">{r.comentario}</p>
             </td>
-            <td className="px-6 py-4 text-sm text-gray-900 font-medium">{r.fecha}</td>
+            <td className="px-6 py-4 text-sm text-gray-900 font-bold">{r.fecha}</td>
             <td className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => deleteReview(r.id)}
-                        className="p-1 text-gray-400 hover:text-red-600"
+                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-100 shadow-sm transition-colors"
                         title="Eliminar Reseña"
                     >
                         🗑️
@@ -99,7 +99,7 @@ export default function Reviews({ reviews, filters = {} }) {
             <Head title="Reseñas - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Comentarios de Clientes</h2>
+                <h2 className="text-lg font-bold text-white">Comentarios de Clientes</h2>
             </div>
 
             <FilterBar
@@ -122,9 +122,9 @@ export default function Reviews({ reviews, filters = {} }) {
                         <Link
                             key={i}
                             href={link.url ?? '#'}
-                            className={`px-3 py-1 rounded text-sm border ${link.active
+                            className={`px-3 py-1 rounded text-sm border font-bold ${link.active
                                 ? 'bg-blue-600 text-white border-blue-600'
-                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
                                 } ${!link.url ? 'opacity-40 pointer-events-none' : ''}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />

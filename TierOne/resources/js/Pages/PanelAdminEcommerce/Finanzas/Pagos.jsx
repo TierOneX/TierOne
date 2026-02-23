@@ -93,7 +93,7 @@ export default function Pagos({ pagos, filters = {} }) {
             <Head title="Pagos - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Sincronización de Pagos</h2>
+                <h2 className="text-lg font-bold text-white uppercase tracking-tight">Sincronización de Pagos</h2>
             </div>
 
             <FilterBar

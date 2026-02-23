@@ -30,13 +30,13 @@ class ProductController extends Controller
         $orderCol = $sortMap[$sortBy] ?? 'fecha_creacion';
         
         return Inertia::render('PanelAdminEcommerce/Products', [
-            'productos' => Producto::with(['categoria', 'variantes'])
+            'productos' => Producto::with(['categoria', 'variantes', 'proveedor'])
                 ->when($filters['search'] ?? null, function($q, $v) {
                     $q->where(function($sq) use ($v) {
-                        $sq->where('id', 'like', "%$v%")
-                           ->orWhere('nombre', 'like', "%$v%")
-                           ->orWhere('slug', 'like', "%$v%")
-                           ->orWhere('descripcion', 'like', "%$v%");
+                        $sq->where('productos.id', 'like', "%$v%")
+                           ->orWhere('productos.nombre', 'like', "%$v%")
+                           ->orWhere('productos.slug', 'like', "%$v%")
+                           ->orWhere('productos.descripcion', 'like', "%$v%");
                     });
                 })
                 ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
@@ -51,7 +51,8 @@ class ProductController extends Controller
                 ->through(fn($p) => [
                     'id'              => $p->id,
                     'nombre'          => $p->nombre,
-                    'categoria'       => $p->categoria?->nombre ?? 'Sin categoría',
+                    'categoria'       => $p->categoria,
+                    'proveedor'       => $p->proveedor,
                     'precio_venta'    => $p->precio_venta,
                     'precio_proveedor'=> $p->precio_proveedor,
                     'imagen_principal'=> $p->imagen_principal,

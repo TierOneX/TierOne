@@ -166,10 +166,10 @@ export default function Proveedores({ proveedores, filters = {} }) {
             <Head title="Proveedores - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Listado de Proveedores</h2>
+                <h2 className="text-lg font-bold text-white uppercase tracking-tight">Listado de Proveedores</h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-blue-200"
                 >
                     <span>+</span> Nuevo Proveedor
                 </button>

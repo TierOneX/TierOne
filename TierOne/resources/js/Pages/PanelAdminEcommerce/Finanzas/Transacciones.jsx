@@ -82,7 +82,7 @@ export default function Transacciones({ transacciones, filters = {} }) {
             <Head title="Transacciones - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Libro de Movimientos</h2>
+                <h2 className="text-lg font-bold text-white uppercase tracking-tight">Libro de Movimientos</h2>
             </div>
 
             <FilterBar

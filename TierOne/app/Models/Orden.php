@@ -119,4 +119,14 @@ class Orden extends Model
     {
         return $this->hasMany(Transaccion::class, 'id_orden');
     }
+
+    /**
+     * Relación: Ítems (productos) incluidos en la orden
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function items()
+    {
+        return $this->hasMany(ItemOrden::class, 'id_orden');
+    }
 }
