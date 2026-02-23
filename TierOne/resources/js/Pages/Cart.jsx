@@ -68,9 +68,9 @@ export default function Cart() {
                                 </p>
                             </div>
 
-                            {/* Resumen detallado en móvil (sin botón) */}
+                            {/* Resumen detallado en móvil */}
                             <div className="lg:hidden mt-8">
-                                <CartSummary hideButton={true} />
+                                <CartSummary />
                             </div>
                         </div>
 
