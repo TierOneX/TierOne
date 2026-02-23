@@ -9,7 +9,9 @@ import AdminModal from '@/Components/PanelAdminEcommerce/AdminModal';
 export default function Products({ productos, categorias = [], filters = {} }) {
     const { data = [], links = [] } = productos ?? {};
     const [expandedProduct, setExpandedProduct] = useState(null);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     const filtersConfig = [
         { name: 'search', label: 'Buscar', type: 'text' },
@@ -35,7 +37,7 @@ export default function Products({ productos, categorias = [], filters = {} }) {
     ];
 
     const columns = [
-        { label: 'Producto', key: 'nombre', sortable: false },
+        { label: 'Producto', key: 'nombre', sortable: true },
         { label: 'P. Coste', key: 'precio_proveedor', sortable: true, align: 'right' },
         { label: 'P. Venta', key: 'precio_venta', sortable: true, align: 'right' },
         { label: 'Ventas', key: 'ventas_totales', sortable: true, align: 'right' },
@@ -56,40 +58,86 @@ export default function Products({ productos, categorias = [], filters = {} }) {
         }, { preserveState: true, replace: true });
     };
 
-    const { data: formData, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const { data: formData, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         nombre: '',
         id_categoria: '',
         precio_venta: '',
         precio_proveedor: '',
-        stock: '0',
         activo: true,
         destacado: false,
         descripcion: '',
     });
 
     const openCreateModal = () => {
+        setModalMode('create');
+        setSelectedProduct(null);
         reset();
         clearErrors();
-        setIsCreateModalOpen(true);
+        setIsModalOpen(true);
     };
 
-    const handleCreateSubmit = (e) => {
-        e.preventDefault();
-        post(route('panel.ecommerce.products.store'), {
-            onSuccess: () => {
-                setIsCreateModalOpen(false);
-                reset();
-            }
+    const openEditModal = (product) => {
+        setModalMode('edit');
+        setSelectedProduct(product);
+        setData({
+            nombre: product.nombre || '',
+            id_categoria: product.categoria?.id || '',
+            precio_venta: product.precio_venta || '',
+            precio_proveedor: product.precio_proveedor || '',
+            activo: !!product.activo,
+            destacado: !!product.destacado,
+            descripcion: product.descripcion || '',
         });
+        clearErrors();
+        setIsModalOpen(true);
+    };
+
+    const openViewModal = (product) => {
+        setModalMode('view');
+        setSelectedProduct(product);
+        setData({
+            nombre: product.nombre || '',
+            id_categoria: product.categoria?.id || '',
+            precio_venta: product.precio_venta || '',
+            precio_proveedor: product.precio_proveedor || '',
+            activo: !!product.activo,
+            destacado: !!product.destacado,
+            descripcion: product.descripcion || '',
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (modalMode === 'create') {
+            post(route('panel.ecommerce.products.store'), {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    reset();
+                }
+            });
+        } else if (modalMode === 'edit') {
+            put(route('panel.ecommerce.products.update', selectedProduct.id), {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                }
+            });
+        }
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
+            router.delete(route('panel.ecommerce.products.destroy', id));
+        }
     };
 
     const renderRow = (product) => (
         <React.Fragment key={product.id}>
-            <tr className="hover:bg-gray-50 transition-colors group border-b border-gray-100">
+            <tr className="hover:bg-gray-50 transition-colors group border-b border-gray-100 cursor-pointer" onClick={() => openViewModal(product)}>
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)}
+                            onClick={(e) => { e.stopPropagation(); setExpandedProduct(expandedProduct === product.id ? null : product.id); }}
                             className="text-gray-400 hover:text-blue-600 transition-colors w-4 text-xs"
                         >
                             {expandedProduct === product.id ? '▼' : '▶'}
@@ -128,10 +176,29 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                         {product.activo ? 'Activo' : 'Pausado'}
                     </span>
                 </td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm" title="Editar">✏️</button>
-                        <button className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm" title="Eliminar">🗑️</button>
+                        <button
+                            onClick={() => openViewModal(product)}
+                            className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm"
+                            title="Ver Detalles"
+                        >
+                            👁️
+                        </button>
+                        <button
+                            onClick={() => openEditModal(product)}
+                            className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            title="Editar"
+                        >
+                            ✏️
+                        </button>
+                        <button
+                            onClick={() => handleDelete(product.id)}
+                            className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            title="Eliminar"
+                        >
+                            🗑️
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -185,9 +252,9 @@ export default function Products({ productos, categorias = [], filters = {} }) {
             <Head title="Productos - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white">Listado de Productos</h2>
+                <h2 className="text-lg font-bold text-white tracking-tight uppercase">Listado de Productos</h2>
                 <div className="flex gap-2">
-                    <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-gray-50 transition-colors tracking-widest ">
+                    <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-gray-50 transition-colors tracking-widest shadow-sm">
                         📦 Importar
                     </button>
                     <button
@@ -214,20 +281,21 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                 emptyMessage="No se encontraron productos."
             />
 
-            {/* Modal de Creación */}
+            {/* Modal Único para CRUD */}
             <AdminModal
-                show={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                title="Nuevo Producto"
+                show={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={modalMode === 'create' ? 'Nuevo Producto' : (modalMode === 'edit' ? 'Editar Producto' : 'Detalles del Producto')}
                 maxWidth="max-w-2xl"
             >
-                <form onSubmit={handleCreateSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-5">
                         <div className="col-span-2">
                             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nombre del Producto</label>
                             <input
                                 type="text"
-                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.nombre ? 'border-red-500' : 'border-gray-200'}`}
+                                readOnly={modalMode === 'view'}
+                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.nombre ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 value={formData.nombre}
                                 onChange={e => setData('nombre', e.target.value)}
                                 placeholder="Ej: PlayStation 5 Slim"
@@ -238,7 +306,8 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                         <div>
                             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Categoría</label>
                             <select
-                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.id_categoria ? 'border-red-500' : 'border-gray-200'}`}
+                                disabled={modalMode === 'view'}
+                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.id_categoria ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 value={formData.id_categoria}
                                 onChange={e => setData('id_categoria', e.target.value)}
                             >
@@ -249,14 +318,29 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             </select>
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Stock Inicial</label>
-                            <input
-                                type="number"
-                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold"
-                                value={formData.stock}
-                                onChange={e => setData('stock', e.target.value)}
-                            />
+                        <div className="flex items-center gap-6 px-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <div className="flex flex-col gap-1">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        disabled={modalMode === 'view'}
+                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        checked={formData.activo}
+                                        onChange={e => setData('activo', e.target.checked)}
+                                    />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Activo</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        disabled={modalMode === 'view'}
+                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        checked={formData.destacado}
+                                        onChange={e => setData('destacado', e.target.checked)}
+                                    />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-amber-600 transition-colors">Destacado</span>
+                                </label>
+                            </div>
                         </div>
 
                         <div>
@@ -264,7 +348,8 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             <input
                                 type="number"
                                 step="0.01"
-                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-black text-lg"
+                                readOnly={modalMode === 'view'}
+                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-black text-lg ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 value={formData.precio_venta}
                                 onChange={e => setData('precio_venta', e.target.value)}
                                 placeholder="0.00"
@@ -276,7 +361,8 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             <input
                                 type="number"
                                 step="0.01"
-                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-500 font-bold"
+                                readOnly={modalMode === 'view'}
+                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-500 font-bold ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 value={formData.precio_proveedor}
                                 onChange={e => setData('precio_proveedor', e.target.value)}
                                 placeholder="0.00"
@@ -286,51 +372,33 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                         <div className="col-span-2">
                             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Descripción</label>
                             <textarea
-                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black min-h-[120px]"
+                                readOnly={modalMode === 'view'}
+                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black min-h-[120px] ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 rows="3"
                                 value={formData.descripcion}
                                 onChange={e => setData('descripcion', e.target.value)}
                                 placeholder="Breve descripción del producto..."
                             ></textarea>
                         </div>
-
-                        <div className="flex items-center gap-6 py-2 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input
-                                    type="checkbox"
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    checked={formData.activo}
-                                    onChange={e => setData('activo', e.target.checked)}
-                                />
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Activo</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input
-                                    type="checkbox"
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    checked={formData.destacado}
-                                    onChange={e => setData('destacado', e.target.checked)}
-                                />
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-amber-600 transition-colors">Destacado</span>
-                            </label>
-                        </div>
                     </div>
 
                     <div className="mt-8 flex justify-end gap-3 border-t border-gray-100 pt-6">
                         <button
                             type="button"
-                            onClick={() => setIsCreateModalOpen(false)}
+                            onClick={() => setIsModalOpen(false)}
                             className="px-5 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-gray-50 rounded-xl transition-all"
                         >
-                            Cancelar
+                            {modalMode === 'view' ? 'Cerrar' : 'Cancelar'}
                         </button>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-8 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 transition-all"
-                        >
-                            {processing ? 'Procesando...' : 'Crear Producto'}
-                        </button>
+                        {modalMode !== 'view' && (
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="px-8 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 transition-all"
+                            >
+                                {processing ? 'Procesando...' : (modalMode === 'create' ? 'Crear Producto' : 'Guardar Cambios')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </AdminModal>

@@ -122,18 +122,20 @@ export default function Reports({ reportes = [], stats = {}, admins = [], filter
             </td>
             <td className="px-6 py-4 text-sm text-gray-500">{reporte.fecha_reporte}</td>
             <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => openDetails(reporte, false)}
-                        className="text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1 text-xs font-black uppercase tracking-tighter"
+                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        title="Ver Detalles"
                     >
-                        👁️ Ver
+                        👁️
                     </button>
                     <button
                         onClick={() => openDetails(reporte, true)}
-                        className="text-gray-400 hover:text-amber-600 transition-colors flex items-center gap-1 text-xs font-black uppercase tracking-tighter"
+                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        title="Gestionar"
                     >
-                        ✏️ Editar
+                        ✏️
                     </button>
                 </div>
             </td>

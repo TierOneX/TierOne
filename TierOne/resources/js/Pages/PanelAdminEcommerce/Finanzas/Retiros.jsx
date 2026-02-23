@@ -116,14 +116,14 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={(e) => { e.stopPropagation(); openDetails(retiro, true); }}
-                        className="p-1 text-gray-400 hover:text-blue-600"
+                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         👁️
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); openDetails(retiro, false); }}
-                        className="p-1 text-gray-400 hover:text-amber-600"
+                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
                         title="Gestionar"
                     >
                         ✏️

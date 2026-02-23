@@ -4,9 +4,9 @@ import { Link } from '@inertiajs/react';
 export default function Sidebar({ menuItems, activeItem, user, isSidebarOpen }) {
     return (
         <aside className={`sidebar ${isSidebarOpen ? 'active' : ''}`} id="sidebar">
-            <div className="logo-sidebar">
-                <span>TIERONE</span>
-            </div>
+            <Link href={route('panel.ecommerce.dashboard')} className="logo-sidebar group">
+                <span className="group-hover:opacity-80 transition-opacity">TIERONE</span>
+            </Link>
 
             <nav>
                 {/* Agrupamos los items si tienen 'section' definida, si no, los mostramos directos. 

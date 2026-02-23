@@ -86,13 +86,41 @@ class OrderController extends Controller
 
         $validated['numero_orden'] = 'ORD-' . strtoupper(uniqid());
         $validated['fecha_orden'] = now();
-        $validated['subtotal'] = $validated['total']; // Simplificación para orden manual
+        $validated['subtotal'] = $validated['total'];
         $validated['impuestos'] = 0;
         $validated['costo_envio'] = 0;
         $validated['descuento'] = 0;
 
-        \App\Models\Orden::create($validated);
+        Orden::create($validated);
 
-        return redirect()->back()->with('success', 'Orden creada manualmente');
+        return redirect()->back()->with('success', 'Orden creada correctamente');
+    }
+
+    /**
+     * Actualiza una orden existente.
+     */
+    public function update(Request $request, Orden $orden)
+    {
+        $validated = $request->validate([
+            'estado'          => 'required|string',
+            'tracking_number' => 'nullable|string|max:255',
+            'transportista'   => 'nullable|string|max:255',
+            'total'           => 'required|numeric|min:0',
+        ]);
+
+        $orden->update($validated);
+
+        return redirect()->back()->with('success', 'Orden actualizada correctamente');
+    }
+
+    /**
+     * Elimina una orden.
+     */
+    public function destroy(Orden $orden)
+    {
+        // Nota: En una app real, se debería manejar la cancelación 
+        // o eliminación de ítems asociados dependiendo de la lógica de negocio.
+        $orden->delete();
+        return redirect()->back()->with('success', 'Orden eliminada correctamente');
     }
 }

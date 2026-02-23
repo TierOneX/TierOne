@@ -20,11 +20,12 @@ class ProductController extends Controller
 
         // Mapeo de campos permitidos para evitar inyección SQL y problemas de nombres
         $sortMap = [
-            'nombre'         => 'nombre',
-            'precio'         => 'precio_venta',
-            'stock'          => 'stock',
-            'activo'         => 'activo',
-            'fecha_creacion' => 'fecha_creacion'
+            'nombre'           => 'nombre',
+            'precio_proveedor' => 'precio_proveedor',
+            'precio_venta'     => 'precio_venta',
+            'ventas_totales'   => 'ventas_totales',
+            'activo'           => 'activo',
+            'fecha_creacion'   => 'fecha_creacion'
         ];
 
         $orderCol = $sortMap[$sortBy] ?? 'fecha_creacion';
@@ -78,7 +79,6 @@ class ProductController extends Controller
             'id_categoria'    => 'required|exists:categorias,id',
             'precio_venta'     => 'required|numeric|min:0',
             'precio_proveedor' => 'nullable|numeric|min:0',
-            'stock'            => 'required|integer|min:0',
             'activo'           => 'boolean',
             'destacado'        => 'boolean',
             'descripcion'      => 'nullable|string',
@@ -90,5 +90,40 @@ class ProductController extends Controller
         Producto::create($validated);
 
         return redirect()->back()->with('success', 'Producto creado correctamente');
+    }
+
+    /**
+     * Actualiza un producto existente.
+     */
+    public function update(Request $request, Producto $producto)
+    {
+        $validated = $request->validate([
+            'nombre'           => 'required|string|max:255',
+            'id_categoria'    => 'required|exists:categorias,id',
+            'precio_venta'     => 'required|numeric|min:0',
+            'precio_proveedor' => 'nullable|numeric|min:0',
+            'activo'           => 'boolean',
+            'destacado'        => 'boolean',
+            'descripcion'      => 'nullable|string',
+        ]);
+
+        if ($validated['nombre'] !== $producto->nombre) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['nombre']);
+        }
+
+        $producto->update($validated);
+
+        return redirect()->back()->with('success', 'Producto actualizado correctamente');
+    }
+
+    /**
+     * Elimina un producto.
+     */
+    public function destroy(Producto $producto)
+    {
+        // Nota: Podríamos verificar si tiene dependencias (ventas, variantes) 
+        // pero por ahora procedemos con el borrado directo.
+        $producto->delete();
+        return redirect()->back()->with('success', 'Producto eliminado correctamente');
     }
 }

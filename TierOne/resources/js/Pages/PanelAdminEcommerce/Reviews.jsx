@@ -84,7 +84,7 @@ export default function Reviews({ reviews, filters = {} }) {
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => deleteReview(r.id)}
-                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-100 shadow-sm transition-colors"
+                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Eliminar Reseña"
                     >
                         🗑️

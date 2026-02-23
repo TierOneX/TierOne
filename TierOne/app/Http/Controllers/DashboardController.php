@@ -15,10 +15,10 @@ class DashboardController extends Controller
     {
         return Inertia::render('PanelAdminEcommerce/Dashboard', [
             'stats' => [
-                'ventas_mes'       => Orden::whereMonth('fecha_orden', now()->month)->sum('total'),
-                'ordenes_activas'  => Orden::whereIn('estado', ['pendiente', 'procesando', 'enviada'])->count(),
-                'productos_activos'=> Producto::where('activo', true)->count(),
-                'stock_bajo'       => Producto::where('activo', true)->where('ventas_totales', '>', 0)->count(),
+                'ventas_mes'        => Orden::whereMonth('fecha_orden', now()->month)->sum('total'),
+                'ordenes_hoy'       => Orden::whereDate('fecha_orden', now())->count(),
+                'usuarios_mes'      => \App\Models\User::whereMonth('fecha_registro', now()->month)->count(),
+                'rating_promedio'   => \App\Models\Review::avg('calificacion') ?? 0,
             ],
             'ordenes_recientes' => Orden::with('usuario')
                 ->latest('fecha_orden')
