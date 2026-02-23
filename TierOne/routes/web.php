@@ -92,6 +92,9 @@ Route::post('/stripe/webhook', [StripeController::class , 'webhook'])->name('str
 // Crear PaymentIntent (requiere que el carrito tenga items)
 Route::post('/stripe/create-intent', [StripeController::class , 'crearPaymentIntent'])->name('stripe.create-intent');
 
+// ✅ CONFIRMÁCIÓN DIRECTA (sin webhook) — el frontend llama esto tras el pago exitoso
+Route::post('/stripe/confirm', [StripeController::class , 'confirmarPago'])->name('stripe.confirm');
+
 // Obtener estado de una orden (para página de confirmación)
 Route::get('/stripe/orden/{orderId}', [StripeController::class , 'obtenerOrden'])->name('stripe.orden');
 

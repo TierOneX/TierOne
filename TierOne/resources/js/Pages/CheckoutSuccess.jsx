@@ -21,18 +21,35 @@ export default function CheckoutSuccess() {
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const redirectStatus = params.get('redirect_status');
+        const paymentIntent = params.get('payment_intent');
         const orderId = params.get('order_id');
 
-        if (redirectStatus === 'succeeded') {
+        // Si volvemos de una redirección de Stripe (3DS) exitosa
+        if (redirectStatus === 'succeeded' && paymentIntent) {
             clearCart();
-            setStatus('success');
+            setStatus('loading'); // Verificando con nuestro backend...
 
-            if (orderId) {
-                fetch(`/stripe/orden/${orderId}`, { headers: { Accept: 'application/json' } })
-                    .then(r => r.json())
-                    .then(data => { if (data.success) setOrderNum(data.data?.numero_orden); })
-                    .catch(() => { });
-            }
+            // ✅ Notificamos al backend para que verifique el PI y marque la orden como pagada
+            fetch('/stripe/confirm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ payment_intent_id: paymentIntent }),
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        setOrderNum(data.data?.numero_orden);
+                        setStatus('success');
+                    } else {
+                        setStatus('failed');
+                    }
+                })
+                .catch(() => setStatus('failed'));
+
             return;
         }
 
@@ -41,7 +58,7 @@ export default function CheckoutSuccess() {
             return;
         }
 
-        // Sin parámetros: llegó aquí después de un pago sin 3DS
+        // Sin parámetros: llegó aquí después de un pago sin 3DS ya confirmado en Checkout.jsx
         setStatus('success');
     }, []);
 

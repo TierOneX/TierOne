@@ -232,7 +232,84 @@ class StripeController extends Controller
     }
 
     // =========================================================================
-    // 3. OBTENER ESTADO DE UNA ORDEN (para la página de confirmación)
+    // 3. CONFIRMAR PAGO DIRECTAMENTE (sin webhook — válido para desarrollo)
+    // =========================================================================
+    /**
+     * El frontend llama a este endpoint justo después de que Stripe confirma el pago.
+     * Se consulta a la API de Stripe para verificar el estado real del PaymentIntent
+     * y se actualiza la BD de forma segura.
+     *
+     * Recibe:  { payment_intent_id: "pi_xxx" }
+     * Devuelve: estado de la orden actualizado
+     */
+    public function confirmarPago(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'payment_intent_id' => 'required|string',
+            ]);
+
+            $piId = $validated['payment_intent_id'];
+
+            // 1. Verificar con Stripe que el PI realmente está pagado
+            $paymentIntent = $this->stripe->paymentIntents->retrieve($piId);
+
+            if ($paymentIntent->status !== 'succeeded') {
+                return $this->errorResponse(
+                    'El pago no se ha completado. Estado: ' . $paymentIntent->status,
+                    null,
+                    422
+                );
+            }
+
+            // 2. Buscar la orden por el PI id
+            $orden = Orden::where('stripe_payment_intent_id', $piId)->first();
+
+            if (!$orden) {
+                return $this->notFoundResponse('Orden no encontrada para este pago.');
+            }
+
+            // 3. Actualizar orden y pago en la BD
+            DB::transaction(function () use ($orden, $paymentIntent) {
+                $orden->update(['estado' => 'pagada']);
+
+                $pago = Pago::where('id_transaccion', $paymentIntent->id)->first();
+                if ($pago) {
+                    $pago->update([
+                        'estado' => 'completado',
+                        'detalles_json' => array_merge($pago->detalles_json ?? [], [
+                            'status' => 'succeeded',
+                            'payment_method' => $paymentIntent->payment_method ?? null,
+                            'confirmed_at' => now()->toISOString(),
+                        ]),
+                    ]);
+                }
+            });
+
+            Log::info("Orden #{$orden->numero_orden} confirmada directamente (sin webhook).");
+
+            return $this->successResponse([
+                'order_id' => $orden->id,
+                'numero_orden' => $orden->numero_orden,
+                'estado' => 'pagada',
+            ], 'Pago confirmado correctamente');
+
+        }
+        catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->validator->errors());
+        }
+        catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error('Stripe confirmarPago API Error: ' . $e->getMessage());
+            return $this->errorResponse('Error al verificar el pago con Stripe', $e->getMessage(), 502);
+        }
+        catch (\Exception $e) {
+            Log::error('Error en confirmarPago: ' . $e->getMessage());
+            return $this->errorResponse('Error al confirmar el pago', $e->getMessage(), 500);
+        }
+    }
+
+    // =========================================================================
+    // 4. OBTENER ESTADO DE UNA ORDEN (para la página de confirmación)
     // =========================================================================
     /**
      * Devuelve el estado y detalles de la orden para la página de éxito.

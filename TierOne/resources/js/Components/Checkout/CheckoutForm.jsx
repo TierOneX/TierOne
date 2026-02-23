@@ -27,10 +27,11 @@ export default function CheckoutForm({ orderId, numeroOrden, total, onSuccess })
         setLoading(true);
         setError(null);
 
+        // 1. Confirmar el pago con Stripe
         const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // Stripe redirige aquí solo si se necesita 3DS
+                // Solo redirige si hay 3DS
                 return_url: `${window.location.origin}/checkout/success?order_id=${orderId}`,
             },
             redirect: 'if_required',
@@ -43,8 +44,28 @@ export default function CheckoutForm({ orderId, numeroOrden, total, onSuccess })
         }
 
         if (paymentIntent?.status === 'succeeded') {
-            onSuccess(orderId, numeroOrden);
+            // 2. ✅ Notificar al backend para actualizar la BD (sin webhook)
+            try {
+                const res = await fetch('/stripe/confirm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ payment_intent_id: paymentIntent.id }),
+                });
+                const data = await res.json();
+                const confirmadoOrden = data.data?.numero_orden ?? numeroOrden;
+                onSuccess(orderId, confirmadoOrden);
+            } catch {
+                // Si falla la llamada al backend, igual mostramos éxito al usuario
+                // (el pago ya se realizó en Stripe)
+                onSuccess(orderId, numeroOrden);
+            }
         }
+
+        setLoading(false);
     };
 
     return (
