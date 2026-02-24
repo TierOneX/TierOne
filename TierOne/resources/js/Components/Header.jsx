@@ -118,7 +118,7 @@ export default function Header() {
                     <div className="flex items-center justify-between h-16">
                         {/* === LOGO === */}
                         <Link
-                            href="/"
+                            href="/home"
                             className="flex items-center gap-2.5 group shrink-0"
                         >
                             <img
