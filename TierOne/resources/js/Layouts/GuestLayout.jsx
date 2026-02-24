@@ -1,6 +1,6 @@
-import HydraLogo from "@/Components/Login/HydraLogo";
-import KittLine from "@/Components/Login/KittLine";
-import ParticleCanvas from "@/Components/Login/ParticleCanvas";
+import HydraLogo from "@/Components/Auth/HydraLogo";
+import KittLine from "@/Components/Auth/KittLine";
+import ParticleCanvas from "@/Components/Auth/ParticleCanvas";
 import { Link } from "@inertiajs/react";
 
 const styles = `
