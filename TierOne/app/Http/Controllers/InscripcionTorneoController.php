@@ -11,6 +11,11 @@ class InscripcionTorneoController extends Controller
 {
     use ApiResponseTrait;
 
+    /**
+     * Display a listing of tournament registrations, filterable by torneo or usuario.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
         try {
@@ -30,6 +35,11 @@ class InscripcionTorneoController extends Controller
         }
     }
 
+    /**
+     * Register a user in a tournament.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         try {
@@ -68,6 +78,11 @@ class InscripcionTorneoController extends Controller
         }
     }
 
+    /**
+     * Cancel a tournament registration.
+     * @param string $id
+     * @return JsonResponse
+     */
     public function destroy(string $id): JsonResponse
     {
         try {

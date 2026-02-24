@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Partida;
 use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StorePartidaRequest;
+use App\Http\Requests\UpdatePartidaRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -87,6 +89,10 @@ class PartidaController extends Controller
             default => 100 // Sin limite estricto definido
         };
     }
+    /**
+     * Display a listing of the resource.
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         try {
@@ -99,32 +105,14 @@ class PartidaController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     * @param StorePartidaRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePartidaRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'id_juego' => 'required|exists:juegos,id',
-                'id_creador' => 'required|exists:users,id',
-                'titulo' => 'required|string|max:255',
-                'tipo' => 'required|string', // e.g., '1v1', '5v5'
-                'buy_in' => 'required|numeric|min:0',
-                'premio_total' => 'required|numeric|min:0',
-                'comision_plataforma' => 'required|numeric|min:0',
-                'fecha_inicio' => 'nullable|date', // Can be instant
-                'fecha_fin' => 'nullable|date|after:fecha_inicio',
-                'estado' => 'required|string', // pendiente, en_curso, finalizada
-                'origen' => 'required|string', // web, app, api
-                'partida_api_id' => 'nullable|string',
-                'datos_api_json' => 'nullable|array',
-            ]);
-
-            $partida = Partida::create($validated);
+            $partida = Partida::create($request->validated());
             return $this->successResponse($partida, 'Partida creada correctamente', 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al crear la partida', $e->getMessage());
         }
@@ -149,30 +137,18 @@ class PartidaController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     * @param UpdatePartidaRequest $request
      * @param string $id
      * @return JsonResponse
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdatePartidaRequest $request, string $id): JsonResponse
     {
         try {
             $partida = Partida::findOrFail($id);
-
-            $validated = $request->validate([
-                'id_juego' => 'sometimes|exists:juegos,id',
-                'titulo' => 'sometimes|string|max:255',
-                'estado' => 'sometimes|string',
-                'fecha_fin' => 'nullable|date',
-                'premio_total' => 'sometimes|numeric',
-                'datos_api_json' => 'nullable|array',
-            ]);
-
-            $partida->update($validated);
+            $partida->update($request->validated());
             return $this->successResponse($partida, 'Partida actualizada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Partida no encontrada');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar la partida', $e->getMessage());
         }
