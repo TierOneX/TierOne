@@ -284,9 +284,6 @@ export default function Products({ productos, categorias = [], proveedores = [],
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-white tracking-tight uppercase">Listado de Productos</h2>
                 <div className="flex gap-2">
-                    <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-gray-50 transition-colors tracking-widest shadow-sm">
-                        📦 Importar
-                    </button>
                     <button
                         onClick={openCreateModal}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-blue-200"

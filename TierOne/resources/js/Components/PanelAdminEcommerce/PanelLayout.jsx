@@ -44,16 +44,7 @@ export default function PanelLayout({ title, activeItem, children }) {
                     <h1 className="page-title">{title}</h1>
                 </div>
                 <div className="header-actions">
-                    <button className="btn-icon">
-                        🔔
-                        <span className="notification-dot"></span>
-                    </button>
-                    <button className="btn-secondary">
-                        📤 Exportar
-                    </button>
-                    <button className="btn-primary">
-                        + Nuevo Producto
-                    </button>
+                    {/* Botones de acción eliminados por simplificación */}
                 </div>
             </header>
 

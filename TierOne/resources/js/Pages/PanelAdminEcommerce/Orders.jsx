@@ -251,9 +251,6 @@ export default function Orders({ ordenes, usuarios = [], direcciones = [], filte
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-white tracking-tight uppercase">Listado de Órdenes</h2>
                 <div className="flex gap-2">
-                    <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-gray-50 transition-colors tracking-widest shadow-sm">
-                        📄 Reporte
-                    </button>
                     <button
                         onClick={openCreateModal}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 tracking-widest"
