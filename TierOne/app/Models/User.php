@@ -103,6 +103,14 @@ class User extends Authenticatable
         return $this->hasMany(Carrito::class, 'id_usuario');
     }
 
+    /**
+     * Relación: Órdenes de compra del usuario
+     */
+    public function ordenes()
+    {
+        return $this->hasMany(Orden::class, 'id_usuario');
+    }
+
     // --- Relaciones de Torneos ---
 
     /**

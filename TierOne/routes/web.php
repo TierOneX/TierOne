@@ -8,27 +8,27 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-    'canLogin' => Route::has('login'),
-    'canRegister' => Route::has('register'),
-    'laravelVersion' => Application::VERSION,
-    'phpVersion' => PHP_VERSION,
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
     ]);
 });
 
 Route::get('/home', function () {
     return Inertia::render('Home', [
-    'games' => \App\Models\Juego::where('activo', true)->get(),
-    'products' => \App\Models\Producto::with('categoria')
-    ->where('activo', true)
-    ->where('destacado', true)
-    ->take(8)
-    ->get(),
-    'tournaments' => \App\Models\Torneo::with('juego')
-    ->withCount('inscripciones')
-    ->whereIn('estado', ['inscripciones', 'en_curso'])
-    ->orderBy('fecha_inicio')
-    ->take(4)
-    ->get(),
+        'games' => \App\Models\Juego::where('activo', true)->get(),
+        'products' => \App\Models\Producto::with('categoria')
+            ->where('activo', true)
+            ->where('destacado', true)
+            ->take(8)
+            ->get(),
+        'tournaments' => \App\Models\Torneo::with('juego')
+            ->withCount('inscripciones')
+            ->whereIn('estado', ['inscripciones', 'en_curso'])
+            ->orderBy('fecha_inicio')
+            ->take(4)
+            ->get(),
     ]);
 })->name('home');
 
@@ -38,20 +38,22 @@ Route::get('/dashboard', function () {
 
 Route::get('/shop', function () {
     return Inertia::render('Shop', [
-    'productos' => \App\Models\Producto::with('categoria')
-    ->where('activo', true)
-    ->orderByDesc('destacado')
-    ->orderByDesc('ventas_totales')
-    ->get(),
-    'categorias' => \App\Models\Categoria::where('activa', true)
-    ->whereHas('productos', function ($q) {
-            $q->where('activo', true);
-        }
-        )
-        ->orderBy('nombre')
-        ->get(),
-        ]);
-    })->name('shop');
+        'productos' => \App\Models\Producto::with('categoria')
+            ->where('activo', true)
+            ->orderByDesc('destacado')
+            ->orderByDesc('ventas_totales')
+            ->get(),
+        'categorias' => \App\Models\Categoria::where('activa', true)
+            ->whereHas(
+                'productos',
+                function ($q) {
+                    $q->where('activo', true);
+                }
+            )
+            ->orderBy('nombre')
+            ->get(),
+    ]);
+})->name('shop');
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.user'])
@@ -67,8 +69,8 @@ Route::get('/shop/{slug}', function (string $slug) {
         ->get();
 
     return Inertia::render('Product', [
-    'producto' => $producto,
-    'relacionados' => $relacionados,
+        'producto' => $producto,
+        'relacionados' => $relacionados,
     ]);
 })->name('product.show');
 
@@ -77,9 +79,10 @@ Route::get('/cart', function () {
 })->name('cart');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // =========================================================================
@@ -87,21 +90,21 @@ Route::middleware('auth')->group(function () {
 // =========================================================================
 
 // Webhook de Stripe (sin auth, CSRF ya excluido en bootstrap/app.php)
-Route::post('/stripe/webhook', [StripeController::class , 'webhook'])->name('stripe.webhook');
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
 
 // Crear PaymentIntent (requiere que el carrito tenga items)
-Route::post('/stripe/create-intent', [StripeController::class , 'crearPaymentIntent'])->name('stripe.create-intent');
+Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
 
 // ✅ CONFIRMÁCIÓN DIRECTA (sin webhook) — el frontend llama esto tras el pago exitoso
-Route::post('/stripe/confirm', [StripeController::class , 'confirmarPago'])->name('stripe.confirm');
+Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 
 // Obtener estado de una orden (para página de confirmación)
-Route::get('/stripe/orden/{orderId}', [StripeController::class , 'obtenerOrden'])->name('stripe.orden');
+Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
 
 // Rutas frontend del proceso de pago
 Route::get('/checkout', function () {
     return Inertia::render('Checkout', [
-    'stripeKey' => config('stripe.key'),
+        'stripeKey' => config('stripe.key'),
     ]);
 })->name('checkout');
 
