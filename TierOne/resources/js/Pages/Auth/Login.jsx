@@ -4,6 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import BrandHeading from "@/Components/Login/BrandHeading";
+import AuthToggle from "@/Components/Login/AuthToggle";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 
@@ -20,7 +21,10 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <GuestLayout brandContent={<BrandHeading />}>
+        <GuestLayout
+            brandContent={<BrandHeading />}
+            toggleSlot={<AuthToggle active="login" />}
+        >
             <Head title="Acceso al Sistema" />
 
             {/* Mobile heading — solo visible < md, en desktop lo muestra el panel izquierdo */}

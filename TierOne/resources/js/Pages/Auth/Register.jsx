@@ -1,118 +1,156 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import AuthToggle from "@/Components/Login/AuthToggle";
+import RegisterHeroPanel from "@/Components/Login/RegisterHeroPanel";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+        username: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
-
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route("register"), {
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
     return (
-        <GuestLayout>
-            <Head title="Register" />
+        <GuestLayout
+            brandContent={<RegisterHeroPanel />}
+            toggleSlot={<AuthToggle active="register" />}
+            reverse={true}
+        >
+            <Head title="Crear Cuenta" />
 
-            <form onSubmit={submit}>
+            {/* Mobile heading */}
+            <div className="md:hidden mb-6 text-center">
+                <h1 className="text-2xl font-black uppercase italic tracking-[0.08em] text-white">
+                    CREAR <span className="text-[#e31837]">CUENTA</span>
+                </h1>
+            </div>
+
+            <form onSubmit={submit} className="space-y-5">
+                {/* Username */}
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                    <InputLabel
+                        htmlFor="username"
+                        value="Nombre de Usuario"
+                        className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
                     />
-
-                    <InputError message={errors.name} className="mt-2" />
+                    <TextInput
+                        id="username"
+                        name="username"
+                        value={data.username}
+                        className="mt-2 block w-full py-3.5 px-4"
+                        autoComplete="username"
+                        placeholder="tu_gamertag"
+                        isFocused={true}
+                        onChange={(e) => setData("username", e.target.value)}
+                    />
+                    <InputError
+                        message={errors.username}
+                        className="mt-1.5 text-[10px] font-semibold uppercase"
+                    />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
+                {/* Email */}
+                <div>
+                    <InputLabel
+                        htmlFor="email"
+                        value="Email"
+                        className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
+                    />
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        className="mt-2 block w-full py-3.5 px-4"
+                        autoComplete="email"
+                        placeholder="tu@email.com"
+                        onChange={(e) => setData("email", e.target.value)}
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError
+                        message={errors.email}
+                        className="mt-1.5 text-[10px] font-semibold uppercase"
+                    />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                {/* Password */}
+                <div>
+                    <InputLabel
+                        htmlFor="password"
+                        value="Contraseña"
+                        className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
+                    />
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="mt-2 block w-full py-3.5 px-4"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
+                        placeholder="••••••••"
+                        onChange={(e) => setData("password", e.target.value)}
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError
+                        message={errors.password}
+                        className="mt-1.5 text-[10px] font-semibold uppercase"
+                    />
                 </div>
 
-                <div className="mt-4">
+                {/* Confirm Password */}
+                <div>
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirmar Contraseña"
+                        className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
                     />
-
                     <TextInput
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className="mt-2 block w-full py-3.5 px-4"
                         autoComplete="new-password"
+                        placeholder="••••••••"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData("password_confirmation", e.target.value)
                         }
-                        required
                     />
-
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2"
+                        className="mt-1.5 text-[10px] font-semibold uppercase"
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
+                {/* Submit */}
+                <PrimaryButton
+                    className="w-full py-4 mt-2"
+                    disabled={processing}
+                >
+                    Crear Cuenta
+                </PrimaryButton>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
+                {/* Login link */}
+                <div className="pt-4 border-t border-white/[0.06] text-center">
+                    <p className="text-[10px] text-gray-600 font-semibold uppercase tracking-[0.15em]">
+                        ¿Ya tienes cuenta?{" "}
+                        <Link
+                            href="/login"
+                            className="text-[#e31837] font-bold hover:text-white transition-colors"
+                        >
+                            Inicia sesión
+                        </Link>
+                    </p>
                 </div>
             </form>
         </GuestLayout>
