@@ -1,5 +1,5 @@
-import { Link, usePage } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { Link, usePage, router } from "@inertiajs/react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/Contexts/CartContext";
 
 export default function Header() {
@@ -8,6 +8,22 @@ export default function Header() {
     const user = auth?.user ?? null;
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+
+    // Cerrar el menú de usuario al clicar fuera
+    useEffect(() => {
+        const handler = (e) => {
+            if (
+                userMenuRef.current &&
+                !userMenuRef.current.contains(e.target)
+            ) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
 
     // Detectar scroll para efecto de sombra
     useEffect(() => {
@@ -159,14 +175,109 @@ export default function Header() {
                                 )}
                             </Link>
 
-                            {/* Botón Login/Perfil - solo desktop */}
-                            <Link
-                                href={user ? "/profile" : "/login"}
-                                id="login-button"
-                                className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
-                            >
-                                {user ? `@${user.username}` : "ACCEDER"}
-                            </Link>
+                            {/* Avatar con dropdown / botón Acceder */}
+                            {user ? (
+                                <div
+                                    ref={userMenuRef}
+                                    className="relative hidden lg:block"
+                                >
+                                    <button
+                                        onClick={() =>
+                                            setUserMenuOpen((v) => !v)
+                                        }
+                                        className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 hover:border-[#e31837]/40 bg-white/[0.04] hover:bg-white/[0.07] transition-all duration-200 group"
+                                        aria-label="Menú de usuario"
+                                    >
+                                        {/* Avatar */}
+                                        <span className="w-7 h-7 rounded-full bg-gradient-to-br from-[#e31837]/70 to-[#7a0d1c] flex items-center justify-center text-[11px] font-black text-white select-none">
+                                            {user.username?.[0]?.toUpperCase() ??
+                                                "?"}
+                                        </span>
+                                        <span className="text-[11px] font-bold text-gray-300 group-hover:text-white transition-colors max-w-[90px] truncate">
+                                            {user.username}
+                                        </span>
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth={2}
+                                            className={`w-3 h-3 text-gray-500 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    {/* Dropdown */}
+                                    {userMenuOpen && (
+                                        <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#141414] border border-white/[0.08] shadow-[0_16px_40px_rgba(0,0,0,0.7)] overflow-hidden z-50">
+                                            <div className="px-4 py-3 border-b border-white/[0.06]">
+                                                <p className="text-[10px] font-black text-white uppercase tracking-widest truncate">
+                                                    {user.username}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 truncate mt-0.5">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href="/profile"
+                                                onClick={() =>
+                                                    setUserMenuOpen(false)
+                                                }
+                                                className="flex items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0"
+                                                    />
+                                                </svg>
+                                                Mi Perfil
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    setUserMenuOpen(false);
+                                                    router.post("/logout");
+                                                }}
+                                                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-[#e31837] hover:bg-[#e31837]/10 transition-colors border-t border-white/[0.05]"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                                                    />
+                                                </svg>
+                                                Cerrar sesión
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    id="login-button"
+                                    className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
+                                >
+                                    ACCEDER
+                                </Link>
+                            )}
 
                             {/* Hamburguesa - solo móvil */}
                             <button
