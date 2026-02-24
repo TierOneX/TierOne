@@ -65,6 +65,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Potencia extrema para 4K con trazado de rayos de tercera generación.',
                 'precio_proveedor' => 850.00,
                 'precio_venta' => 1099.99,
+                'imagen_principal' => 'assets/productos/rtx_4080_super_oc.png',
                 'destacado' => true,
             ],
             [
@@ -74,6 +75,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'El mejor procesador para gaming con tecnología 3D V-Cache.',
                 'precio_proveedor' => 320.00,
                 'precio_venta' => 449.99,
+                'imagen_principal' => 'assets/productos/ryzen_7_7800x3d.png',
                 'destacado' => true,
             ],
             [
@@ -83,6 +85,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Cuero sintético premium, pistón de clase 4 y soporte lumbar ajustable.',
                 'precio_proveedor' => 150.00,
                 'precio_venta' => 299.99,
+                'imagen_principal' => 'assets/productos/silla_omega_v2.png',
                 'destacado' => false,
             ],
             [
@@ -92,6 +95,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Kit de 2x16GB con perfiles EXPO/XMP 3.0 para máximo rendimiento.',
                 'precio_proveedor' => 80.00,
                 'precio_venta' => 145.50,
+                'imagen_principal' => 'assets/productos/ram_ddr5_32gb_6000mhz.png',
                 'destacado' => false,
             ],
             [
@@ -101,6 +105,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Velocidades de lectura de hasta 7400MB/s, ideal para PS5 y PC.',
                 'precio_proveedor' => 95.00,
                 'precio_venta' => 179.99,
+                'imagen_principal' => 'assets/productos/ssd_nvme_gen4_2tb_extreme.png',
                 'destacado' => true,
             ],
             [
@@ -110,6 +115,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Panel IPS, 1ms de respuesta y compatible con G-Sync.',
                 'precio_proveedor' => 180.00,
                 'precio_venta' => 349.00,
+                'imagen_principal' => 'assets/productos/monitor_gaming_27_1440p.png',
                 'destacado' => true,
             ],
             [
@@ -119,6 +125,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Perfecto para streaming y podcasts, plug and play con soporte incluido.',
                 'precio_proveedor' => 40.00,
                 'precio_venta' => 79.99,
+                'imagen_principal' => 'assets/productos/microfono_usb_cardioide.png',
                 'destacado' => false,
             ],
             [
@@ -128,6 +135,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Diseño compacto, conexión dual 2.4GHz y Bluetooth.',
                 'precio_proveedor' => 50.00,
                 'precio_venta' => 95.00,
+                'imagen_principal' => 'assets/productos/teclado_60_wireless.png',
                 'destacado' => false,
             ],
             [
@@ -137,6 +145,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => '12 botones laterales programables y ajuste de peso.',
                 'precio_proveedor' => 35.00,
                 'precio_venta' => 69.99,
+                'imagen_principal' => 'assets/productos/raton_mmo_pro.png',
                 'destacado' => false,
             ],
             [
@@ -146,6 +155,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Arquitectura RDNA 3 para un rendimiento masivo en rasterización.',
                 'precio_proveedor' => 780.00,
                 'precio_venta' => 950.00,
+                'imagen_principal' => 'assets/productos/rx_7900_xtx_24gb.png',
                 'destacado' => false,
             ],
             [
@@ -155,6 +165,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => '24 núcleos y 32 hilos, frecuencia máxima de 6.0GHz.',
                 'precio_proveedor' => 450.00,
                 'precio_venta' => 589.99,
+                'imagen_principal' => 'assets/productos/core_i9_14900k.png',
                 'destacado' => false,
             ],
             [
@@ -164,6 +175,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Auriculares intrauditivos optimizados para posicionamiento de sonido.',
                 'precio_proveedor' => 30.00,
                 'precio_venta' => 59.99,
+                'imagen_principal' => 'assets/productos/iems_gaming_hifi.png',
                 'destacado' => false,
             ],
             [
@@ -173,6 +185,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Ajuste de altura con memoria y soporte para cables.',
                 'precio_proveedor' => 200.00,
                 'precio_venta' => 399.00,
+                'imagen_principal' => 'assets/productos/escritorio_elevable_gaming.png',
                 'destacado' => false,
             ],
             [
@@ -182,6 +195,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Kit DDR4 clásico con excelente iluminación y compatibilidad.',
                 'precio_proveedor' => 35.00,
                 'precio_venta' => 65.00,
+                'imagen_principal' => 'assets/productos/ram_rgb_16gb_3600mhz.png',
                 'destacado' => false,
             ],
             [
@@ -191,6 +205,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Resistente a golpes y agua, USB-C 3.2 Gen2.',
                 'precio_proveedor' => 55.00,
                 'precio_venta' => 99.00,
+                'imagen_principal' => 'assets/productos/ssd_externo_rugged_1tb.png',
                 'destacado' => false,
             ],
             [
@@ -200,6 +215,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Negros perfectos y tiempo de respuesta casi instantáneo.',
                 'precio_proveedor' => 650.00,
                 'precio_venta' => 899.99,
+                'imagen_principal' => 'assets/productos/monitor_4k_oled_144hz.png',
                 'destacado' => true,
             ],
             [
@@ -209,6 +225,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Movimiento silencioso y gestión de cables interna.',
                 'precio_proveedor' => 45.00,
                 'precio_venta' => 85.00,
+                'imagen_principal' => 'assets/productos/brazo_microfono_pro.png',
                 'destacado' => false,
             ],
         ];

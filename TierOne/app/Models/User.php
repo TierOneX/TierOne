@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Sanctum\HasApiTokens;
 
-use Laravel\Sanctum\HasApiTokens;
 
 /**
  *  Modelo User 
