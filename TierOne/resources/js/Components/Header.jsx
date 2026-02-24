@@ -185,30 +185,13 @@ export default function Header() {
                                         onClick={() =>
                                             setUserMenuOpen((v) => !v)
                                         }
-                                        className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 hover:border-[#e31837]/40 bg-white/[0.04] hover:bg-white/[0.07] transition-all duration-200 group"
+                                        className={`relative w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-black text-white select-none transition-all duration-200 bg-[#1a0508] border-2 ${userMenuOpen ? "border-[#e31837] shadow-[0_0_12px_2px_rgba(227,24,55,0.35)]" : "border-[#e31837]/30 hover:border-[#e31837]/80 hover:shadow-[0_0_10px_1px_rgba(227,24,55,0.25)]"}`}
                                         aria-label="Menú de usuario"
                                     >
-                                        {/* Avatar */}
-                                        <span className="w-7 h-7 rounded-full bg-gradient-to-br from-[#e31837]/70 to-[#7a0d1c] flex items-center justify-center text-[11px] font-black text-white select-none">
-                                            {user.username?.[0]?.toUpperCase() ??
-                                                "?"}
-                                        </span>
-                                        <span className="text-[11px] font-bold text-gray-300 group-hover:text-white transition-colors max-w-[90px] truncate">
-                                            {user.username}
-                                        </span>
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth={2}
-                                            className={`w-3 h-3 text-gray-500 transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                                            />
-                                        </svg>
+                                        {user.username?.[0]?.toUpperCase() ??
+                                            "?"}
+                                        {/* Punto de estado online */}
+                                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#111111]" />
                                     </button>
 
                                     {/* Dropdown */}
