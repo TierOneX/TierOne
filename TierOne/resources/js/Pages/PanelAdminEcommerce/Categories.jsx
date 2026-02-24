@@ -13,6 +13,7 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         nombre: '',
+        slug: '',
         descripcion: '',
         id_parent: '',
         activa: true
@@ -50,6 +51,7 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
         setIsReadOnly(false);
         setData({
             nombre: cat.nombre || '',
+            slug: cat.slug || '',
             descripcion: cat.descripcion || '',
             id_parent: cat.padre || '',
             activa: !!cat.activa
@@ -63,6 +65,7 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
         setIsReadOnly(true);
         setData({
             nombre: cat.nombre || '',
+            slug: cat.slug || '',
             descripcion: cat.descripcion || '',
             id_parent: cat.padre || '',
             activa: !!cat.activa
@@ -202,6 +205,20 @@ export default function Categories({ categorias = [], filters = {}, todas_catego
                             placeholder="Ej: Camisetas"
                         />
                         {errors.nombre && <p className="text-red-500 text-[10px] mt-1 font-bold uppercase">{errors.nombre}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Slug (URL)</label>
+                        <input
+                            type="text"
+                            readOnly={isReadOnly}
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-mono text-xs focus:ring-2 focus:ring-blue-500 ${isReadOnly ? 'border-gray-100 bg-gray-100' : (errors.slug ? 'border-red-500' : 'border-gray-200')}`}
+                            value={data.slug}
+                            onChange={e => setData('slug', e.target.value)}
+                            placeholder="Dejar vacío para auto-generar"
+                        />
+                        {errors.slug && <p className="text-red-500 text-[10px] mt-1 font-bold uppercase">{errors.slug}</p>}
+                        {!isReadOnly && <p className="text-[9px] text-gray-400 mt-1 italic">Ej: mi-categoria-personalizada</p>}
                     </div>
 
                     <div>

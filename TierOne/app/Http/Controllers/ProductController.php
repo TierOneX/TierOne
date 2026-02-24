@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Producto;
 use App\Models\Categoria;
+use App\Models\Proveedor;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -65,24 +66,30 @@ class ProductController extends Controller
                     'variantes'       => $p->variantes,
                 ]),
             'categorias' => Categoria::where('activa', true)->get(['id', 'nombre']),
+            'proveedores' => Proveedor::where('activo', true)->get(['id', 'nombre']),
             'filters' => $filters
         ]);
     }
 
-    /**
-     * Guarda un nuevo producto.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nombre'           => 'required|string|max:255',
             'id_categoria'    => 'required|exists:categorias,id',
+            'id_proveedor'    => 'required|exists:proveedores,id',
             'precio_venta'     => 'required|numeric|min:0',
-            'precio_proveedor' => 'nullable|numeric|min:0',
+            'precio_proveedor' => 'required|numeric|min:0',
             'activo'           => 'boolean',
             'destacado'        => 'boolean',
             'descripcion'      => 'nullable|string',
+            'imagen_principal' => 'nullable|string|max:2048',
+            'imagen_archivo'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('imagen_archivo')) {
+            $path = $request->file('imagen_archivo')->store('products', 'public');
+            $validated['imagen_principal'] = '/storage/' . $path;
+        }
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['nombre']);
         $validated['fecha_creacion'] = now();
@@ -92,20 +99,25 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Producto creado correctamente');
     }
 
-    /**
-     * Actualiza un producto existente.
-     */
     public function update(Request $request, Producto $producto)
     {
         $validated = $request->validate([
             'nombre'           => 'required|string|max:255',
             'id_categoria'    => 'required|exists:categorias,id',
+            'id_proveedor'    => 'required|exists:proveedores,id',
             'precio_venta'     => 'required|numeric|min:0',
-            'precio_proveedor' => 'nullable|numeric|min:0',
+            'precio_proveedor' => 'required|numeric|min:0',
             'activo'           => 'boolean',
             'destacado'        => 'boolean',
             'descripcion'      => 'nullable|string',
+            'imagen_principal' => 'nullable|string|max:2048',
+            'imagen_archivo'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('imagen_archivo')) {
+            $path = $request->file('imagen_archivo')->store('products', 'public');
+            $validated['imagen_principal'] = '/storage/' . $path;
+        }
 
         if ($validated['nombre'] !== $producto->nombre) {
             $validated['slug'] = \Illuminate\Support\Str::slug($validated['nombre']);

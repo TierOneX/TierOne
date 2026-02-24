@@ -6,12 +6,13 @@ import AdminTable from '@/Components/PanelAdminEcommerce/AdminTable';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AdminModal from '@/Components/PanelAdminEcommerce/AdminModal';
 
-export default function Products({ productos, categorias = [], filters = {} }) {
+export default function Products({ productos, categorias = [], proveedores = [], filters = {} }) {
     const { data = [], links = [] } = productos ?? {};
     const [expandedProduct, setExpandedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const filtersConfig = [
         { name: 'search', label: 'Buscar', type: 'text' },
@@ -61,16 +62,20 @@ export default function Products({ productos, categorias = [], filters = {} }) {
     const { data: formData, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         nombre: '',
         id_categoria: '',
+        id_proveedor: '',
         precio_venta: '',
         precio_proveedor: '',
         activo: true,
         destacado: false,
         descripcion: '',
+        imagen_principal: '',
+        imagen_archivo: null,
     });
 
     const openCreateModal = () => {
         setModalMode('create');
         setSelectedProduct(null);
+        setImagePreview(null);
         reset();
         clearErrors();
         setIsModalOpen(true);
@@ -79,14 +84,18 @@ export default function Products({ productos, categorias = [], filters = {} }) {
     const openEditModal = (product) => {
         setModalMode('edit');
         setSelectedProduct(product);
+        setImagePreview(product.imagen_principal || null);
         setData({
             nombre: product.nombre || '',
             id_categoria: product.categoria?.id || '',
+            id_proveedor: product.proveedor?.id || '',
             precio_venta: product.precio_venta || '',
             precio_proveedor: product.precio_proveedor || '',
             activo: !!product.activo,
             destacado: !!product.destacado,
             descripcion: product.descripcion || '',
+            imagen_principal: product.imagen_principal || '',
+            imagen_archivo: null,
         });
         clearErrors();
         setIsModalOpen(true);
@@ -95,14 +104,18 @@ export default function Products({ productos, categorias = [], filters = {} }) {
     const openViewModal = (product) => {
         setModalMode('view');
         setSelectedProduct(product);
+        setImagePreview(product.imagen_principal || null);
         setData({
             nombre: product.nombre || '',
             id_categoria: product.categoria?.id || '',
+            id_proveedor: product.proveedor?.id || '',
             precio_venta: product.precio_venta || '',
             precio_proveedor: product.precio_proveedor || '',
             activo: !!product.activo,
             destacado: !!product.destacado,
             descripcion: product.descripcion || '',
+            imagen_principal: product.imagen_principal || '',
+            imagen_archivo: null,
         });
         setIsModalOpen(true);
     };
@@ -114,14 +127,31 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
+                    setImagePreview(null);
                 }
             });
         } else if (modalMode === 'edit') {
-            put(route('panel.ecommerce.products.update', selectedProduct.id), {
+            // Usamos post con _method: put para soportar subida de archivos en actualización
+            router.post(route('panel.ecommerce.products.update', selectedProduct.id), {
+                ...formData,
+                _method: 'put',
+            }, {
                 onSuccess: () => {
                     setIsModalOpen(false);
                 }
             });
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('imagen_archivo', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -288,8 +318,8 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                 title={modalMode === 'create' ? 'Nuevo Producto' : (modalMode === 'edit' ? 'Editar Producto' : 'Detalles del Producto')}
                 maxWidth="max-w-2xl"
             >
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-5">
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-2">
                             <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Nombre del Producto</label>
                             <input
@@ -303,11 +333,11 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                             {errors.nombre && <p className="text-red-500 text-[10px] mt-2 uppercase font-black tracking-widest">{errors.nombre}</p>}
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Categoría</label>
+                        <div className="col-span-1">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1.5">Categoría</label>
                             <select
                                 disabled={modalMode === 'view'}
-                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.id_categoria ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all text-xs ${errors.id_categoria ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 value={formData.id_categoria}
                                 onChange={e => setData('id_categoria', e.target.value)}
                             >
@@ -316,73 +346,100 @@ export default function Products({ productos, categorias = [], filters = {} }) {
                                     <option key={c.id} value={c.id}>{c.nombre}</option>
                                 ))}
                             </select>
+                            {errors.id_categoria && <p className="text-red-500 text-[9px] mt-1 uppercase font-black tracking-widest">{errors.id_categoria}</p>}
                         </div>
 
-                        <div className="flex items-center gap-6 px-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <div className="flex flex-col gap-1">
-                                <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="col-span-1">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1.5">Proveedor</label>
+                            <select
+                                disabled={modalMode === 'view'}
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all text-xs ${errors.id_proveedor ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                value={formData.id_proveedor}
+                                onChange={e => setData('id_proveedor', e.target.value)}
+                            >
+                                <option value="">Seleccionar Proveedor</option>
+                                {proveedores.map(p => (
+                                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                                ))}
+                            </select>
+                            {errors.id_proveedor && <p className="text-red-500 text-[9px] mt-1 uppercase font-black tracking-widest">{errors.id_proveedor}</p>}
+                        </div>
+
+                        <div className="col-span-2">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1.5">Imagen del Producto</label>
+                            <div className="grid grid-cols-2 gap-3 items-center">
+                                <div className="space-y-2">
+                                    <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer transition-all ${modalMode === 'view' ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-50 border-gray-200 hover:border-blue-400'}`}>
+                                        <div className="flex flex-col items-center justify-center py-2">
+                                            <span className="text-xl">📁</span>
+                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center px-2 truncate w-full">
+                                                {formData.imagen_archivo ? formData.imagen_archivo.name : 'Subir archivo'}
+                                            </p>
+                                        </div>
+                                        <input type="file" className="hidden" disabled={modalMode === 'view'} onChange={handleFileChange} accept="image/*" />
+                                    </label>
                                     <input
-                                        type="checkbox"
-                                        disabled={modalMode === 'view'}
-                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                        checked={formData.activo}
-                                        onChange={e => setData('activo', e.target.checked)}
+                                        type="text"
+                                        readOnly={modalMode === 'view'}
+                                        className={`w-full p-2.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold text-[10px] transition-all ${errors.imagen_principal ? 'border-red-500' : 'border-gray-200'}`}
+                                        value={formData.imagen_principal}
+                                        onChange={e => setData('imagen_principal', e.target.value)}
+                                        placeholder="O URL de imagen"
                                     />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Activo</span>
+                                </div>
+                                <div className="bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center h-full min-h-[140px] relative">
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Preview" className="max-h-28 rounded-lg shadow-sm object-contain" />
+                                    ) : (
+                                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Sin vista previa</span>
+                                    )}
+                                    {imagePreview && modalMode !== 'view' && (
+                                        <button type="button" onClick={() => { setImagePreview(null); setData('imagen_archivo', null); setData('imagen_principal', ''); }} className="absolute -top-1 -right-1 bg-red-100 text-red-600 rounded-full p-1 border border-red-200 shadow-sm text-[8px]">✕</button>
+                                    )}
+                                </div>
+                            </div>
+                            {errors.imagen_archivo && <p className="text-red-500 text-[10px] mt-2 uppercase font-black tracking-widest">{errors.imagen_archivo}</p>}
+                            {errors.imagen_principal && <p className="text-red-500 text-[10px] mt-2 uppercase font-black tracking-widest">{errors.imagen_principal}</p>}
+                        </div>
+
+                        <div className="col-span-1">
+                            <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 h-full justify-center">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" disabled={modalMode === 'view'} className="w-4 h-4 rounded border-gray-300 text-blue-600" checked={formData.activo} onChange={e => setData('activo', e.target.checked)} />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Activo</span>
                                 </label>
-                                <label className="flex items-center gap-2 cursor-pointer group">
-                                    <input
-                                        type="checkbox"
-                                        disabled={modalMode === 'view'}
-                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                        checked={formData.destacado}
-                                        onChange={e => setData('destacado', e.target.checked)}
-                                    />
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-amber-600 transition-colors">Destacado</span>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" disabled={modalMode === 'view'} className="w-4 h-4 rounded border-gray-300 text-amber-600" checked={formData.destacado} onChange={e => setData('destacado', e.target.checked)} />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Destacado</span>
                                 </label>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Precio Venta (€)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                readOnly={modalMode === 'view'}
-                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-black text-lg ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
-                                value={formData.precio_venta}
-                                onChange={e => setData('precio_venta', e.target.value)}
-                                placeholder="0.00"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Precio Proveedor (€)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                readOnly={modalMode === 'view'}
-                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-500 font-bold ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
-                                value={formData.precio_proveedor}
-                                onChange={e => setData('precio_proveedor', e.target.value)}
-                                placeholder="0.00"
-                            />
+                        <div className="col-span-1 space-y-2">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Precio Venta</label>
+                                <input type="number" step="0.01" readOnly={modalMode === 'view'} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-black text-sm" value={formData.precio_venta} onChange={e => setData('precio_venta', e.target.value)} />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Precio Coste</label>
+                                <input type="number" step="0.01" readOnly={modalMode === 'view'} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 text-gray-500 font-bold text-xs" value={formData.precio_proveedor} onChange={e => setData('precio_proveedor', e.target.value)} />
+                            </div>
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Descripción</label>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1.5">Descripción</label>
                             <textarea
                                 readOnly={modalMode === 'view'}
-                                className={`w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black min-h-[120px] ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
-                                rows="3"
+                                className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black text-xs min-h-[80px] ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                rows="2"
                                 value={formData.descripcion}
                                 onChange={e => setData('descripcion', e.target.value)}
-                                placeholder="Breve descripción del producto..."
+                                placeholder="Breve descripción..."
                             ></textarea>
                         </div>
                     </div>
 
-                    <div className="mt-8 flex justify-end gap-3 border-t border-gray-100 pt-6">
+                    <div className="mt-4 flex justify-end gap-3 border-t border-gray-100 pt-4">
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}

@@ -61,8 +61,26 @@ class ReporteController extends Controller
                 'reportes_abiertos' => \App\Models\Reporte::whereIn('estado', ['pendiente', 'en_revision'])->count(),
             ],
             'admins' => \App\Models\User::where('rol', 'admin')->get(['id', 'nombre as name']),
+            'usuarios' => \App\Models\User::all(['id', 'nombre as name', 'email']),
             'filters' => $filters
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_partida'         => 'required|integer',
+            'id_usuario_reporta' => 'required|exists:users,id',
+            'tipo'               => 'required|string|max:100',
+            'descripcion'        => 'required|string',
+        ]);
+
+        $validated['estado'] = 'pendiente';
+        $validated['fecha_reporte'] = now();
+
+        Reporte::create($validated);
+
+        return redirect()->back()->with('success', 'Reporte creado correctamente');
     }
 
     public function update(Request $request, $id)

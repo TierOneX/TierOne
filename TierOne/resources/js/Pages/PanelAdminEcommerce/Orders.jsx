@@ -17,7 +17,7 @@ const estadoBadge = (estado) => {
     return map[estado] ?? 'bg-gray-100 text-gray-800 border-gray-200';
 };
 
-export default function Orders({ ordenes, usuarios = [], filters = {} }) {
+export default function Orders({ ordenes, usuarios = [], direcciones = [], filters = {} }) {
     const { data = [], links = [] } = ordenes ?? {};
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,11 +67,28 @@ export default function Orders({ ordenes, usuarios = [], filters = {} }) {
 
     const { data: formData, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         id_usuario: '',
+        id_direccion_envio: '',
+        // Manual address fields
+        nombre_completo: '',
+        direccion_linea1: '',
+        ciudad: '',
+        codigo_postal: '',
+        pais: '',
+        telefono: '',
+
         estado: 'pendiente',
+        subtotal: '',
+        impuestos: '0',
+        costo_envio: '0',
+        descuento: '0',
         total: '',
         tracking_number: '',
         transportista: '',
     });
+
+    const [isManualAddress, setIsManualAddress] = useState(false);
+
+    const userAddresses = direcciones.filter(d => Number(d.id_usuario) === Number(formData.id_usuario));
 
     const openCreateModal = () => {
         setModalMode('create');
@@ -86,11 +103,17 @@ export default function Orders({ ordenes, usuarios = [], filters = {} }) {
         setSelectedOrder(orden);
         setData({
             id_usuario: orden.id_usuario || '',
+            id_direccion_envio: orden.id_direccion_envio || '',
             estado: orden.estado || 'pendiente',
+            subtotal: orden.subtotal || '',
+            impuestos: orden.impuestos || '0',
+            costo_envio: orden.costo_envio || '0',
+            descuento: orden.descuento || '0',
             total: orden.total || '',
             tracking_number: orden.tracking || '',
             transportista: orden.transportista || '',
         });
+        setIsManualAddress(false);
         setIsModalOpen(true);
     };
 
@@ -99,11 +122,17 @@ export default function Orders({ ordenes, usuarios = [], filters = {} }) {
         setSelectedOrder(orden);
         setData({
             id_usuario: orden.id_usuario || '',
+            id_direccion_envio: orden.id_direccion_envio || '',
             estado: orden.estado || 'pendiente',
+            subtotal: orden.subtotal || '',
+            impuestos: orden.impuestos || '0',
+            costo_envio: orden.costo_envio || '0',
+            descuento: orden.descuento || '0',
             total: orden.total || '',
             tracking_number: orden.tracking || '',
             transportista: orden.transportista || '',
         });
+        setIsManualAddress(false);
         clearErrors();
         setIsModalOpen(true);
     };
@@ -280,6 +309,83 @@ export default function Orders({ ordenes, usuarios = [], filters = {} }) {
                             {errors.id_usuario && <p className="text-red-500 text-[10px] mt-2 font-black uppercase tracking-widest">{errors.id_usuario}</p>}
                         </div>
 
+                        {modalMode === 'create' && formData.id_usuario && (
+                            <div className="col-span-2">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Dirección de Envío</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsManualAddress(!isManualAddress)}
+                                        className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                    >
+                                        {isManualAddress ? '← Seleccionar existente' : '+ Introducir manual'}
+                                    </button>
+                                </div>
+                                {!isManualAddress ? (
+                                    <select
+                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.id_direccion_envio ? 'border-red-500' : 'border-gray-200'}`}
+                                        value={formData.id_direccion_envio}
+                                        onChange={e => setData('id_direccion_envio', e.target.value)}
+                                    >
+                                        <option value="">Seleccionar Dirección Guardada</option>
+                                        {userAddresses.map(d => (
+                                            <option key={d.id} value={d.id}>{d.nombre_completo} - {d.direccion_linea1} ({d.ciudad})</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-3 p-4 bg-blue-50/30 border border-blue-100 rounded-xl">
+                                        <div className="col-span-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Nombre Completo"
+                                                className="w-full bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                                value={formData.nombre_completo}
+                                                onChange={e => setData('nombre_completo', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Dirección"
+                                                className="w-full bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                                value={formData.direccion_linea1}
+                                                onChange={e => setData('direccion_linea1', e.target.value)}
+                                            />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Ciudad"
+                                            className="bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                            value={formData.ciudad}
+                                            onChange={e => setData('ciudad', e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Código Postal"
+                                            className="bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                            value={formData.codigo_postal}
+                                            onChange={e => setData('codigo_postal', e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="País"
+                                            className="bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                            value={formData.pais}
+                                            onChange={e => setData('pais', e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Teléfono"
+                                            className="bg-white border border-gray-100 p-3 rounded-lg text-sm"
+                                            value={formData.telefono}
+                                            onChange={e => setData('telefono', e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                                {errors.id_direccion_envio && <p className="text-red-500 text-[10px] mt-2 font-black uppercase tracking-widest">{errors.id_direccion_envio}</p>}
+                            </div>
+                        )}
+
                         {modalMode !== 'create' && (
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Número de Seguimiento</label>
@@ -310,19 +416,70 @@ export default function Orders({ ordenes, usuarios = [], filters = {} }) {
                             </select>
                         </div>
 
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Total de la Orden (€)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                readOnly={modalMode === 'view'}
-                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-lg transition-all ${errors.total ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
-                                value={formData.total}
-                                onChange={e => setData('total', e.target.value)}
-                                placeholder="0.00"
-                            />
-                            {errors.total && <p className="text-red-500 text-[10px] mt-2 font-black uppercase tracking-widest">{errors.total}</p>}
-                        </div>
+                        {modalMode === 'create' ? (
+                            <>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Subtotal (€)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        value={formData.subtotal}
+                                        onChange={e => setData('subtotal', e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Impuestos (€)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        value={formData.impuestos}
+                                        onChange={e => setData('impuestos', e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Costo Envío (€)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        value={formData.costo_envio}
+                                        onChange={e => setData('costo_envio', e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Descuento (€)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        value={formData.descuento}
+                                        onChange={e => setData('descuento', e.target.value)}
+                                    />
+                                </div>
+                                <div className="col-span-2">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 font-black text-blue-600">Total Final (€)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full p-6 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-3xl text-blue-900 transition-all"
+                                        value={formData.total}
+                                        onChange={e => setData('total', e.target.value)}
+                                    />
+                                    {errors.total && <p className="text-red-500 text-[10px] mt-2 font-black uppercase tracking-widest">{errors.total}</p>}
+                                </div>
+                            </>
+                        ) : (
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Total de la Orden (€)</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    readOnly={modalMode === 'view'}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-lg transition-all ${errors.total ? 'border-red-500' : 'border-gray-200'} ${modalMode === 'view' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    value={formData.total}
+                                    onChange={e => setData('total', e.target.value)}
+                                    placeholder="0.00"
+                                />
+                                {errors.total && <p className="text-red-500 text-[10px] mt-2 font-black uppercase tracking-widest">{errors.total}</p>}
+                            </div>
+                        )}
 
                         {modalMode === 'view' && selectedOrder?.items?.length > 0 && (
                             <div className="col-span-2 mt-4">

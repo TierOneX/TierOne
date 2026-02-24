@@ -60,12 +60,18 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'nombre'      => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:categorias,slug',
             'descripcion' => 'nullable|string',
             'id_parent'   => 'nullable|exists:categorias,id',
             'activa'      => 'boolean',
         ]);
 
-        $validated['slug'] = Str::slug($validated['nombre']);
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['nombre']);
+        } else {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+        
         $validated['activa'] = $request->boolean('activa', true);
 
         Categoria::create($validated);
@@ -80,12 +86,18 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'nombre'      => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:categorias,slug,' . $categoria->id,
             'descripcion' => 'nullable|string',
             'id_parent'   => 'nullable|exists:categorias,id',
             'activa'      => 'boolean',
         ]);
 
-        $validated['slug'] = Str::slug($validated['nombre']);
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['nombre']);
+        } else {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+        
         $validated['activa'] = $request->boolean('activa');
 
         $categoria->update($validated);

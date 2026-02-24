@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Orden;
 use App\Models\User;
 use App\Models\Producto;
+use App\Models\DireccionEnvio;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -69,6 +70,7 @@ class OrderController extends Controller
                 ]),
             'filters' => $filters,
             'usuarios' => User::all(['id', 'nombre', 'email']),
+            'direcciones' => DireccionEnvio::all(['id', 'id_usuario', 'nombre_completo', 'direccion_linea1', 'ciudad', 'pais']),
             'productos' => Producto::where('activo', true)->get(['id', 'nombre', 'precio_venta'])
         ]);
     }
@@ -79,17 +81,41 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_usuario' => 'required|exists:users,id',
-            'estado'     => 'required|string',
-            'total'      => 'required|numeric|min:0',
+            'id_usuario'         => 'required|exists:users,id',
+            'id_direccion_envio' => 'nullable|exists:direcciones_envio,id',
+            // Campos de dirección manual (si no se selecciona id_direccion_envio)
+            'nombre_completo'    => 'required_without:id_direccion_envio|string|max:255',
+            'direccion_linea1'   => 'required_without:id_direccion_envio|string|max:255',
+            'ciudad'             => 'required_without:id_direccion_envio|string|max:255',
+            'codigo_postal'      => 'required_without:id_direccion_envio|string|max:255',
+            'pais'               => 'required_without:id_direccion_envio|string|max:255',
+            'telefono'           => 'required_without:id_direccion_envio|string|max:255',
+            
+            'estado'             => 'required|string',
+            'subtotal'           => 'required|numeric|min:0',
+            'impuestos'          => 'required|numeric|min:0',
+            'costo_envio'        => 'required|numeric|min:0',
+            'descuento'          => 'required|numeric|min:0',
+            'total'              => 'required|numeric|min:0',
         ]);
+
+        // Si es dirección manual, crearla
+        if (!$request->id_direccion_envio) {
+            $direccion = DireccionEnvio::create([
+                'id_usuario'       => $validated['id_usuario'],
+                'nombre_completo'  => $validated['nombre_completo'],
+                'direccion_linea1' => $validated['direccion_linea1'],
+                'ciudad'           => $validated['ciudad'],
+                'codigo_postal'    => $validated['codigo_postal'],
+                'pais'             => $validated['pais'],
+                'telefono'         => $validated['telefono'],
+                'predeterminada'   => false
+            ]);
+            $validated['id_direccion_envio'] = $direccion->id;
+        }
 
         $validated['numero_orden'] = 'ORD-' . strtoupper(uniqid());
         $validated['fecha_orden'] = now();
-        $validated['subtotal'] = $validated['total'];
-        $validated['impuestos'] = 0;
-        $validated['costo_envio'] = 0;
-        $validated['descuento'] = 0;
 
         Orden::create($validated);
 
