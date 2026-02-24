@@ -55,7 +55,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
     Route::put('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'destroy'])->name('orders.destroy');
-    Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
+    // Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');
     Route::post('/proveedores', [App\Http\Controllers\ProveedorController::class, 'store'])->name('proveedores.store');
     Route::put('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'update'])->name('proveedores.update');
@@ -71,7 +71,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    Route::post('/reports/{id}', [App\Http\Controllers\ReporteController::class, 'update'])->name('reports.update');
+    // Route::post('/reports/{id}', [App\Http\Controllers\ReporteController::class, 'update'])->name('reports.update');
 });
 
 Route::middleware('auth')->group(function () {

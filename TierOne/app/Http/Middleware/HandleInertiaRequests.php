@@ -56,7 +56,6 @@ class HandleInertiaRequests extends Middleware
                 [
                     'title' => 'Sistema',
                     'items' => [
-                        ['label' => 'Reportes', 'icon' => '⚠️', 'link' => route('panel.ecommerce.reports')],
                         ['label' => 'Configuración', 'icon' => '⚙️', 'link' => '#'],
                     ]
                 ],

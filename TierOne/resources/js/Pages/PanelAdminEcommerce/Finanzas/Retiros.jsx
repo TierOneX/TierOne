@@ -15,12 +15,13 @@ const estadoBadge = (estado) => {
     return map[estado] ?? 'bg-gray-100 text-gray-700 border-gray-200';
 };
 
-export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
+export default function Retiros({ retiros, filters = {}, admins = [] }) {
+    const { data = [], links = [] } = retiros ?? {};
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRetiro, setEditingRetiro] = useState(null);
     const [isReadOnly, setIsReadOnly] = useState(false);
 
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const { data: formData, setData, post, processing, errors, reset, clearErrors } = useForm({
         id_retiro: '',
         estado: '',
         metodo: '',
@@ -67,7 +68,7 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('panel.ecommerce.retiros.update'), {
+        post(route('panel.ecommerce.retiros.update', formData.id_retiro), {
             onSuccess: () => {
                 setIsModalOpen(false);
                 reset();
@@ -149,11 +150,28 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
 
             <AdminTable
                 columns={columns}
-                data={retiros}
+                data={data}
                 filters={filters}
                 onSort={handleSort}
                 renderRow={renderRow}
             />
+
+            {/* Pagination */}
+            {links.length > 3 && (
+                <div className="flex justify-center gap-1 mt-6">
+                    {links.map((link, i) => (
+                        <Link
+                            key={i}
+                            href={link.url ?? '#'}
+                            className={`px-3 py-1 rounded text-sm border ${link.active
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                } ${!link.url ? 'opacity-40 pointer-events-none' : ''}`}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                        />
+                    ))}
+                </div>
+            )}
 
             {/* Modal de Detalles / Edición */}
             <AdminModal
@@ -182,7 +200,7 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
                             <select
                                 disabled={isReadOnly}
                                 className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                value={data.estado}
+                                value={formData.estado}
                                 onChange={e => setData('estado', e.target.value)}
                             >
                                 <option value="pendiente">Pendiente</option>
@@ -196,7 +214,7 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
                             <select
                                 disabled={isReadOnly}
                                 className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                value={data.id_procesado_por}
+                                value={formData.id_procesado_por}
                                 onChange={e => setData('id_procesado_por', e.target.value)}
                             >
                                 <option value="">— Sin Asignar —</option>
@@ -213,7 +231,7 @@ export default function Retiros({ retiros = [], filters = {}, admins = [] }) {
                             readOnly={isReadOnly}
                             className={`w-full p-3 bg-white border rounded-xl outline-none text-black focus:ring-2 focus:ring-blue-500 min-h-[100px] ${isReadOnly ? 'border-transparent bg-gray-50' : 'border-gray-200'}`}
                             rows="4"
-                            value={data.notas_admin}
+                            value={formData.notas_admin}
                             onChange={e => setData('notas_admin', e.target.value)}
                             placeholder="Añade notas sobre el proceso, motivo de rechazo, etc..."
                         ></textarea>

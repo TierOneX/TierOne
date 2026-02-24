@@ -245,7 +245,7 @@ export default function Orders({ ordenes, usuarios = [], direcciones = [], filte
     );
 
     return (
-        <PanelLayout title="Gestión de Órdenes" activeItem="orders">
+        <PanelLayout title="Gestión de Órdenes" activeItem="Órdenes">
             <Head title="Órdenes - Admin Panel" />
 
             <div className="flex justify-between items-center mb-6">
