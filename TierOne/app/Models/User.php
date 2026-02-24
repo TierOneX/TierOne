@@ -71,10 +71,29 @@ class User extends Authenticatable
 
     /**
      * Deshabilitar timestamps
-     * 
+     *
      * Usamos fecha_registro y ultima_conexion personalizados
      */
     public $timestamps = false;
+
+    /**
+     * Indica a Laravel que el campo de contraseña se llama `password_hash`
+     * (por defecto buscaría `password`). Necesario para que Auth::attempt()
+     * funcione correctamente.
+     */
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    /**
+     * Nombre del campo de contraseña (requerido en Laravel 10+)
+     */
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
+    }
+
 
     /**
      * Relación: Carritos del usuario
