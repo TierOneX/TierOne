@@ -509,6 +509,11 @@ section {
         background-size: cover !important;
         background-position: 70% 30% !important;
     }
+
+    #tienda {
+        background-size: cover !important;
+        background-position: 50% 20% !important;
+    }
 }
 
 /* MOBILE FIXES */

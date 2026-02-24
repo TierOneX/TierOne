@@ -51,7 +51,7 @@ export default function Features() {
             sectionTitle: 'NUESTRA TIENDA',
             title: 'MERCHANDISING EXCLUSIVO',
             description: 'Descubre nuestra colección oficial de merchandising gaming. Camisetas, sudaderas, gorras y accesorios diseñados para verdaderos competidores.',
-            image: '/images/landing/merchandising.jpg',
+            image: '/images/landing/shop.png',
             items: [
                 'Productos oficiales de calidad',
                 'Diseños exclusivos limitados',
