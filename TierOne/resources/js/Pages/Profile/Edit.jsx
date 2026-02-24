@@ -1,7 +1,8 @@
-import { Head, useForm, router } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import Header from "@/Components/Header";
+import Footer from "@/Components/Footer";
 
 /* ─── Iconos mínimos inline ───────────────────────────────────────────────── */
 const Icon = {
@@ -587,11 +588,12 @@ export default function Edit({
     const [tab, setTab] = useState("perfil");
 
     return (
-        <AuthenticatedLayout>
+        <>
             <Head title="Mi Perfil" />
             <style>{styles}</style>
+            <Header />
 
-            <div className="min-h-screen bg-[#080808] py-10 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-[#080808] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
                 {/* Cabecera de página */}
                 <div className="max-w-5xl mx-auto mb-8 prof-enter">
                     <h1 className="text-2xl font-black uppercase tracking-[0.08em] text-white">
@@ -661,6 +663,8 @@ export default function Edit({
                     </main>
                 </div>
             </div>
-        </AuthenticatedLayout>
+
+            <Footer />
+        </>
     );
 }

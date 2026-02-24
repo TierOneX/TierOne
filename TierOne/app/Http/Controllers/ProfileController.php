@@ -24,7 +24,7 @@ class ProfileController extends Controller
 
         // Torneos que el usuario ha organizado
         $torneosOrganizados = $user->torneosOrganizados()
-            ->with('juego:id,nombre,imagen_portada')
+            ->with('juego:id,nombre,imagen_url')
             ->orderByDesc('fecha_inicio')
             ->get(['id', 'id_juego', 'nombre', 'estado', 'fecha_inicio', 'fecha_fin', 'premio_total', 'es_gratuito', 'cuota_inscripcion', 'max_participantes']);
 
@@ -32,7 +32,7 @@ class ProfileController extends Controller
         $torneosInscritos = $user->inscripcionesTorneos()
             ->with([
                 'torneo' => function ($q) {
-                    $q->with('juego:id,nombre,imagen_portada')
+                    $q->with('juego:id,nombre,imagen_url')
                         ->select('id', 'id_juego', 'nombre', 'estado', 'fecha_inicio', 'fecha_fin', 'premio_total');
                 }
             ])
