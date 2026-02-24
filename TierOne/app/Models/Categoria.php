@@ -55,7 +55,7 @@ class Categoria extends Model
      */
     public function subcategorias()
     {
-        return $this->hasMany(Categoria::class, 'id_parent');
+        return $this->hasMany(Categoria::class , 'id_parent');
     }
 
     /**
@@ -63,7 +63,16 @@ class Categoria extends Model
      * 
      * Ejemplo: "Camisetas" pertenece a "Ropa"
      */
-    public function padre(){
-        return $this->belongsTo(Categoria::class, 'id_parent');
+    public function padre()
+    {
+        return $this->belongsTo(Categoria::class , 'id_parent');
+    }
+
+    /**
+     * Relación: Una categoría tiene muchos productos
+     */
+    public function productos()
+    {
+        return $this->hasMany(Producto::class , 'id_categoria');
     }
 }

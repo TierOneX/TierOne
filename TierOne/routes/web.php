@@ -1,27 +1,112 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+    'canLogin' => Route::has('login'),
+    'canRegister' => Route::has('register'),
+    'laravelVersion' => Application::VERSION,
+    'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/home', function () {
+    return Inertia::render('Home', [
+    'games' => \App\Models\Juego::where('activo', true)->get(),
+    'products' => \App\Models\Producto::with('categoria')
+    ->where('activo', true)
+    ->where('destacado', true)
+    ->take(8)
+    ->get(),
+    'tournaments' => \App\Models\Torneo::with('juego')
+    ->withCount('inscripciones')
+    ->whereIn('estado', ['inscripciones', 'en_curso'])
+    ->orderBy('fecha_inicio')
+    ->take(4)
+    ->get(),
+    ]);
+})->name('home');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/shop', function () {
+    return Inertia::render('Shop', [
+    'productos' => \App\Models\Producto::with('categoria')
+    ->where('activo', true)
+    ->orderByDesc('destacado')
+    ->orderByDesc('ventas_totales')
+    ->get(),
+    'categorias' => \App\Models\Categoria::where('activa', true)
+    ->whereHas('productos', function ($q) {
+            $q->where('activo', true);
+        }
+        )
+        ->orderBy('nombre')
+        ->get(),
+        ]);
+    })->name('shop');
+
+Route::get('/shop/{slug}', function (string $slug) {
+    $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.user'])
+        ->where('slug', $slug)
+        ->where('activo', true)
+        ->firstOrFail();
+
+    $relacionados = \App\Models\Producto::with('categoria')
+        ->where('id_categoria', $producto->id_categoria)
+        ->where('id', '!=', $producto->id)
+        ->where('activo', true)
+        ->take(4)
+        ->get();
+
+    return Inertia::render('Product', [
+    'producto' => $producto,
+    'relacionados' => $relacionados,
+    ]);
+})->name('product.show');
+
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
+})->name('cart');
+
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+// =========================================================================
+// RUTAS DE STRIPE / PAGOS
+// =========================================================================
+
+// Webhook de Stripe (sin auth, CSRF ya excluido en bootstrap/app.php)
+Route::post('/stripe/webhook', [StripeController::class , 'webhook'])->name('stripe.webhook');
+
+// Crear PaymentIntent (requiere que el carrito tenga items)
+Route::post('/stripe/create-intent', [StripeController::class , 'crearPaymentIntent'])->name('stripe.create-intent');
+
+// ✅ CONFIRMÁCIÓN DIRECTA (sin webhook) — el frontend llama esto tras el pago exitoso
+Route::post('/stripe/confirm', [StripeController::class , 'confirmarPago'])->name('stripe.confirm');
+
+// Obtener estado de una orden (para página de confirmación)
+Route::get('/stripe/orden/{orderId}', [StripeController::class , 'obtenerOrden'])->name('stripe.orden');
+
+// Rutas frontend del proceso de pago
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout', [
+    'stripeKey' => config('stripe.key'),
+    ]);
+})->name('checkout');
+
+Route::get('/checkout/success', function () {
+    return Inertia::render('CheckoutSuccess');
+})->name('checkout.success');
+
+require __DIR__ . '/auth.php';
