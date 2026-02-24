@@ -12,7 +12,10 @@ export default function AuthToggle({ active = "login" }) {
         if (to === active) return;
         setClicking(to);
         setTimeout(
-            () => router.visit(to === "login" ? "/login" : "/register"),
+            () =>
+                router.visit(to === "login" ? "/login" : "/register", {
+                    replace: true,
+                }),
             280,
         );
     };
