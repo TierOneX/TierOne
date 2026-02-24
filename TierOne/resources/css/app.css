@@ -483,6 +483,12 @@ section {
         /* x=20% shifts image content left, y=30% shifts content down */
         background-position: 20% 30% !important;
     }
+
+    #rankings {
+        background-size: contain !important;
+        background-position: right top !important;
+        background-repeat: no-repeat !important;
+    }
 }
 
 /* MOBILE FIXES */

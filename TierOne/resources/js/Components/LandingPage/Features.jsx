@@ -37,7 +37,7 @@ export default function Features() {
             sectionTitle: 'CLASIFICACIÓN GLOBAL',
             title: 'SISTEMA DE RANKINGS',
             description: 'Sistema de ranking dinámico basado en MMR (Match Making Rating). Cada victoria te acerca a la cima, cada derrota te reta a mejorar.',
-            image: './img/imgRanking.jpg',
+            image: '/images/landing/ranking.png',
             items: [
                 'Sistema MMR transparente y justo',
                 'Temporadas competitivas mensuales',
@@ -51,7 +51,7 @@ export default function Features() {
             sectionTitle: 'NUESTRA TIENDA',
             title: 'MERCHANDISING EXCLUSIVO',
             description: 'Descubre nuestra colección oficial de merchandising gaming. Camisetas, sudaderas, gorras y accesorios diseñados para verdaderos competidores.',
-            image: 'merchandising-imagen.jpg',
+            image: '/images/landing/merchandising.jpg',
             items: [
                 'Productos oficiales de calidad',
                 'Diseños exclusivos limitados',
