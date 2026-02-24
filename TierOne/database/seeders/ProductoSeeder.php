@@ -24,7 +24,7 @@ class ProductoSeeder extends Seeder
         $ssd = Categoria::where('nombre', 'Almacenamiento SSD')->first();
         $monitores = Categoria::where('nombre', 'Consolas')->first(); // Fallback similar
         $microfonos = Categoria::where('nombre', 'Micrófonos')->first();
-        
+
         $proveedor = Proveedor::first();
 
         $productos = [
@@ -35,7 +35,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Interruptores blue, retroiluminación RGB personalizable y reposamuñecas ergonómico.',
                 'precio_proveedor' => 45.00,
                 'precio_venta' => 89.99,
-                'imagen_principal' => 'https://example.com/teclado.jpg',
+                'imagen_principal' => 'assets/productos/teclado_mecanico_rgb_pro.png',
                 'destacado' => true,
             ],
             [
@@ -45,7 +45,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Sensor óptico de 16000 DPI, solo 60g de peso y cable paracord.',
                 'precio_proveedor' => 25.00,
                 'precio_venta' => 49.99,
-                'imagen_principal' => 'https://example.com/raton.jpg',
+                'imagen_principal' => 'assets/productos/raton_gaming_ultra_ligero.png',
                 'destacado' => false,
             ],
             [
@@ -55,7 +55,7 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Sonido envolvente 7.1, micrófono con cancelación de ruido y 20h de batería.',
                 'precio_proveedor' => 60.00,
                 'precio_venta' => 119.99,
-                'imagen_principal' => 'https://example.com/auriculares.jpg',
+                'imagen_principal' => 'assets/productos/auriculares_inalambricos_71.png',
                 'destacado' => true,
             ],
             [
