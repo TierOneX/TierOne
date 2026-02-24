@@ -450,6 +450,28 @@ section {
     margin-bottom: 1rem;
 }
 
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.feature-list li {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feature-list .check {
+    color: var(--primary-red);
+    font-weight: bold;
+}
+
 .feature-cta {
     display: inline-flex;
     align-items: center;
@@ -480,14 +502,12 @@ section {
 /* SECTION SPECIFIC ADJUSTMENTS */
 @media (min-width: 768px) {
     #torneos {
-        /* x=20% shifts image content left, y=30% shifts content down */
         background-position: 20% 30% !important;
     }
 
     #rankings {
-        background-size: contain !important;
-        background-position: right top !important;
-        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: 70% 30% !important;
     }
 }
 
@@ -506,7 +526,6 @@ section {
 
     .section-overlay,
     .feature-bg-section.is-reversed .section-overlay {
-        /* Gradiente vertical más sólido para legibilidad en móvil */
         background: linear-gradient(0deg, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0.6) 100%) !important;
     }
 
