@@ -45,35 +45,22 @@ const styles = `
     .card-breath    { animation: cardBreath 4s ease-in-out infinite; }
 `;
 
-/**
- * GuestLayout — Layout split-screen para Login / Register.
- *
- * Props:
- *   brandContent  — contenido del panel hero
- *   toggleSlot    — pill toggle Login/Register
- *   reverse       — invierte paneles (Register mode)
- */
 export default function GuestLayout({
     children,
     brandContent,
     toggleSlot,
     reverse = false,
 }) {
-    /* ── Panel de marca ─────────────────────────────────────────────────────── */
     const BrandPanel = (
         <div className="relative z-10 hidden md:flex md:w-[52%] lg:w-[55%] flex-col items-center justify-center bg-[#0d0d0d] overflow-hidden">
-            {/* ── Partículas canvas ── */}
             <ParticleCanvas />
 
-            {/* ── Orbes de glow animados ── */}
             <div className="orb-1 absolute top-[20%] left-[30%] w-[28rem] h-[28rem] bg-[#e31837]/10 blur-[140px] rounded-full pointer-events-none" />
             <div className="orb-2 absolute bottom-[15%] right-[20%] w-[22rem] h-[22rem] bg-[#e31837]/07 blur-[120px] rounded-full pointer-events-none" />
             <div className="orb-3 absolute top-[50%] left-[60%] w-[16rem] h-[16rem] bg-white/[0.03] blur-[100px] rounded-full pointer-events-none" />
 
-            {/* ── Scanline sweep ── */}
             <div className="scanline-sweep absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#e31837]/30 to-transparent pointer-events-none z-10" />
 
-            {/* ── Dot grid estático ── */}
             <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none"
                 style={{
@@ -83,7 +70,6 @@ export default function GuestLayout({
                 }}
             />
 
-            {/* Separador vertical */}
             <div
                 className="absolute pointer-events-none z-10"
                 style={{
@@ -97,7 +83,6 @@ export default function GuestLayout({
                 }}
             />
 
-            {/* Contenido de marca */}
             <div className="relative z-10 flex flex-col items-center text-center gap-8 px-10 lg:px-16 w-full overflow-y-auto max-h-full py-10">
                 <Link href="/" className="logo-float block shrink-0">
                     <HydraLogo size="xl" />
@@ -105,28 +90,24 @@ export default function GuestLayout({
                 {brandContent}
             </div>
 
-            {/* Esquinas decorativas */}
             <div className="absolute top-6 left-6 w-10 h-px  bg-[#e31837]/40 z-10" />
             <div className="absolute top-6 left-6 w-px  h-10 bg-[#e31837]/40 z-10" />
             <div className="absolute bottom-6 left-6 w-10 h-px bg-[#e31837]/40 z-10" />
             <div className="absolute bottom-6 left-6 w-px  h-10 bg-[#e31837]/40 z-10" />
 
-            {/* Versión */}
             <p className="absolute bottom-5 right-10 text-[8px] font-bold text-gray-700 uppercase tracking-[0.45em] select-none z-10">
                 V.0.0.0.1 // TIER_ONE
             </p>
         </div>
     );
 
-    /* ── Panel de formulario ────────────────────────────────────────────────── */
     const FormPanel = (
         <div className="relative z-10 flex-1 flex flex-col bg-[#0a0a0a] overflow-hidden">
             <style>{styles}</style>
 
-            {/* Glow sutil de fondo — respiración */}
             <div className="orb-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-[#e31837]/4 blur-[150px] rounded-full pointer-events-none" />
 
-            {/* ── MÓVIL: logo + toggle fluyen en layout ─── */}
+            {/* MÓVIL */}
             <div className="md:hidden flex flex-col items-start gap-4 px-6 pt-6 pb-2">
                 <Link href="/">
                     <HydraLogo size="sm" />
@@ -134,18 +115,16 @@ export default function GuestLayout({
                 {toggleSlot && <div>{toggleSlot}</div>}
             </div>
 
-            {/* ── DESKTOP: toggle arriba-izquierda ─── */}
+            {/* DESKTOP — toggle arriba izquierda */}
             {toggleSlot && (
                 <div className="hidden md:block absolute top-6 left-8 z-20">
                     {toggleSlot}
                 </div>
             )}
 
-            {/* Card */}
             <div className="flex-1 flex items-center justify-center p-6 md:p-10 md:mt-10 page-enter">
                 <div className="relative w-full max-w-[410px]">
                     <div className="card-breath relative overflow-hidden px-8 py-10 sm:px-10 sm:py-12 bg-[#131313] border border-white/[0.05] rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.8)]">
-                        {/* KittLine — borde superior */}
                         <KittLine
                             direction="horizontal"
                             speed="fast"
@@ -156,11 +135,8 @@ export default function GuestLayout({
                                 boxShadow: "0 0 14px 5px rgba(227,24,55,0.55)",
                             }}
                         />
-
-                        {/* Esquinas decorativas card */}
                         <div className="absolute bottom-0 left-0 w-6 h-px bg-[#e31837]/50 rounded-full" />
                         <div className="absolute bottom-0 left-0 w-px  h-6 bg-[#e31837]/50 rounded-full" />
-
                         {children}
                     </div>
                 </div>
