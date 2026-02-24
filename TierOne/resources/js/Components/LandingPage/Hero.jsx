@@ -9,7 +9,7 @@ export default function Hero() {
                 muted
                 loop
                 playsInline
-                src="/images/landing/hero-bg.mp4"
+                src="/images/landing/video.mp4"
             />
             <div className="hero-bg-overlay"></div>
             <div className="hero-content">
