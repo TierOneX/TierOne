@@ -10,8 +10,9 @@ use Illuminate\Http\JsonResponse;
 class CategoriaController extends Controller
 {
     use ApiResponseTrait;
+
     /**
-     * Summary of index
+     * Display a listing of the resource.
      * @return JsonResponse
      */
     public function index(): JsonResponse
@@ -25,15 +26,7 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-    }
-
-    /**
-     * Summary of store
+     * Store a newly created resource in storage.
      * @param Request $request
      * @return JsonResponse
      */
@@ -58,7 +51,7 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Summary of show
+     * Display the specified resource.
      * @param string $id
      * @return JsonResponse
      */
@@ -75,15 +68,7 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Summary of update
+     * Update the specified resource in storage.
      * @param Request $request
      * @param string $id
      * @return JsonResponse
@@ -113,7 +98,7 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Summary of destroy
+     * Remove the specified resource from storage.
      * @param string $id
      * @return JsonResponse
      */

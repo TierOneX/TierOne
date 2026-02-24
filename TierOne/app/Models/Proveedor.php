@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 /**
  * Modelo Proveedor 
  * 
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $nombre
+ * @property string $slug
  * @property string $contacto_nombre
  * @property string $email
  * @property string|null $telefono
@@ -17,6 +20,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $notas
  * @property bool $activo
  * @property \Carbon\Carbon $fecha_registro
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Proveedor extends Model
 {
@@ -34,6 +39,7 @@ class Proveedor extends Model
 
     protected $fillable = [
         'nombre',
+        'slug',
         'contacto_nombre',
         'email',
         'telefono',
@@ -49,11 +55,38 @@ class Proveedor extends Model
     protected $casts = [
         'activo' => 'boolean',
         'fecha_registro' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
-     * Deshabilitar timestamps automáticos
+     * Boot method para generar slug automáticamente
      */
-    public $timestamps = false;
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Antes de crear
+        static::creating(function ($proveedor) {
+            if (empty($proveedor->slug)) {
+                $proveedor->slug = Str::slug($proveedor->nombre);
+            }
+        });
+
+        // Después de crear (por si creating no funcionó)
+        static::created(function ($proveedor) {
+            if (empty($proveedor->slug)) {
+                $proveedor->slug = Str::slug($proveedor->nombre);
+                $proveedor->saveQuietly();
+            }
+        });
+
+        // Al actualizar
+        static::updating(function ($proveedor) {
+            if ($proveedor->isDirty('nombre') && empty($proveedor->slug)) {
+                $proveedor->slug = Str::slug($proveedor->nombre);
+            }
+        });
+    }
 
 }

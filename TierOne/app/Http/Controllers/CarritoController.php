@@ -6,6 +6,7 @@ use App\Models\Carrito;
 use App\Models\ItemCarrito;
 use App\Models\Producto;
 use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StoreCarritoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,16 +42,13 @@ class CarritoController extends Controller
 
     /**
      * Agregar un item al carrito
+     * @param StoreCarritoRequest $request
+     * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreCarritoRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'id_usuario' => 'required|exists:users,id',
-                'id_producto' => 'required|exists:productos,id',
-                'id_variante' => 'nullable|exists:variantes_productos,id',
-                'cantidad' => 'required|integer|min:1',
-            ]);
+            $validated = $request->validated();
 
             // 1. Obtener o crear el carrito
             $carrito = Carrito::firstOrCreate(
