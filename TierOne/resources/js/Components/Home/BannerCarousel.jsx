@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/react';
 const banners = [
     {
         id: 1,
-        image: '/images/banners/banner1.jpg',
+        image: '/images/home/banner1.jpg',
         title: 'DOMINA LA',
         highlight: 'COMPETICIÓN',
         subtitle: 'Únete al torneo de League of Legends más prestigioso de la temporada.',
@@ -14,8 +14,8 @@ const banners = [
     },
     {
         id: 2,
-        image: '/images/banners/banner2.jpg',
-        title: 'NUEVA COLECCIÓN',
+        image: '/images/home/banner2.png',
+        title: 'NUEVA COLECCIÓN',           
         highlight: 'STREETWEAR',
         subtitle: 'Descubre nuestra colección exclusiva de merchandising gaming.',
         cta: 'VER TIENDA',
@@ -24,7 +24,7 @@ const banners = [
     },
     {
         id: 3,
-        image: '/images/banners/banner3.jpg',
+        image: '/images/home/banner3.jpg',
         title: 'COMPITE EN',
         highlight: 'TIEMPO REAL',
         subtitle: 'Matchmaking inteligente, rankings dinámicos y partidas competitivas.',
@@ -69,6 +69,7 @@ export default function BannerCarousel() {
                         src={b.image}
                         alt={b.title}
                         className="absolute inset-0 w-full h-full object-cover"
+                        style={{ objectPosition: 'center 5%' }}
                     />
                     {/* Overlay oscuro para legibilidad */}
                     <div className="absolute inset-0" style={{

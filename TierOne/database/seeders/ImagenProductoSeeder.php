@@ -27,7 +27,7 @@ class ImagenProductoSeeder extends Seeder
 
             ImagenProducto::create([
                 'id_producto' => $producto->id,
-                'url' => "assets/productos/galeria/{$producto->slug}-side.png",
+                'url' => "images/productos/galeria/{$producto->slug}-side.png",
                 'orden' => 1,
                 'es_principal' => false,
             ]);
@@ -38,7 +38,7 @@ class ImagenProductoSeeder extends Seeder
             if ($count < 20 && $producto->id % 2 == 0) {
                 ImagenProducto::create([
                     'id_producto' => $producto->id,
-                    'url' => "assets/productos/galeria/{$producto->slug}-box.png",
+                    'url' => "images/productos/galeria/{$producto->slug}-box.png",
                     'orden' => 2,
                     'es_principal' => false,
                 ]);
