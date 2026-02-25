@@ -1,7 +1,7 @@
-import { Head } from "@inertiajs/react";
-import MainLayout from "@/Layouts/MainLayout";
-import Hero from "@/Components/LandingPage/Hero";
-import Features from "@/Components/LandingPage/Features";
+import { Head } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
+import Hero from '@/Components/LandingPage/Hero';
+import Features from '@/Components/LandingPage/Features';
 
 export default function LandingPage() {
     return (
@@ -10,6 +10,7 @@ export default function LandingPage() {
 
             <Hero />
             <Features />
+
         </MainLayout>
     );
 }
