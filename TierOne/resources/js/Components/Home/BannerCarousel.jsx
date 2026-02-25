@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/react';
 const banners = [
     {
         id: 1,
-        image: '/images/banners/banner1.jpg',
+        image: '/images/home/banner1.jpg',
         title: 'DOMINA LA',
         highlight: 'COMPETICIÓN',
         subtitle: 'Únete al torneo de League of Legends más prestigioso de la temporada.',
@@ -14,7 +14,7 @@ const banners = [
     },
     {
         id: 2,
-        image: '/images/banners/banner2.jpg',
+        image: '/images/home/banner2.jpg',
         title: 'NUEVA COLECCIÓN',
         highlight: 'STREETWEAR',
         subtitle: 'Descubre nuestra colección exclusiva de merchandising gaming.',
@@ -24,7 +24,7 @@ const banners = [
     },
     {
         id: 3,
-        image: '/images/banners/banner3.jpg',
+        image: '/images/home/banner3.jpg',
         title: 'COMPITE EN',
         highlight: 'TIEMPO REAL',
         subtitle: 'Matchmaking inteligente, rankings dinámicos y partidas competitivas.',
