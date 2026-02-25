@@ -14,8 +14,8 @@ const banners = [
     },
     {
         id: 2,
-        image: '/images/home/banner2.jpg',
-        title: 'NUEVA COLECCIÓN',
+        image: '/images/home/banner2.png',
+        title: 'NUEVA COLECCIÓN',           
         highlight: 'STREETWEAR',
         subtitle: 'Descubre nuestra colección exclusiva de merchandising gaming.',
         cta: 'VER TIENDA',
@@ -69,6 +69,7 @@ export default function BannerCarousel() {
                         src={b.image}
                         alt={b.title}
                         className="absolute inset-0 w-full h-full object-cover"
+                        style={{ objectPosition: 'center 5%' }}
                     />
                     {/* Overlay oscuro para legibilidad */}
                     <div className="absolute inset-0" style={{
