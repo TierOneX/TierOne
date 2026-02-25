@@ -40,32 +40,38 @@ export default function KittLine({
     /* ── Traveler (el "ojo" de KITT) ────────────────────────────────────── */
     const travelerStyle = isVertical
         ? {
-            position: "absolute",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "200%",
-            height: "20%",
-            background: "radial-gradient(ellipse 60% 50% at 50% 50%, #ff4060 0%, #e31837 25%, rgba(227,24,55,0.15) 70%, transparent 100%)",
-            filter: "blur(3px)",
-            animation: `kitt-v ${dur} ease-in-out infinite`,
-            borderRadius: "50%",
-        }
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "200%",
+              height: "20%",
+              background:
+                  "radial-gradient(ellipse 60% 50% at 50% 50%, #ff4060 0%, #e31837 25%, rgba(227,24,55,0.15) 70%, transparent 100%)",
+              filter: "blur(3px)",
+              animation: `kitt-v ${dur} ease-in-out infinite`,
+              borderRadius: "50%",
+          }
         : {
-            position: "absolute",
-            top: "50%",
-            transform: "translateY(-50%)",
-            height: "800%",
-            width: "20%",
-            background: "radial-gradient(ellipse 50% 60% at 50% 50%, #ff4060 0%, #e31837 20%, rgba(227,24,55,0.25) 60%, transparent 100%)",
-            filter: "blur(6px)",
-            animation: `kitt-h ${dur} ease-in-out infinite`,
-            borderRadius: "50%",
-        };
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              height: "800%",
+              width: "20%",
+              background:
+                  "radial-gradient(ellipse 50% 60% at 50% 50%, #ff4060 0%, #e31837 30%, rgba(227,24,55,0.35) 65%, transparent 100%)",
+              filter: "blur(4px)",
+              animation: `kitt-h ${dur} ease-in-out infinite`,
+              borderRadius: "50%",
+          };
 
     /* ── Track (línea base estática) ────────────────────────────────────── */
     const trackStyle = isVertical
-        ? { background: `linear-gradient(to bottom, transparent, rgba(227,24,55,${opacity * 0.65}), transparent)` }
-        : { background: `linear-gradient(to right,  transparent, rgba(227,24,55,${opacity * 0.65}), transparent)` };
+        ? {
+              background: `linear-gradient(to bottom, transparent, rgba(227,24,55,${opacity * 0.65}), transparent)`,
+          }
+        : {
+              background: `linear-gradient(to right,  transparent, rgba(227,24,55,${opacity * 0.65}), transparent)`,
+          };
 
     return (
         <>
@@ -75,16 +81,20 @@ export default function KittLine({
              * Wrapper exterior — el className controla el posicionamiento.
              * overflow:visible aquí para que el boxShadow no se corte.
              */}
-            <div className={className} style={{ pointerEvents: "none", ...style }}>
-
+            <div
+                className={className}
+                style={{ pointerEvents: "none", ...style }}
+            >
                 {/*
                  * Track interior — overflow:hidden limita la animación a los
                  * límites del track. Separado del wrapper para no cortar el glow.
                  */}
-                <div className="absolute inset-0 overflow-hidden" style={trackStyle}>
+                <div
+                    className="absolute inset-0 overflow-hidden"
+                    style={trackStyle}
+                >
                     <div style={travelerStyle} />
                 </div>
-
             </div>
         </>
     );

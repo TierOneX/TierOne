@@ -43,7 +43,7 @@ class JuegoSeeder extends Seeder
             'nombre' => 'Dota 2',
             'slug' => 'dota-2',
             'descripcion' => 'MOBA competitivo desarrollado por Valve',
-            'imagen_url' => 'images/juegos/portada_dota2.png',
+            'imagen_url' => 'assets/juegos/portada_dota2.png',
             'categoria' => 'MOBA',
             'activo' => true,
         ]);
