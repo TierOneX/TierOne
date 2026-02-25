@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Orden;
 use App\Models\ItemOrden;
 use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StoreOrdenRequest;
+use App\Http\Requests\UpdateOrdenRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,35 +31,13 @@ class OrdenController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     * @param StoreOrdenRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreOrdenRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'id_usuario' => 'required|exists:users,id',
-                'id_direccion_envio' => 'required|exists:direcciones_envio,id',
-                'numero_orden' => 'required|string|unique:ordenes,numero_orden',
-                'subtotal' => 'required|numeric|min:0',
-                'impuestos' => 'required|numeric|min:0',
-                'costo_envio' => 'required|numeric|min:0',
-                'descuento' => 'required|numeric|min:0',
-                'total' => 'required|numeric|min:0',
-                'estado' => 'required|in:pendiente,pagada,enviada_proveedor,en_transito,entregada,cancelada',
-                'fecha_orden' => 'required|date',
-                // Optional fields
-                'tracking_number' => 'nullable|string',
-                'transportista' => 'nullable|string',
-
-                // Items de la orden
-                'items' => 'required|array|min:1',
-                'items.*.id_producto' => 'required|exists:productos,id',
-                'items.*.id_variante' => 'nullable|exists:variantes_productos,id',
-                'items.*.id_proveedor' => 'required|exists:proveedores,id',
-                'items.*.cantidad' => 'required|integer|min:1',
-                'items.*.precio_unitario' => 'required|numeric|min:0',
-            ]);
+            $validated = $request->validated();
 
             $orden = DB::transaction(function () use ($validated) {
                 // 1. Crear la cabecera de la orden
@@ -106,33 +86,18 @@ class OrdenController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     * @param UpdateOrdenRequest $request
      * @param string $id
      * @return JsonResponse
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateOrdenRequest $request, string $id): JsonResponse
     {
         try {
             $orden = Orden::findOrFail($id);
-
-            $validated = $request->validate([
-                'estado' => 'sometimes|in:pendiente,pagada,enviada_proveedor,en_transito,entregada,cancelada',
-                'tracking_number' => 'nullable|string',
-                'transportista' => 'nullable|string',
-                'fecha_enviada_proveedor' => 'nullable|date',
-                'fecha_actualizacion' => 'nullable|date',
-                // Cancellation logic fields
-                'id_cancelado_por' => 'nullable|exists:users,id',
-                'fecha_cancelacion' => 'nullable|date',
-                'razon_cancelacion' => 'nullable|string',
-            ]);
-
-            $orden->update($validated);
+            $orden->update($request->validated());
             return $this->successResponse($orden, 'Orden actualizada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Orden no encontrada');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
             return $this->errorResponse('Error al actualizar la orden', $e->getMessage());
         }

@@ -9,11 +9,10 @@ use Illuminate\Http\Request;
 
 class ProveedorController extends Controller
 {
-
-    use ApiResponseTrait; //Importar el trait
+    use ApiResponseTrait;
 
     /**
-     * Summary of index
+     * Display a listing of the resource.
      * @return JsonResponse
      */
     public function index(): JsonResponse
@@ -27,15 +26,7 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Summary of store
+     * Store a newly created resource in storage.
      * @param Request $request
      * @return JsonResponse
      */
@@ -53,9 +44,7 @@ class ProveedorController extends Controller
             ]);
 
             $proveedor = Proveedor::create($validated);
-
             return $this->successResponse($proveedor, 'Proveedor creado correctamente', 201);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->validationErrorResponse($e->validator->errors());
         } catch (\Exception $e) {
@@ -64,7 +53,7 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Summary of show
+     * Display the specified resource.
      * @param string $id
      * @return JsonResponse
      */
@@ -73,7 +62,6 @@ class ProveedorController extends Controller
         try {
             $proveedor = Proveedor::findOrFail($id);
             return $this->successResponse($proveedor, 'Proveedor obtenido correctamente');
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Proveedor no encontrado');
         } catch (\Exception $e) {
@@ -82,15 +70,7 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Summary of update
+     * Update the specified resource in storage.
      * @param Request $request
      * @param string $id
      * @return JsonResponse
@@ -100,7 +80,6 @@ class ProveedorController extends Controller
         try {
             $proveedor = Proveedor::findOrFail($id);
 
-            //Validar 
             $validated = $request->validate([
                 'nombre' => 'sometimes|required|string|max:100',
                 'contacto_nombre' => 'sometimes|required|string|max:100',
@@ -113,7 +92,6 @@ class ProveedorController extends Controller
 
             $proveedor->update($validated);
             return $this->successResponse($proveedor, 'Proveedor actualizado correctamente');
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Proveedor no encontrado');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -124,7 +102,7 @@ class ProveedorController extends Controller
     }
 
     /**
-     * Summary of destroy
+     * Remove the specified resource from storage.
      * @param string $id
      * @return JsonResponse
      */
