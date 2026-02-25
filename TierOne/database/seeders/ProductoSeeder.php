@@ -25,6 +25,11 @@ class ProductoSeeder extends Seeder
         $monitores = Categoria::where('nombre', 'Consolas')->first(); // Fallback similar
         $microfonos = Categoria::where('nombre', 'Micrófonos')->first();
 
+        // Categorías de merchandising
+        $camisetas = Categoria::where('nombre', 'Camisetas')->first();
+        $figuras = Categoria::where('nombre', 'Figuras')->first();
+        $merchandising = Categoria::where('nombre', 'Merchandising')->first();
+
         $proveedor = Proveedor::first();
 
         $productos = [
@@ -228,7 +233,69 @@ class ProductoSeeder extends Seeder
                 'imagen_principal' => 'images/productos/brazo_microfono_pro.png',
                 'destacado' => false,
             ],
+            // ─── MERCHANDISING ────────────────────────────────────────────
+            [
+                'id_categoria' => $camisetas->id ?? $merchandising->id ?? 1,
+                'nombre' => 'Camiseta Gaming TierOne Negra',
+                'slug' => 'camiseta-gaming-tierone-negra',
+                'descripcion' => 'Camiseta 100% algodón premium con logo TierOne estampado en serigrafía. Disponible en tallas S-XXL.',
+                'precio_proveedor' => 8.00,
+                'precio_venta' => 24.99,
+                'imagen_principal' => 'images/productos/camiseta_gaming_tierone_negra.png',
+                'destacado' => true,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Sudadera Hoodie TierOne Negro/Rojo',
+                'slug' => 'sudadera-hoodie-tierone-negro-rojo',
+                'descripcion' => 'Sudadera con capucha y bolsillo canguro. Algodón pesado 400g, bordado en pecho y espalda.',
+                'precio_proveedor' => 20.00,
+                'precio_venta' => 59.99,
+                'imagen_principal' => 'images/productos/sudadera_hoodie_tierone.png',
+                'destacado' => true,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Sudadera Zip TierOne Gris',
+                'slug' => 'sudadera-zip-tierone-gris',
+                'descripcion' => 'Sudadera con cremallera completa, forro polar interior y logo TierOne en relieve.',
+                'precio_proveedor' => 22.00,
+                'precio_venta' => 64.99,
+                'imagen_principal' => 'images/productos/sudadera_zip_tierone_gris.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Gorra Snapback TierOne',
+                'slug' => 'gorra-snapback-tierone',
+                'descripcion' => 'Gorra snapback ajustable con visera plana y logo TierOne bordado en 3D. Talla única.',
+                'precio_proveedor' => 7.00,
+                'precio_venta' => 19.99,
+                'imagen_principal' => 'images/productos/gorra_snapback_tierone.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Pack Calcetines Gaming x3',
+                'slug' => 'pack-calcetines-gaming-x3',
+                'descripcion' => 'Pack de 3 pares de calcetines con diseños gaming exclusivos. Algodón con refuerzo en talón.',
+                'precio_proveedor' => 5.00,
+                'precio_venta' => 14.99,
+                'imagen_principal' => 'images/productos/calcetines_gaming_pack.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $figuras->id ?? $merchandising->id ?? 1,
+                'nombre' => 'Mochila Gaming TierOne 30L',
+                'slug' => 'mochila-gaming-tierone-30l',
+                'descripcion' => 'Mochila resistente al agua con compartimento acolchado para portátil 17" y organización para periféricos.',
+                'precio_proveedor' => 25.00,
+                'precio_venta' => 69.99,
+                'imagen_principal' => 'images/productos/mochila_gaming_tierone.png',
+                'destacado' => true,
+            ],
         ];
+
 
         foreach ($productos as $item) {
             Producto::updateOrCreate(
