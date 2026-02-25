@@ -32,7 +32,7 @@ class SponsorTorneoSeeder extends Seeder
                 'logo_url' => "https://example.com/logos/sponsor-$i.png",
                 'aportacion' => rand(500, 5000),
                 'enlace_web' => 'https://example.com',
-                'nivel' => ['Oro', 'Plata', 'Bronce'][rand(0, 2)],
+                'nivel' => ['oro', 'plata', 'bronce'][rand(0, 2)],
                 'activo' => true,
             ]);
         }
