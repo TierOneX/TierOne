@@ -75,7 +75,7 @@ export default function RegisterHeroPanel() {
             {/* Headline */}
             <div className="space-y-1.5 shrink-0">
                 <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#e31837]">
-                    Bienvenido a
+                    Bienvenido
                 </p>
                 <h2 className="text-3xl font-black uppercase italic tracking-tight text-white leading-none">
                     ÚNETE A <span className="text-[#e31837]">LA ÉLITE</span>

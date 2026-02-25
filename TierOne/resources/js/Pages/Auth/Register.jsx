@@ -71,12 +71,6 @@ export default function Register() {
         >
             <Head title="Crear Cuenta" />
 
-            <div className="md:hidden mb-6 text-center">
-                <h1 className="text-2xl font-black uppercase italic tracking-[0.08em] text-white">
-                    CREAR <span className="text-[#e31837]">CUENTA</span>
-                </h1>
-            </div>
-
             <form onSubmit={submit} className="space-y-5">
                 {/* Username */}
                 <div>
@@ -206,7 +200,7 @@ export default function Register() {
                         ¿Ya tienes cuenta?{" "}
                         <Link
                             href="/login"
-                            className="text-[#e31837] font-bold hover:text-white transition-colors"
+                            className="text-[#e31837] font-black hover:text-white transition-colors"
                         >
                             Inicia sesión
                         </Link>

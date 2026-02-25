@@ -66,34 +66,25 @@ export default function Login({ status, canResetPassword }) {
             toggleSlot={<AuthToggle active="login" />}
         >
             <Head title="Acceso al Sistema" />
-
-            {/* Mobile heading */}
-            <div className="md:hidden mb-6 text-center">
-                <h1 className="text-2xl font-black uppercase italic tracking-[0.08em] text-white">
-                    ACCESO AL <span className="text-[#e31837]">SISTEMA</span>
-                </h1>
-            </div>
-
             {status && (
                 <div className="mb-5 rounded-lg bg-green-500/10 p-3 text-center text-[10px] font-bold text-green-400 border border-green-500/20 uppercase tracking-widest">
                     {status}
                 </div>
             )}
-
             <form onSubmit={submit} className="space-y-6">
                 {/* Email */}
                 <div>
                     <InputLabel
                         htmlFor="email"
                         value="Email / Usuario"
-                        className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
+                        className="text-sm tracking-[0.2em] text-gray-400 uppercase font-semibold"
                     />
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-2 block w-full py-3.5 px-4"
+                        className="mt-2 block w-full py-4 px-4 text-base"
                         autoComplete="username"
                         placeholder="tu@email.com"
                         isFocused={true}
@@ -101,7 +92,7 @@ export default function Login({ status, canResetPassword }) {
                     />
                     <InputError
                         message={errors.email}
-                        className="mt-1.5 text-[10px] font-semibold uppercase"
+                        className="mt-1.5 text-xs font-semibold uppercase"
                     />
                 </div>
 
@@ -111,12 +102,12 @@ export default function Login({ status, canResetPassword }) {
                         <InputLabel
                             htmlFor="password"
                             value="Contraseña"
-                            className="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-semibold"
+                            className="text-sm tracking-[0.2em] text-gray-400 uppercase font-semibold"
                         />
                         {canResetPassword && (
                             <Link
                                 href="/forgot-password"
-                                className="text-[9px] font-bold text-[#e31837]/50 hover:text-[#e31837] transition-colors uppercase tracking-[0.15em]"
+                                className="text-xs font-bold text-[#e31837]/50 hover:text-[#e31837] transition-colors uppercase tracking-[0.15em]"
                             >
                                 ¿Olvidaste la contraseña?
                             </Link>
@@ -128,7 +119,7 @@ export default function Login({ status, canResetPassword }) {
                             type={showPwd ? "text" : "password"}
                             name="password"
                             value={data.password}
-                            className="block w-full py-3.5 pl-4 pr-11"
+                            className="block w-full py-4 pl-4 pr-12 text-base"
                             autoComplete="current-password"
                             placeholder="••••••••"
                             onChange={(e) =>
@@ -145,7 +136,7 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                     <InputError
                         message={errors.password}
-                        className="mt-1.5 text-[10px] font-semibold uppercase"
+                        className="mt-1.5 text-xs font-semibold uppercase"
                     />
                 </div>
 
@@ -156,22 +147,22 @@ export default function Login({ status, canResetPassword }) {
                         checked={data.remember}
                         onChange={(e) => setData("remember", e.target.checked)}
                     />
-                    <span className="text-[10px] font-semibold text-gray-500 group-hover:text-gray-300 transition-colors uppercase tracking-[0.2em]">
+                    <span className="text-sm font-semibold text-gray-500 group-hover:text-gray-300 transition-colors uppercase tracking-[0.15em]">
                         Recordarme
                     </span>
                 </label>
 
                 {/* Submit */}
                 <PrimaryButton
-                    className="w-full py-4 mt-2"
+                    className="w-full py-5 mt-2 text-base tracking-widest"
                     disabled={processing}
                 >
                     Entrar
                 </PrimaryButton>
 
                 {/* Register link */}
-                <div className="pt-4 border-t border-white/[0.06] text-center">
-                    <p className="text-[10px] text-gray-600 font-semibold uppercase tracking-[0.15em]">
+                <div className="pt-5 border-t border-white/[0.06] text-center">
+                    <p className="text-sm text-gray-500 font-semibold uppercase tracking-[0.12em]">
                         ¿Aún no tienes cuenta?{" "}
                         <Link
                             href="/register"
