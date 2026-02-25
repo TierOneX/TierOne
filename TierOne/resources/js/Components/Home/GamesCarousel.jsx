@@ -116,10 +116,10 @@ export default function GamesCarousel({ games }) {
 
                         {/* Card */}
                         <div className="flex-1 rounded-xl overflow-hidden border border-white/5" style={{ background: '#141418' }}>
-                            <div className="relative h-[160px] overflow-hidden" style={{ background: '#1C1C20' }}>
+                            <div className="relative h-[160px] overflow-hidden" style={{ background: '#111116' }}>
                                 {juego.imagen_url && !imgErrors[juego.id] ? (
                                     <img src={juego.imagen_url} alt={juego.nombre}
-                                        className="absolute inset-0 w-full h-full object-cover"
+                                        className="absolute inset-0 w-full h-full object-contain object-center"
                                         onError={() => handleImgError(juego.id)} />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center"
@@ -175,10 +175,10 @@ function DesktopCard({ juego, imgErrors, onImgError }) {
             className="group flex-shrink-0 w-[200px] lg:w-[230px] rounded-xl overflow-hidden border border-white/5 hover:border-[#e31837]/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-red-900/10"
             style={{ scrollSnapAlign: 'start', background: '#141418' }}
         >
-            <div className="relative h-[200px] lg:h-[220px] overflow-hidden" style={{ background: '#1C1C20' }}>
+            <div className="relative h-[200px] lg:h-[220px] overflow-hidden" style={{ background: '#111116' }}>
                 {juego.imagen_url && !imgErrors[juego.id] ? (
                     <img src={juego.imagen_url} alt={juego.nombre}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
                         onError={() => onImgError(juego.id)} />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center"
