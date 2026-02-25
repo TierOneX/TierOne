@@ -404,6 +404,16 @@ section {
 
 .feature-text-content {
     max-width: 600px;
+    background: rgba(10, 10, 10, 0.4);
+    padding: 2.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    border-left: 3px solid var(--primary-red);
+}
+
+.feature-bg-section.is-reversed .feature-text-content {
+    border-left: none;
+    border-right: 3px solid var(--primary-red);
 }
 
 .feature-bg-section.is-reversed {
@@ -441,13 +451,17 @@ section {
 }
 
 .section-label {
-    display: block;
+    display: inline-block;
     color: var(--primary-red);
+    background: rgba(225, 6, 0, 0.1);
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    border: 1px solid rgba(225, 6, 0, 0.3);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 3px;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
 .feature-list {
@@ -477,18 +491,26 @@ section {
     align-items: center;
     gap: 1rem;
     color: var(--primary-red);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.8rem 1.8rem;
+    border-radius: 4px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(225, 6, 0, 0.2);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 3px;
     text-decoration: none;
     margin-top: 1rem;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feature-cta:hover {
     gap: 1.2rem;
     color: #fff;
+    background: rgba(0, 0, 0, 0.8);
+    border-color: var(--primary-red);
+    box-shadow: 0 0 20px rgba(225, 6, 0, 0.2);
 }
 
 .feature-cta span {
