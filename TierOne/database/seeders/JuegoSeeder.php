@@ -139,15 +139,6 @@ class JuegoSeeder extends Seeder
         ]);
 
         Juego::create([
-            'nombre' => 'FC 24',
-            'slug' => 'fc-24',
-            'descripcion' => 'Simulador de fútbol profesional de EA Sports',
-            'imagen_url' => 'assets/juegos/portada_fc24.png',
-            'categoria' => 'Deportes',
-            'activo' => true,
-        ]);
-
-        Juego::create([
             'nombre' => 'Rainbow Six Siege',
             'slug' => 'rainbow-six-siege',
             'descripcion' => 'Shooter táctico centrado en la destrucción y el trabajo en equipo',
