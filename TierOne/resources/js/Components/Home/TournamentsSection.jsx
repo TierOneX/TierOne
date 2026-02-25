@@ -1,11 +1,11 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 
 /**
  * Datos del modelo Torneo (BD):
  * - id, nombre, descripcion, imagen_banner, formato, max_participantes,
  *   premio_total, fecha_inicio, fecha_fin, estado, es_gratuito
- * - juego (relación): nombre, imagen_url
+ * - juego (relaci├│n): nombre, imagen_url
  * - inscripciones_count: count de inscripciones
  * 
  * Estados posibles: 'inscripciones', 'en_curso', 'finalizado'
@@ -33,10 +33,10 @@ export default function TournamentsSection({ tournaments }) {
                     <div>
                         <p className="text-[#e31837] text-xs font-bold uppercase tracking-[0.25em] mb-2 flex items-center gap-2">
                             <span className="w-5 h-[2px] bg-[#e31837] rounded-full" />
-                            COMPETICIÓN
+                            COMPETICI├ôN
                         </p>
                         <h2 className="text-2xl lg:text-4xl font-black italic uppercase text-white">
-                            TORNEOS <span className="text-[#e31837]">PRÓXIMOS</span>
+                            TORNEOS <span className="text-[#e31837]">PR├ôXIMOS</span>
                         </h2>
                     </div>
                     <Link href="/tournaments"
@@ -94,7 +94,7 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center"
                             style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}>
-                            <span className="text-3xl font-black text-white/10">🎮</span>
+                            <span className="text-3xl font-black text-white/10">­ƒÄ«</span>
                         </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#141418] hidden lg:block" />
@@ -131,7 +131,7 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
                         {/* Premio */}
                         <div className="lg:text-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-0.5">Premio</p>
-                            <p className="text-[#e31837] font-black text-2xl">{torneo.premio_total}€</p>
+                            <p className="text-[#e31837] font-black text-2xl">{torneo.premio_total}Ôé¼</p>
                         </div>
 
                         {/* Formato */}
@@ -158,7 +158,7 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
                             </div>
                         </div>
 
-                        {/* Botón */}
+                        {/* Bot├│n */}
                         <div className="lg:ml-auto flex-shrink-0">
                             <span className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${isFull || torneo.estado === 'finalizado'
                                 ? 'bg-white/5 text-gray-500 border border-white/10'

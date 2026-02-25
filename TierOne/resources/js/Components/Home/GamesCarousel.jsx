@@ -1,10 +1,10 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+﻿import { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from '@inertiajs/react';
 
 /**
  * Carrusel de juegos:
- * - DESKTOP (lg+): scroll horizontal con múltiples cards visibles
- * - MÓVIL (<lg): 1 card a la vez, flechas fuera, auto-avance cada 4s
+ * - DESKTOP (lg+): scroll horizontal con m├║ltiples cards visibles
+ * - M├ôVIL (<lg): 1 card a la vez, flechas fuera, auto-avance cada 4s
  */
 export default function GamesCarousel({ games }) {
     // ===== Estado para DESKTOP (scroll) =====
@@ -32,7 +32,7 @@ export default function GamesCarousel({ games }) {
         scrollRef.current.scrollBy({ left: dir === 'left' ? -250 : 250, behavior: 'smooth' });
     };
 
-    // ===== Estado para MÓVIL (card a card) =====
+    // ===== Estado para M├ôVIL (card a card) =====
     const [current, setCurrent] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
     const [imgErrors, setImgErrors] = useState({});
@@ -100,7 +100,7 @@ export default function GamesCarousel({ games }) {
                     )}
                 </div>
 
-                {/* ==================== MÓVIL: card a card ==================== */}
+                {/* ==================== M├ôVIL: card a card ==================== */}
                 <div className="lg:hidden">
                     <div
                         className="flex items-center gap-3"
@@ -167,7 +167,7 @@ export default function GamesCarousel({ games }) {
     );
 }
 
-/* Card para DESKTOP — scroll horizontal */
+/* Card para DESKTOP ÔÇö scroll horizontal */
 function DesktopCard({ juego, imgErrors, onImgError }) {
     return (
         <Link
