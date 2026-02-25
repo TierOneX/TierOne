@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link } from "@inertiajs/react";
 
 export default function Hero() {
     return (
@@ -9,13 +9,13 @@ export default function Hero() {
                 muted
                 loop
                 playsInline
-                src="/images/landing/videos/hero-bg.mp4"
+                src="/images/landing/video.mp4"
             />
             <div className="hero-bg-overlay"></div>
             <div className="hero-content">
-
                 <h1>
-                    DOMINA LA<br />
+                    DOMINA LA
+                    <br />
                     <span className="highlight">COMPETICIÓN</span>
                 </h1>
 
@@ -23,7 +23,10 @@ export default function Hero() {
                     <Link href="/login" className="hero-btn hero-btn-login">
                         INICIAR SESIÓN
                     </Link>
-                    <Link href="/register" className="hero-btn hero-btn-register">
+                    <Link
+                        href="/register"
+                        className="hero-btn hero-btn-register"
+                    >
                         REGISTRARSE
                     </Link>
                 </div>
