@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 import BannerCarousel from '@/Components/Home/BannerCarousel';
@@ -11,7 +11,7 @@ export default function Home({ games, products, tournaments }) {
         <>
             <Head title="Inicio - TierOne Gaming" />
             <Head>
-                <meta name="description" content="TierOne - Tu plataforma de gaming competitivo. Torneos, partidas en vivo, merchandising exclusivo y una comunidad de ├®lite." />
+                <meta name="description" content="TierOne - Tu plataforma de gaming competitivo. Torneos, partidas en vivo, merchandising exclusivo y una comunidad de élite." />
             </Head>
 
             <div className="min-h-screen" style={{ background: '#0B0B0B', color: '#ffffff' }}>
@@ -27,7 +27,7 @@ export default function Home({ games, products, tournaments }) {
                 {/* 3. Merchandising */}
                 <MerchSection products={products} />
 
-                {/* 4. Torneos pr├│ximos */}
+                {/* 4. Torneos próximos */}
                 <TournamentsSection tournaments={tournaments} />
 
                 <Footer />

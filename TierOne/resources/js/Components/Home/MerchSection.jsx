@@ -1,8 +1,8 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import ProductCard from '@/Components/Shop/ProductCard';
 
 /**
- * Secci├│n de Merchandising para la p├ígina Home.
+ * Sección de Merchandising para la página Home.
  * Reutiliza el componente ProductCard compartido con la Shop.
  */
 export default function MerchSection({ products }) {
@@ -31,7 +31,7 @@ export default function MerchSection({ products }) {
                     </Link>
                 </div>
 
-                {/* Grid de productos ÔÇö reutiliza ProductCard de Shop */}
+                {/* Grid de productos — reutiliza ProductCard de Shop */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
                     {products.map((producto) => (
                         <ProductCard key={producto.id} producto={producto} />

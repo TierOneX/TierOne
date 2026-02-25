@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@inertiajs/react';
 
 const banners = [
@@ -6,18 +6,18 @@ const banners = [
         id: 1,
         image: '/images/banners/banner1.jpg',
         title: 'DOMINA LA',
-        highlight: 'COMPETICI├ôN',
-        subtitle: '├Ünete al torneo de League of Legends m├ís prestigioso de la temporada.',
-        cta: 'INSCR├ìBETE AHORA',
+        highlight: 'COMPETICIÓN',
+        subtitle: 'Únete al torneo de League of Legends más prestigioso de la temporada.',
+        cta: 'INSCRÍBETE AHORA',
         ctaLink: '/tournaments',
         badge: 'TORNEO DESTACADO',
     },
     {
         id: 2,
         image: '/images/banners/banner2.jpg',
-        title: 'NUEVA COLECCI├ôN',
+        title: 'NUEVA COLECCIÓN',
         highlight: 'STREETWEAR',
-        subtitle: 'Descubre nuestra colecci├│n exclusiva de merchandising gaming.',
+        subtitle: 'Descubre nuestra colección exclusiva de merchandising gaming.',
         cta: 'VER TIENDA',
         ctaLink: '/shop',
         badge: 'MERCH EXCLUSIVO',
@@ -27,7 +27,7 @@ const banners = [
         image: '/images/banners/banner3.jpg',
         title: 'COMPITE EN',
         highlight: 'TIEMPO REAL',
-        subtitle: 'Matchmaking inteligente, rankings din├ímicos y partidas competitivas.',
+        subtitle: 'Matchmaking inteligente, rankings dinámicos y partidas competitivas.',
         cta: 'JUGAR AHORA',
         ctaLink: '/matches',
         badge: 'PARTIDAS EN VIVO',
@@ -58,7 +58,7 @@ export default function BannerCarousel() {
 
     return (
         <section id="hero-banner" className="relative overflow-hidden" style={{ height: '80vh', minHeight: '500px' }}>
-            {/* Im├ígenes de fondo con transici├│n */}
+            {/* Imágenes de fondo con transición */}
             {banners.map((b, i) => (
                 <div
                     key={b.id}
@@ -77,7 +77,7 @@ export default function BannerCarousel() {
                 </div>
             ))}
 
-            {/* L├¡nea roja decorativa inferior */}
+            {/* Línea roja decorativa inferior */}
             <div className="absolute bottom-0 left-0 right-0 h-1 z-20 bg-[#e31837]" />
 
             {/* Contenido */}
@@ -91,13 +91,13 @@ export default function BannerCarousel() {
                         {banner.badge}
                     </div>
 
-                    {/* T├¡tulo */}
+                    {/* Título */}
                     <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black italic uppercase leading-[0.9] mb-6 text-white drop-shadow-lg">
                         {banner.title}<br />
                         <span className="text-[#e31837]">{banner.highlight}</span>
                     </h1>
 
-                    {/* Subt├¡tulo */}
+                    {/* Subtítulo */}
                     <p className="text-gray-300 text-lg lg:text-xl leading-relaxed mb-10 max-w-lg">
                         {banner.subtitle}
                     </p>
