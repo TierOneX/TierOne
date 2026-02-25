@@ -35,6 +35,11 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        // Drop FK from ordenes table first
+        Schema::table('ordenes', function (Blueprint $table) {
+            $table->dropForeign(['id_direccion_envio']);
+        });
+
         Schema::dropIfExists('direcciones_envio');
     }
 };
