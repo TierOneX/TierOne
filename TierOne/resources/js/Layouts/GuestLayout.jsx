@@ -215,6 +215,10 @@ export default function GuestLayout({
                     </div>
                 </div>
             </div>
+
+            {/* Global Ambient Glows */}
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#e31837]/5 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#e31837]/5 blur-[120px] rounded-full pointer-events-none"></div>
         </div>
     );
 
