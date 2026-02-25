@@ -148,15 +148,6 @@ class JuegoSeeder extends Seeder
         ]);
 
         Juego::create([
-            'nombre' => 'Dead by Daylight',
-            'slug' => 'dead-by-daylight',
-            'descripcion' => 'Juego de terror asimétrico 4v1',
-            'imagen_url' => 'assets/juegos/portada_dbd.png',
-            'categoria' => 'Terror',
-            'activo' => true,
-        ]);
-
-        Juego::create([
             'nombre' => 'Call of Duty: Warzone',
             'slug' => 'warzone',
             'descripcion' => 'Experiencia Battle Royale masiva gratuita de CoD',
@@ -171,15 +162,6 @@ class JuegoSeeder extends Seeder
             'descripcion' => 'Auto-battler basado en el universo de LoL',
             'imagen_url' => 'assets/juegos/portada_tft.png',
             'categoria' => 'Estrategia',
-            'activo' => true,
-        ]);
-
-        Juego::create([
-            'nombre' => 'Roblox',
-            'slug' => 'roblox',
-            'descripcion' => 'Plataforma de creación de juegos y experiencias virtuales',
-            'imagen_url' => 'assets/juegos/portada_roblox.png',
-            'categoria' => 'Sandbox',
             'activo' => true,
         ]);
     }
