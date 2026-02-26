@@ -3,7 +3,8 @@ import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
-import { Head, useForm, router } from "@inertiajs/react";
+import { Head, useForm, router, Link } from "@inertiajs/react";
+import { User, TrendingDown, CreditCard, Calendar, Eye, Edit2 } from "lucide-react";
 
 const estadoBadge = (estado) => {
     const map = {
