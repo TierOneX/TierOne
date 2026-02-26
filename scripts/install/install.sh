@@ -17,19 +17,13 @@ if [ ! -f "composer.json" ]; then
     exit 1
 fi
 
-echo "[1/6] Verificando PHP y extensiones..."
+echo "[1/6] Verificando PHP..."
 if ! command -v php &> /dev/null; then
     echo "ERROR: PHP no está instalado"
     exit 1
 fi
 
-if ! php -m | grep -q mongodb; then
-    echo "ERROR: La extensión MongoDB de PHP no está instalada"
-    echo "Instala con: sudo pecl install mongodb"
-    exit 1
-fi
-
-echo "[OK] PHP y extensiones verificadas"
+echo "[OK] PHP vericiado"
 echo ""
 
 echo "[2/6] Instalando dependencias de Composer..."

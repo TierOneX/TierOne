@@ -27,8 +27,6 @@ class InscripcionTorneo extends Model
      */
     protected $table = 'inscripciones_torneo';
 
-    public $timestamps = false;
-
     /**
      * Campos asignables masivamente
      */

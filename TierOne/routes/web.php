@@ -1,33 +1,33 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// =========================================================================
+// FRONTEND ROUTES (LANDING & HOME)
+// =========================================================================
+
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-    'canLogin' => Route::has('login'),
-    'canRegister' => Route::has('register'),
-    'laravelVersion' => Application::VERSION,
-    'phpVersion' => PHP_VERSION,
-    ]);
+    return Inertia::render('LandingPage');
 });
 
 Route::get('/home', function () {
     return Inertia::render('Home', [
-    'games' => \App\Models\Juego::where('activo', true)->get(),
-    'products' => \App\Models\Producto::with('categoria')
-    ->where('activo', true)
-    ->where('destacado', true)
-    ->take(8)
-    ->get(),
-    'tournaments' => \App\Models\Torneo::with('juego')
-    ->withCount('inscripciones')
-    ->whereIn('estado', ['inscripciones', 'en_curso'])
-    ->orderBy('fecha_inicio')
-    ->take(4)
-    ->get(),
+        'games' => \App\Models\Juego::where('activo', true)->get(),
+        'products' => \App\Models\Producto::with('categoria')
+            ->where('activo', true)
+            ->where('destacado', true)
+            ->take(8)
+            ->get(),
+        'tournaments' => \App\Models\Torneo::with('juego')
+            ->withCount('inscripciones')
+            ->whereIn('estado', ['inscripciones', 'en_curso'])
+            ->orderBy('fecha_inicio')
+            ->take(4)
+            ->get(),
     ]);
 })->name('home');
 
@@ -35,11 +35,52 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// =========================================================================
+// SHOP & PRODUCT ROUTES
+// =========================================================================
+
 Route::get('/shop', function () {
     return Inertia::render('Shop', [
-    'productos' => []
+        'productos' => \App\Models\Producto::with('categoria')
+            ->where('activo', true)
+            ->orderByDesc('destacado')
+            ->orderByDesc('ventas_totales')
+            ->get(),
+        'categorias' => \App\Models\Categoria::where('activa', true)
+            ->whereHas('productos', function ($q) {
+                $q->where('activo', true);
+            })
+            ->orderBy('nombre')
+            ->get(),
     ]);
 })->name('shop');
+
+Route::get('/shop/{slug}', function (string $slug) {
+    $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.user'])
+        ->where('slug', $slug)
+        ->where('activo', true)
+        ->firstOrFail();
+
+    $relacionados = \App\Models\Producto::with('categoria')
+        ->where('id_categoria', $producto->id_categoria)
+        ->where('id', '!=', $producto->id)
+        ->where('activo', true)
+        ->take(4)
+        ->get();
+
+    return Inertia::render('Product', [
+        'producto' => $producto,
+        'relacionados' => $relacionados,
+    ]);
+})->name('product.show');
+
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
+})->name('cart');
+
+// =========================================================================
+// ADMIN PANEL ROUTES
+// =========================================================================
 
 Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -55,7 +96,6 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
     Route::put('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'destroy'])->name('orders.destroy');
-    // Route::get('/reports', [App\Http\Controllers\ReporteController::class, 'index'])->name('reports');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');
     Route::post('/proveedores', [App\Http\Controllers\ProveedorController::class, 'store'])->name('proveedores.store');
     Route::put('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'update'])->name('proveedores.update');
@@ -70,14 +110,35 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     // Reviews
     Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
-
-    // Route::post('/reports/{id}', [App\Http\Controllers\ReporteController::class, 'update'])->name('reports.update');
 });
 
+// =========================================================================
+// STRIPE / PAYMENT ROUTES
+// =========================================================================
+
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
+Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
+Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
+Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
+
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout', [
+        'stripeKey' => config('stripe.key'),
+    ]);
+})->name('checkout');
+
+Route::get('/checkout/success', function () {
+    return Inertia::render('CheckoutSuccess');
+})->name('checkout.success');
+
+// =========================================================================
+// AUTH & PROFILE ROUTES
+// =========================================================================
+
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';

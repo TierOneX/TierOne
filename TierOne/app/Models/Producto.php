@@ -34,8 +34,6 @@ class Producto extends Model
      */
     protected $table = 'productos';
 
-    public $timestamps = false;
-
     /**
      * Campos asignables masivamente
      */
@@ -75,7 +73,7 @@ class Producto extends Model
      */
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class , 'id_categoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria');
     }
 
     /**
@@ -85,16 +83,30 @@ class Producto extends Model
      */
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class , 'id_proveedor');
+        return $this->belongsTo(Proveedor::class, 'id_proveedor');
     }
 
     /**
-     * Relación: Variantes del producto
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * Relación: Un producto tiene muchas imágenes
+     */
+    public function imagenes()
+    {
+        return $this->hasMany(ImagenProducto::class, 'id_producto');
+    }
+
+    /**
+     * Relación: Un producto tiene muchas variantes
      */
     public function variantes()
     {
         return $this->hasMany(VarianteProducto::class, 'id_producto');
+    }
+
+    /**
+     * Relación: Un producto tiene muchas reviews
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'id_producto');
     }
 }

@@ -24,7 +24,16 @@ class ProductoSeeder extends Seeder
         $ssd = Categoria::where('nombre', 'Almacenamiento SSD')->first();
         $monitores = Categoria::where('nombre', 'Consolas')->first(); // Fallback similar
         $microfonos = Categoria::where('nombre', 'Micrófonos')->first();
+<<<<<<< HEAD
         
+=======
+
+        // Categorías de merchandising
+        $camisetas = Categoria::where('nombre', 'Camisetas')->first();
+        $figuras = Categoria::where('nombre', 'Figuras')->first();
+        $merchandising = Categoria::where('nombre', 'Merchandising')->first();
+
+>>>>>>> origin/dev
         $proveedor = Proveedor::first();
 
         $productos = [
@@ -35,7 +44,11 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Interruptores blue, retroiluminación RGB personalizable y reposamuñecas ergonómico.',
                 'precio_proveedor' => 45.00,
                 'precio_venta' => 89.99,
+<<<<<<< HEAD
                 'imagen_principal' => 'https://example.com/teclado.jpg',
+=======
+                'imagen_principal' => 'images/productos/teclado_mecanico_rgb_pro.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -45,7 +58,11 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Sensor óptico de 16000 DPI, solo 60g de peso y cable paracord.',
                 'precio_proveedor' => 25.00,
                 'precio_venta' => 49.99,
+<<<<<<< HEAD
                 'imagen_principal' => 'https://example.com/raton.jpg',
+=======
+                'imagen_principal' => 'images/productos/raton_gaming_ultra_ligero.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -55,7 +72,11 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Sonido envolvente 7.1, micrófono con cancelación de ruido y 20h de batería.',
                 'precio_proveedor' => 60.00,
                 'precio_venta' => 119.99,
+<<<<<<< HEAD
                 'imagen_principal' => 'https://example.com/auriculares.jpg',
+=======
+                'imagen_principal' => 'images/productos/auriculares_inalambricos_71.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -65,6 +86,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Potencia extrema para 4K con trazado de rayos de tercera generación.',
                 'precio_proveedor' => 850.00,
                 'precio_venta' => 1099.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/rtx_4080_super_oc.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -74,6 +99,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'El mejor procesador para gaming con tecnología 3D V-Cache.',
                 'precio_proveedor' => 320.00,
                 'precio_venta' => 449.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/ryzen_7_7800x3d.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -83,6 +112,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Cuero sintético premium, pistón de clase 4 y soporte lumbar ajustable.',
                 'precio_proveedor' => 150.00,
                 'precio_venta' => 299.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/silla_omega_v2.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -92,6 +125,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Kit de 2x16GB con perfiles EXPO/XMP 3.0 para máximo rendimiento.',
                 'precio_proveedor' => 80.00,
                 'precio_venta' => 145.50,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/ram_ddr5_32gb_6000mhz.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -101,6 +138,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Velocidades de lectura de hasta 7400MB/s, ideal para PS5 y PC.',
                 'precio_proveedor' => 95.00,
                 'precio_venta' => 179.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/ssd_nvme_gen4_2tb_extreme.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -110,6 +151,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Panel IPS, 1ms de respuesta y compatible con G-Sync.',
                 'precio_proveedor' => 180.00,
                 'precio_venta' => 349.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/monitor_gaming_27_1440p.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -119,6 +164,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Perfecto para streaming y podcasts, plug and play con soporte incluido.',
                 'precio_proveedor' => 40.00,
                 'precio_venta' => 79.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/microfono_usb_cardioide.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -128,6 +177,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Diseño compacto, conexión dual 2.4GHz y Bluetooth.',
                 'precio_proveedor' => 50.00,
                 'precio_venta' => 95.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/teclado_60_wireless.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -137,6 +190,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => '12 botones laterales programables y ajuste de peso.',
                 'precio_proveedor' => 35.00,
                 'precio_venta' => 69.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/raton_mmo_pro.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -146,6 +203,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Arquitectura RDNA 3 para un rendimiento masivo en rasterización.',
                 'precio_proveedor' => 780.00,
                 'precio_venta' => 950.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/rx_7900_xtx_24gb.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -155,6 +216,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => '24 núcleos y 32 hilos, frecuencia máxima de 6.0GHz.',
                 'precio_proveedor' => 450.00,
                 'precio_venta' => 589.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/core_i9_14900k.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -164,6 +229,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Auriculares intrauditivos optimizados para posicionamiento de sonido.',
                 'precio_proveedor' => 30.00,
                 'precio_venta' => 59.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/iems_gaming_hifi.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -173,6 +242,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Ajuste de altura con memoria y soporte para cables.',
                 'precio_proveedor' => 200.00,
                 'precio_venta' => 399.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/escritorio_elevable_gaming.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -182,6 +255,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Kit DDR4 clásico con excelente iluminación y compatibilidad.',
                 'precio_proveedor' => 35.00,
                 'precio_venta' => 65.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/ram_rgb_16gb_3600mhz.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -191,6 +268,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Resistente a golpes y agua, USB-C 3.2 Gen2.',
                 'precio_proveedor' => 55.00,
                 'precio_venta' => 99.00,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/ssd_externo_rugged_1tb.png',
+>>>>>>> origin/dev
                 'destacado' => false,
             ],
             [
@@ -200,6 +281,10 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Negros perfectos y tiempo de respuesta casi instantáneo.',
                 'precio_proveedor' => 650.00,
                 'precio_venta' => 899.99,
+<<<<<<< HEAD
+=======
+                'imagen_principal' => 'images/productos/monitor_4k_oled_144hz.png',
+>>>>>>> origin/dev
                 'destacado' => true,
             ],
             [
@@ -209,10 +294,80 @@ class ProductoSeeder extends Seeder
                 'descripcion' => 'Movimiento silencioso y gestión de cables interna.',
                 'precio_proveedor' => 45.00,
                 'precio_venta' => 85.00,
+<<<<<<< HEAD
                 'destacado' => false,
             ],
         ];
 
+=======
+                'imagen_principal' => 'images/productos/brazo_microfono_pro.png',
+                'destacado' => false,
+            ],
+            // ─── MERCHANDISING ────────────────────────────────────────────
+            [
+                'id_categoria' => $camisetas->id ?? $merchandising->id ?? 1,
+                'nombre' => 'Camiseta Gaming TierOne Negra',
+                'slug' => 'camiseta-gaming-tierone-negra',
+                'descripcion' => 'Camiseta 100% algodón premium con logo TierOne estampado en serigrafía. Disponible en tallas S-XXL.',
+                'precio_proveedor' => 8.00,
+                'precio_venta' => 24.99,
+                'imagen_principal' => 'images/productos/camiseta_gaming_tierone_negra.png',
+                'destacado' => true,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Sudadera Hoodie TierOne Negro/Rojo',
+                'slug' => 'sudadera-hoodie-tierone-negro-rojo',
+                'descripcion' => 'Sudadera con capucha y bolsillo canguro. Algodón pesado 400g, bordado en pecho y espalda.',
+                'precio_proveedor' => 20.00,
+                'precio_venta' => 59.99,
+                'imagen_principal' => 'images/productos/sudadera_hoodie_tierone.png',
+                'destacado' => true,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Sudadera Zip TierOne Gris',
+                'slug' => 'sudadera-zip-tierone-gris',
+                'descripcion' => 'Sudadera con cremallera completa, forro polar interior y logo TierOne en relieve.',
+                'precio_proveedor' => 22.00,
+                'precio_venta' => 64.99,
+                'imagen_principal' => 'images/productos/sudadera_zip_tierone_gris.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Gorra Snapback TierOne',
+                'slug' => 'gorra-snapback-tierone',
+                'descripcion' => 'Gorra snapback ajustable con visera plana y logo TierOne bordado en 3D. Talla única.',
+                'precio_proveedor' => 7.00,
+                'precio_venta' => 19.99,
+                'imagen_principal' => 'images/productos/gorra_snapback_tierone.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $merchandising->id ?? 1,
+                'nombre' => 'Pack Calcetines Gaming x3',
+                'slug' => 'pack-calcetines-gaming-x3',
+                'descripcion' => 'Pack de 3 pares de calcetines con diseños gaming exclusivos. Algodón con refuerzo en talón.',
+                'precio_proveedor' => 5.00,
+                'precio_venta' => 14.99,
+                'imagen_principal' => 'images/productos/calcetines_gaming_pack.png',
+                'destacado' => false,
+            ],
+            [
+                'id_categoria' => $figuras->id ?? $merchandising->id ?? 1,
+                'nombre' => 'Mochila Gaming TierOne 30L',
+                'slug' => 'mochila-gaming-tierone-30l',
+                'descripcion' => 'Mochila resistente al agua con compartimento acolchado para portátil 17" y organización para periféricos.',
+                'precio_proveedor' => 25.00,
+                'precio_venta' => 69.99,
+                'imagen_principal' => 'images/productos/mochila_gaming_tierone.png',
+                'destacado' => true,
+            ],
+        ];
+
+
+>>>>>>> origin/dev
         foreach ($productos as $item) {
             Producto::updateOrCreate(
                 ['slug' => $item['slug']],

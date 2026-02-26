@@ -33,6 +33,12 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        // Drop FKs from items_carrito first
+        Schema::table('items_carrito', function (Blueprint $table) {
+            $table->dropForeign(['id_producto']);
+            $table->dropForeign(['id_variante']);
+        });
+
         Schema::dropIfExists('variantes_productos');
     }
 };

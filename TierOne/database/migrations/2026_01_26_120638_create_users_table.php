@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('password_hash');
             $table->string('nombre');
-            $table->string('apellido');
+            $table->string('apellido')->nullable();
             $table->string('pais');
             $table->timestamp('fecha_registro')->useCurrent();
             $table->timestamp('ultima_conexion')->nullable();

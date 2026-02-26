@@ -19,25 +19,25 @@ class ProveedorController extends Controller
 
         $sortMap = [
             'fecha_registro' => 'fecha_registro',
-            'activo'         => 'activo'
+            'activo' => 'activo'
         ];
 
         $orderCol = $sortMap[$sortBy] ?? 'fecha_registro';
 
         return Inertia::render('PanelAdminEcommerce/Proveedores', [
             'proveedores' => Proveedor::query()
-                ->when($filters['search'] ?? null, function($q, $v) {
-                    $q->where(function($sq) use ($v) {
+                ->when($filters['search'] ?? null, function ($q, $v) {
+                    $q->where(function ($sq) use ($v) {
                         $sq->where('id', 'like', "%$v%")
-                           ->orWhere('nombre', 'like', "%$v%")
-                           ->orWhere('contacto_nombre', 'like', "%$v%")
-                           ->orWhere('email', 'like', "%$v%")
-                           ->orWhere('telefono', 'like', "%$v%");
+                            ->orWhere('nombre', 'like', "%$v%")
+                            ->orWhere('contacto_nombre', 'like', "%$v%")
+                            ->orWhere('email', 'like', "%$v%")
+                            ->orWhere('telefono', 'like', "%$v%");
                     });
                 })
                 ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
                 ->when($filters['email'] ?? null, fn($q, $v) => $q->where('email', 'like', "%$v%"))
-                ->when($filters['activo'] ?? null, function($q, $v) {
+                ->when($filters['activo'] ?? null, function ($q, $v) {
                     if ($v !== 'all') {
                         $q->where('activo', $v === '1');
                     }

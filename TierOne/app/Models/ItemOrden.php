@@ -11,8 +11,6 @@ class ItemOrden extends Model
 
     protected $table = 'items_orden';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'id_orden',
         'id_producto',
