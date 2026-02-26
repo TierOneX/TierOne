@@ -56,7 +56,7 @@ Route::get('/shop', function () {
 })->name('shop');
 
 Route::get('/shop/{slug}', function (string $slug) {
-    $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.user'])
+    $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])
         ->where('slug', $slug)
         ->where('activo', true)
         ->firstOrFail();

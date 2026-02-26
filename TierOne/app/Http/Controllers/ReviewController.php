@@ -60,7 +60,7 @@ class ReviewController extends Controller
             }
 
             // Lógica API JSON
-            $query = Review::with('user');
+            $query = Review::with('usuario');
 
             if ($request->has('id_producto')) {
                 $query->where('id_producto', $request->query('id_producto'));
