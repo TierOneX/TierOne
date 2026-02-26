@@ -1,6 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { Trophy, Zap, Gamepad2 } from 'lucide-react';
+
+/** Normaliza rutas de imagen relativas a absolutas */
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
 import MainLayout from '@/Layouts/MainLayout';
 import ProductGallery from '@/Components/Product/ProductGallery';
 import ProductInfo from '@/Components/Product/ProductInfo';
@@ -86,7 +92,7 @@ export default function Product({ producto, relacionados = [] }) {
                             <div className="aspect-square rounded-2xl overflow-hidden" style={{ background: '#1C1C20' }}>
                                 {producto.imagen_principal ? (
                                     <img
-                                        src={producto.imagen_principal}
+                                        src={imgUrl(producto.imagen_principal)}
                                         alt={producto.nombre}
                                         className="w-full h-full object-cover"
                                     />

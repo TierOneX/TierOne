@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 
+/** Normaliza rutas de imagen relativas a absolutas */
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
+
 /**
  * Tarjeta de producto reutilizable.
  * Usada en: Shop (tienda) y MerchSection (home).
@@ -31,7 +37,7 @@ export default function ProductCard({ producto }) {
             <div className="relative aspect-square overflow-hidden" style={{ background: '#1C1C20' }}>
                 {producto.imagen_principal && !imgError ? (
                     <img
-                        src={producto.imagen_principal}
+                        src={imgUrl(producto.imagen_principal)}
                         alt={producto.nombre}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         onError={() => setImgError(true)}

@@ -4,8 +4,26 @@ import { useCart } from "@/Contexts/CartContext";
 
 export default function Header() {
     const { cartCount } = useCart();
+    const { auth } = usePage().props;
+    const user = auth?.user ?? null;
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+
+    // Cerrar el menú de usuario al clicar fuera
+    useEffect(() => {
+        const handler = (e) => {
+            if (
+                userMenuRef.current &&
+                !userMenuRef.current.contains(e.target)
+            ) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
 
     // Detectar scroll para efecto de sombra
     useEffect(() => {
@@ -157,14 +175,92 @@ export default function Header() {
                                 )}
                             </Link>
 
-                            {/* Botón Login - solo desktop */}
-                            <Link
-                                href="/login"
-                                id="login-button"
-                                className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
-                            >
-                                ACCEDER
-                            </Link>
+                            {/* Avatar con dropdown / botón Acceder */}
+                            {user ? (
+                                <div
+                                    ref={userMenuRef}
+                                    className="relative hidden lg:block"
+                                >
+                                    <button
+                                        onClick={() =>
+                                            setUserMenuOpen((v) => !v)
+                                        }
+                                        className={`relative w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-black text-white select-none transition-all duration-200 bg-[#1a0508] border-2 ${userMenuOpen ? "border-[#e31837] shadow-[0_0_12px_2px_rgba(227,24,55,0.35)]" : "border-[#e31837]/30 hover:border-[#e31837]/80 hover:shadow-[0_0_10px_1px_rgba(227,24,55,0.25)]"}`}
+                                        aria-label="Menú de usuario"
+                                    >
+                                        {user.username?.[0]?.toUpperCase() ??
+                                            "?"}
+                                        {/* Punto de estado online */}
+                                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#111111]" />
+                                    </button>
+
+                                    {/* Dropdown */}
+                                    {userMenuOpen && (
+                                        <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#141414] border border-white/[0.08] shadow-[0_16px_40px_rgba(0,0,0,0.7)] overflow-hidden z-50">
+                                            <div className="px-4 py-3 border-b border-white/[0.06]">
+                                                <p className="text-[10px] font-black text-white uppercase tracking-widest truncate">
+                                                    {user.username}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 truncate mt-0.5">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href="/profile"
+                                                onClick={() =>
+                                                    setUserMenuOpen(false)
+                                                }
+                                                className="flex items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0"
+                                                    />
+                                                </svg>
+                                                Mi Perfil
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    setUserMenuOpen(false);
+                                                    router.post("/logout");
+                                                }}
+                                                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-[#e31837] hover:bg-[#e31837]/10 transition-colors border-t border-white/[0.05]"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                                                    />
+                                                </svg>
+                                                Cerrar sesión
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    id="login-button"
+                                    className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
+                                >
+                                    ACCEDER
+                                </Link>
+                            )}
 
                             {/* Hamburguesa - solo móvil */}
                             <button
@@ -230,11 +326,11 @@ export default function Header() {
                         ))}
                         <div className="pt-3 border-t border-white/5">
                             <Link
-                                href="/login"
+                                href={user ? "/profile" : "/login"}
                                 className="block w-full text-center px-4 py-3 bg-[#e31837] hover:bg-[#c2102d] text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                ACCEDER
+                                {user ? "MI PERFIL" : "ACCEDER"}
                             </Link>
                         </div>
                     </div>

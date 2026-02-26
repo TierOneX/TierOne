@@ -5,13 +5,20 @@ import { useState } from 'react';
  * Desktop: thumbnails a la izquierda + imagen grande.
  * Mobile: carrusel con dots.
  */
+/** Normaliza rutas de imagen: convierte 'images/...' → '/images/...' */
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
+
 export default function ProductGallery({ imagenes, imagenPrincipal, nombre }) {
-    // Construir array de todas las imágenes
+    // Construir array de todas las imágenes (con URLs normalizadas)
     const allImages = [];
-    if (imagenPrincipal) allImages.push(imagenPrincipal);
+    if (imagenPrincipal) allImages.push(imgUrl(imagenPrincipal));
     if (imagenes && imagenes.length > 0) {
         imagenes.forEach((img) => {
-            if (img.url !== imagenPrincipal) allImages.push(img.url);
+            const url = imgUrl(img.url);
+            if (url !== imgUrl(imagenPrincipal)) allImages.push(url);
         });
     }
     // Garantizar al menos 1 imagen (placeholder)
