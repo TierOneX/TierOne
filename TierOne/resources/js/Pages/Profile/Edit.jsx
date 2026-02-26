@@ -66,6 +66,22 @@ const Icon = {
             />
         </svg>
     ),
+    shield: (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            className="w-5 h-5"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0 1 12 2.714Z"
+            />
+        </svg>
+    ),
+
     eye: (open) =>
         open ? (
             <svg
@@ -182,26 +198,38 @@ function SectionMiPerfil({ user, status }) {
     return (
         <div className="space-y-8">
             {/* Avatar + nombre */}
-            <div className="flex items-center gap-5">
-                <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#e31837]/30 to-[#0a0a0a] border-2 border-[#e31837]/40 flex items-center justify-center text-2xl font-black text-white select-none">
-                        {(user.username ?? "?")[0].toUpperCase()}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div className="flex items-center gap-5">
+                    <div className="relative">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#e31837]/30 to-[#0a0a0a] border-2 border-[#e31837]/40 flex items-center justify-center text-2xl font-black text-white select-none">
+                            {(user.username ?? "?")[0].toUpperCase()}
+                        </div>
+                        <div
+                            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[#131313]"
+                            title="En línea"
+                        />
                     </div>
-                    <div
-                        className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[#131313]"
-                        title="En línea"
-                    />
+                    <div>
+                        <p className="text-lg font-black text-white">
+                            {user.username}
+                        </p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <p className="text-[10px] text-gray-600 mt-0.5 uppercase tracking-widest">
+                            {user.rol ?? "jugador"} · Desde{" "}
+                            {fmt(user.fecha_registro)}
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <p className="text-lg font-black text-white">
-                        {user.username}
-                    </p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
-                    <p className="text-[10px] text-gray-600 mt-0.5 uppercase tracking-widest">
-                        {user.rol ?? "jugador"} · Desde{" "}
-                        {fmt(user.fecha_registro)}
-                    </p>
-                </div>
+
+                {user.rol === "admin" && (
+                    <Link
+                        href={route("panel.ecommerce.dashboard")}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#e31837] hover:bg-[#c41430] text-white text-[11px] font-black uppercase tracking-widest rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-red-900/20"
+                    >
+                        <span className="opacity-80">{Icon.shield}</span>
+                        Panel Admin
+                    </Link>
+                )}
             </div>
 
             {status === "profile-updated" && (
@@ -548,6 +576,99 @@ function SectionSeguridad({ status }) {
     );
 }
 
+function SectionAdministracion() {
+    return (
+        <div className="space-y-6">
+            <div className="rounded-xl bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] border border-white/[0.08] p-8 text-center">
+                <div className="w-16 h-16 bg-[#e31837]/10 rounded-2xl flex items-center justify-center text-[#e31837] mx-auto mb-5 border border-[#e31837]/20">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        className="w-8 h-8"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0 1 12 2.714Z"
+                        />
+                    </svg>
+                </div>
+                <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2">
+                    Panel de Administración
+                </h2>
+                <p className="text-gray-400 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+                    Tienes privilegios de administrador. Accede al panel para
+                    gestionar productos, categorías, pedidos y más.
+                </p>
+                <Link
+                    href={route("panel.ecommerce.dashboard")}
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-[#e31837] hover:bg-[#c41430] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-red-900/20"
+                >
+                    Entrar al Panel
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                        className="w-4 h-4"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                    </svg>
+                </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                    {
+                        label: "Productos",
+                        href: route("panel.ecommerce.products"),
+                    },
+                    {
+                        label: "Categorías",
+                        href: route("panel.ecommerce.categories"),
+                    },
+                    { label: "Pedidos", href: route("panel.ecommerce.orders") },
+                    {
+                        label: "Proveedores",
+                        href: route("panel.ecommerce.proveedores"),
+                    },
+                ].map((item) => (
+                    <Link
+                        key={item.label}
+                        href={item.href}
+                        className="flex items-center justify-between p-4 rounded-xl bg-[#0d0d0d] border border-white/[0.05] hover:border-[#e31837]/30 transition-colors group"
+                    >
+                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors">
+                            {item.label}
+                        </span>
+                        <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-[#e31837]/10 transition-colors">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                                className="w-3 h-3 text-gray-600 group-hover:text-[#e31837]"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                />
+                            </svg>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 /* ─── Estilos globales de la página ─────────────────────────────────────── */
 const styles = `
     @keyframes profEnter {
@@ -587,6 +708,19 @@ export default function Edit({
     const user = auth.user;
     const [tab, setTab] = useState("perfil");
 
+    const filteredTabs = TABS.filter((t) => {
+        if (t.id === "administracion") return user.rol === "admin";
+        return true;
+    });
+
+    if (user.rol === "admin" && !TABS.find((t) => t.id === "administracion")) {
+        TABS.push({
+            id: "administracion",
+            label: "Administración",
+            icon: "shield",
+        });
+    }
+
     return (
         <>
             <Head title="Mi Perfil" />
@@ -608,7 +742,7 @@ export default function Edit({
                     {/* Sidebar tabs */}
                     <aside className="md:w-52 shrink-0">
                         <nav className="flex md:flex-col gap-1 flex-row flex-wrap">
-                            {TABS.map((t) => (
+                            {filteredTabs.map((t) => (
                                 <button
                                     key={t.id}
                                     onClick={() => setTab(t.id)}
@@ -658,6 +792,9 @@ export default function Edit({
                             )}
                             {tab === "seguridad" && (
                                 <SectionSeguridad status={status} />
+                            )}
+                            {tab === "administracion" && (
+                                <SectionAdministracion />
                             )}
                         </div>
                     </main>
