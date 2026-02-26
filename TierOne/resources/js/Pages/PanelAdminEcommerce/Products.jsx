@@ -291,21 +291,21 @@ export default function Products({
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                             onClick={() => openViewModal(product)}
-                            className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm"
                             title="Ver Detalles"
                         >
                             <Eye size={14} />
                         </button>
                         <button
                             onClick={() => openEditModal(product)}
-                            className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
                             title="Editar"
                         >
                             <Edit2 size={14} />
                         </button>
                         <button
                             onClick={() => handleDelete(product.id)}
-                            className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
                             title="Eliminar"
                         >
                             <Trash2 size={14} />
@@ -424,8 +424,8 @@ export default function Products({
                     modalMode === "create"
                         ? "Nuevo Producto"
                         : modalMode === "edit"
-                          ? "Editar Producto"
-                          : "Detalles del Producto"
+                            ? "Editar Producto"
+                            : "Detalles del Producto"
                 }
                 maxWidth="max-w-2xl"
             >
@@ -521,7 +521,7 @@ export default function Products({
                                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center px-2 truncate w-full mt-1">
                                                 {formData.imagen_archivo
                                                     ? formData.imagen_archivo
-                                                          .name
+                                                        .name
                                                     : "Subir archivo"}
                                             </p>
                                         </div>
@@ -698,8 +698,8 @@ export default function Products({
                                 {processing
                                     ? "Procesando..."
                                     : modalMode === "create"
-                                      ? "Crear Producto"
-                                      : "Guardar Cambios"}
+                                        ? "Crear Producto"
+                                        : "Guardar Cambios"}
                             </button>
                         )}
                     </div>
@@ -713,11 +713,10 @@ export default function Products({
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${
-                                link.active
+                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${link.active
                                     ? "bg-blue-600 text-white border-blue-500 shadow-sm"
                                     : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-black"
-                            } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
+                                } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}

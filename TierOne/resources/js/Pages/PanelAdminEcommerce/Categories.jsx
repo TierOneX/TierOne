@@ -181,7 +181,7 @@ export default function Categories({
                             e.stopPropagation();
                             openDetailsModal(cat);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         <Eye size={14} />
@@ -191,7 +191,7 @@ export default function Categories({
                             e.stopPropagation();
                             openEditModal(cat);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
                         title="Editar"
                     >
                         <Edit2 size={14} />
@@ -201,7 +201,7 @@ export default function Categories({
                             e.stopPropagation();
                             handleDelete(cat.id);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Eliminar"
                     >
                         <Trash2 size={14} />
@@ -250,8 +250,8 @@ export default function Categories({
                     isReadOnly
                         ? "Detalles de Categoría"
                         : editingCategory
-                          ? "Editar Categoría"
-                          : "Nueva Categoría"
+                            ? "Editar Categoría"
+                            : "Nueva Categoría"
                 }
             >
                 <form onSubmit={handleSubmit} className="space-y-4">

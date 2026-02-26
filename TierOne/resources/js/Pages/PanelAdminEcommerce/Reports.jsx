@@ -193,14 +193,14 @@ export default function Reports({
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => openDetails(reporte, false)}
-                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         <Eye size={14} />
                     </button>
                     <button
                         onClick={() => openDetails(reporte, true)}
-                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
                         title="Gestionar"
                     >
                         <Edit2 size={14} />
@@ -267,8 +267,8 @@ export default function Reports({
                     modalMode === "create"
                         ? "Crear Nuevo Reporte"
                         : modalMode === "edit"
-                          ? `Gestión de Reporte #${selectedReport?.id}`
-                          : `Detalles del Reporte #${selectedReport?.id}`
+                            ? `Gestión de Reporte #${selectedReport?.id}`
+                            : `Detalles del Reporte #${selectedReport?.id}`
                 }
                 maxWidth="max-w-2xl"
             >
@@ -553,8 +553,8 @@ export default function Reports({
                                 {processing
                                     ? "Guardando..."
                                     : modalMode === "create"
-                                      ? "Crear Reporte"
-                                      : "Aplicar Resolución"}
+                                        ? "Crear Reporte"
+                                        : "Aplicar Resolución"}
                             </button>
                         )}
                     </div>

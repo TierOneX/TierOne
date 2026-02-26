@@ -169,7 +169,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                             e.stopPropagation();
                             openDetailsModal(prov);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         <Eye size={14} />
@@ -179,7 +179,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                             e.stopPropagation();
                             openEditModal(prov);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
                         title="Editar"
                     >
                         <Edit2 size={14} />
@@ -189,7 +189,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                             e.stopPropagation();
                             handleDelete(prov.id);
                         }}
-                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Eliminar"
                     >
                         <Trash2 size={14} />
@@ -236,11 +236,10 @@ export default function Proveedores({ proveedores, filters = {} }) {
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
+                            className={`px-3 py-1 rounded text-sm border ${link.active
                                     ? "bg-blue-600 text-white border-blue-600"
                                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                            } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
+                                } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}
@@ -254,8 +253,8 @@ export default function Proveedores({ proveedores, filters = {} }) {
                     isReadOnly
                         ? "Detalles del Proveedor"
                         : editingProveedor
-                          ? "Editar Proveedor"
-                          : "Nuevo Proveedor"
+                            ? "Editar Proveedor"
+                            : "Nuevo Proveedor"
                 }
                 maxWidth="max-w-xl"
             >
