@@ -57,12 +57,17 @@ export default function Sidebar({
 
             <div className="user-profile">
                 <div className="user-avatar">
-                    {user.avatar || user.name.charAt(0)}
+                    {user?.avatar ||
+                        (user?.username || user?.nombre || "?")
+                            .charAt(0)
+                            .toUpperCase()}
                 </div>
                 <div className="user-info">
-                    <div className="user-name">{user.name}</div>
+                    <div className="user-name">
+                        {user?.username || user?.nombre || "Admin"}
+                    </div>
                     <div className="user-role tracking-widest uppercase text-[8px] font-black opacity-50">
-                        {user.role}
+                        {user?.rol || "admin"}
                     </div>
                 </div>
             </div>

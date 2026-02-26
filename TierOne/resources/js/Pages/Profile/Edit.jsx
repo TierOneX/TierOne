@@ -1,4 +1,4 @@
-import { Head, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
 import Header from "@/Components/Header";
@@ -506,7 +506,7 @@ function SectionSeguridad({ status }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route("profile.password"), { onSuccess: () => reset() });
+        put(route("password.update"), { onSuccess: () => reset() });
     };
 
     const PwdInput = ({ id, label, field, showKey, placeholder }) => (
@@ -708,18 +708,17 @@ export default function Edit({
     const user = auth.user;
     const [tab, setTab] = useState("perfil");
 
-    const filteredTabs = TABS.filter((t) => {
-        if (t.id === "administracion") return user.rol === "admin";
-        return true;
-    });
-
-    if (user.rol === "admin" && !TABS.find((t) => t.id === "administracion")) {
-        TABS.push({
-            id: "administracion",
-            label: "Administración",
-            icon: "shield",
-        });
-    }
+    const sidebarTabs =
+        user.rol === "admin"
+            ? [
+                  ...TABS,
+                  {
+                      id: "administracion",
+                      label: "Administración",
+                      icon: "shield",
+                  },
+              ]
+            : TABS;
 
     return (
         <>
@@ -742,7 +741,7 @@ export default function Edit({
                     {/* Sidebar tabs */}
                     <aside className="md:w-52 shrink-0">
                         <nav className="flex md:flex-col gap-1 flex-row flex-wrap">
-                            {filteredTabs.map((t) => (
+                            {sidebarTabs.map((t) => (
                                 <button
                                     key={t.id}
                                     onClick={() => setTab(t.id)}

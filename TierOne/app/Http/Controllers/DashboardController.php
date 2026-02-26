@@ -27,7 +27,7 @@ class DashboardController extends Controller
                 ->map(fn($o) => [
                     'id'       => $o->id,
                     'numero'   => $o->numero_orden,
-                    'cliente'  => $o->usuario?->name ?? 'N/A',
+                    'cliente'  => $o->usuario?->username ?? $o->usuario?->nombre ?? 'N/A',
                     'total'    => $o->total,
                     'estado'   => $o->estado,
                     'fecha'    => $o->fecha_orden?->format('d/m/Y'),
