@@ -19,10 +19,26 @@ class SponsorTorneoSeeder extends Seeder
         }
 
         $sponsors = [
-            'Red Bull', 'Monster Energy', 'Logitech G', 'Razer', 'Intel',
-            'AMD', 'Secretlab', 'HyperX', 'Corsair', 'ASUS ROG',
-            'MSI', 'ZOWIE', 'SteelSeries', 'NVIDIA', 'Alienware',
-            'Samsung Odyssey', 'BenQ', 'AORUS', 'Elgato', 'Discord'
+            'Red Bull',
+            'Monster Energy',
+            'Logitech G',
+            'Razer',
+            'Intel',
+            'AMD',
+            'Secretlab',
+            'HyperX',
+            'Corsair',
+            'ASUS ROG',
+            'MSI',
+            'ZOWIE',
+            'SteelSeries',
+            'NVIDIA',
+            'Alienware',
+            'Samsung Odyssey',
+            'BenQ',
+            'AORUS',
+            'Elgato',
+            'Discord'
         ];
 
         for ($i = 0; $i < self::TOTAL_RECORDS; $i++) {

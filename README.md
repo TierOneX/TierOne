@@ -74,4 +74,35 @@ Navega por nuestro [Hub de Documentación](docs/README.md) para acceder a inform
 
 ---
 
+<<<<<<< HEAD
+## 🤝 Contribuir
+
+Para contribuir al proyecto:
+
+1. Fork el repositorio
+2. Crea una rama: `git checkout -b feature/nueva-funcionalidad`
+3. Commit tus cambios: `git commit -m 'Añadir nueva funcionalidad'`
+4. Push a la rama: `git push origin feature/nueva-funcionalidad`
+5. Crea un Pull Request
+
+Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para más detalles.
+
+---
+
+## 📝 Licencia
+
+Este proyecto es privado y propietario.
+
+---
+
+## 📞 Contacto
+
+Para preguntas o soporte, contacta al equipo de desarrollo.
+
+---
+
+**Última actualización:** Enero 2026  
+**Versión:** 0.1.0-dev
+=======
 **Última actualización:** Febrero 2026 | **Versión:** 0.2.0-alpha
+>>>>>>> origin/dev

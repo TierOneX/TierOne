@@ -25,6 +25,8 @@ class Carrito extends Model
      */
     protected $table = 'carritos';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

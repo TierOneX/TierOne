@@ -11,6 +11,8 @@ class Review extends Model
 
     protected $table = 'reviews';
 
+    public $timestamps = true;
+
     protected $fillable = [
         'id_producto',
         'id_usuario',
@@ -29,7 +31,7 @@ class Review extends Model
         return $this->belongsTo(Producto::class, 'id_producto');
     }
 
-    public function user()
+    public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario');
     }

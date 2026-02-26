@@ -1,5 +1,5 @@
-import Header from '@/Components/Header';
-import Footer from '@/Components/Footer';
+import Header from "@/Components/Header";
+import Footer from "@/Components/Footer";
 
 export default function MainLayout({ children, cartCount = 0 }) {
     return (
@@ -7,9 +7,7 @@ export default function MainLayout({ children, cartCount = 0 }) {
             <Header cartCount={cartCount} />
 
             {/* Contenido principal con padding para el header fijo */}
-            <main className="pt-16 lg:pb-0 pb-16">
-                {children}
-            </main>
+            <main className="pt-16 lg:pb-0 pb-16">{children}</main>
 
             <Footer />
         </div>

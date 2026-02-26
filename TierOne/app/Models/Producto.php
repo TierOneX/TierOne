@@ -73,7 +73,7 @@ class Producto extends Model
      */
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class , 'id_categoria');
+        return $this->belongsTo(Categoria::class, 'id_categoria');
     }
 
     /**
@@ -83,7 +83,7 @@ class Producto extends Model
      */
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class , 'id_proveedor');
+        return $this->belongsTo(Proveedor::class, 'id_proveedor');
     }
 
     /**
@@ -91,7 +91,7 @@ class Producto extends Model
      */
     public function imagenes()
     {
-        return $this->hasMany(ImagenProducto::class , 'id_producto');
+        return $this->hasMany(ImagenProducto::class, 'id_producto');
     }
 
     /**
@@ -99,7 +99,7 @@ class Producto extends Model
      */
     public function variantes()
     {
-        return $this->hasMany(VarianteProducto::class , 'id_producto');
+        return $this->hasMany(VarianteProducto::class, 'id_producto');
     }
 
     /**
@@ -107,6 +107,6 @@ class Producto extends Model
      */
     public function reviews()
     {
-        return $this->hasMany(Review::class , 'id_producto');
+        return $this->hasMany(Review::class, 'id_producto');
     }
 }

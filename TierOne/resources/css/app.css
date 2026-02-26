@@ -303,11 +303,9 @@
 
 .hero-btn-continue:hover {
     background: #222;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
-
-
 .prize-amount {
     text-align: left;
 }
@@ -450,27 +448,13 @@ section {
     margin-bottom: 2rem;
 }
 
-.section-label {
-    display: inline-block;
-    color: var(--primary-red);
-    background: rgba(225, 6, 0, 0.1);
-    padding: 0.4rem 1rem;
-    border-radius: 4px;
-    border: 1px solid rgba(225, 6, 0, 0.3);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
 .feature-list {
-    list-style: none;
     padding: 0;
     margin: 0 0 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    list-style: none;
 }
 
 .feature-list li {

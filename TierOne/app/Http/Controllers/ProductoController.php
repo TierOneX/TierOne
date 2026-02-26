@@ -64,7 +64,7 @@ class ProductoController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Producto no encontrado');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener el producto', $e->getMessage());
+            return $this->errorResponse('Error al obtener the product', $e->getMessage());
         }
     }
 

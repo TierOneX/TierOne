@@ -1,45 +1,53 @@
-import { Head } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
-import MainLayout from '@/Layouts/MainLayout';
-import ShopHero from '@/Components/Shop/ShopHero';
-import SearchBar from '@/Components/Shop/SearchBar';
-import CategoryFilter from '@/Components/Shop/CategoryFilter';
-import ProductGrid from '@/Components/Shop/ProductGrid';
+import { Head } from "@inertiajs/react";
+import { useState, useMemo } from "react";
+import MainLayout from "@/Layouts/MainLayout";
+import ShopHero from "@/Components/Shop/ShopHero";
+import SearchBar from "@/Components/Shop/SearchBar";
+import CategoryFilter from "@/Components/Shop/CategoryFilter";
+import ProductGrid from "@/Components/Shop/ProductGrid";
 
 const SORT_OPTIONS = [
-    { value: 'default', label: 'Relevancia' },
-    { value: 'price_asc', label: 'Precio: menor a mayor' },
-    { value: 'price_desc', label: 'Precio: mayor a menor' },
-    { value: 'rating', label: 'Mejor valorados' },
-    { value: 'sales', label: 'Más vendidos' },
-    { value: 'name', label: 'Nombre A-Z' },
+    { value: "default", label: "Relevancia" },
+    { value: "price_asc", label: "Precio: menor a mayor" },
+    { value: "price_desc", label: "Precio: mayor a menor" },
+    { value: "rating", label: "Mejor valorados" },
+    { value: "sales", label: "Más vendidos" },
+    { value: "name", label: "Nombre A-Z" },
 ];
 
 export default function Shop({ productos = [], categorias = [] }) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeCategory, setActiveCategory] = useState('TODOS');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeCategory, setActiveCategory] = useState("TODOS");
     const [showFilter, setShowFilter] = useState(false);
-    const [sortBy, setSortBy] = useState('default');
+    const [sortBy, setSortBy] = useState("default");
     const [onlyFeatured, setOnlyFeatured] = useState(false);
 
     // Construir la lista de categorías a partir de los datos del servidor
     const categoryNames = useMemo(() => {
         const names = categorias.map((cat) => cat.nombre.toUpperCase());
-        return ['TODOS', ...names];
+        return ["TODOS", ...names];
     }, [categorias]);
 
     // Filtrado y ordenación de productos
     const filteredProducts = useMemo(() => {
         let result = productos.filter((producto) => {
             const matchesCategory =
-                activeCategory === 'TODOS' ||
+                activeCategory === "TODOS" ||
                 producto.categoria?.nombre?.toUpperCase() === activeCategory;
 
             const matchesSearch =
-                searchTerm === '' ||
-                producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (producto.descripcion && producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (producto.categoria?.nombre && producto.categoria.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+                searchTerm === "" ||
+                producto.nombre
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                (producto.descripcion &&
+                    producto.descripcion
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())) ||
+                (producto.categoria?.nombre &&
+                    producto.categoria.nombre
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase()));
 
             const matchesFeatured = !onlyFeatured || producto.destacado;
 
@@ -48,20 +56,34 @@ export default function Shop({ productos = [], categorias = [] }) {
 
         // Ordenación
         switch (sortBy) {
-            case 'price_asc':
-                result = [...result].sort((a, b) => parseFloat(a.precio_venta) - parseFloat(b.precio_venta));
+            case "price_asc":
+                result = [...result].sort(
+                    (a, b) =>
+                        parseFloat(a.precio_venta) - parseFloat(b.precio_venta),
+                );
                 break;
-            case 'price_desc':
-                result = [...result].sort((a, b) => parseFloat(b.precio_venta) - parseFloat(a.precio_venta));
+            case "price_desc":
+                result = [...result].sort(
+                    (a, b) =>
+                        parseFloat(b.precio_venta) - parseFloat(a.precio_venta),
+                );
                 break;
-            case 'rating':
-                result = [...result].sort((a, b) => parseFloat(b.rating_promedio) - parseFloat(a.rating_promedio));
+            case "rating":
+                result = [...result].sort(
+                    (a, b) =>
+                        parseFloat(b.rating_promedio) -
+                        parseFloat(a.rating_promedio),
+                );
                 break;
-            case 'sales':
-                result = [...result].sort((a, b) => b.ventas_totales - a.ventas_totales);
+            case "sales":
+                result = [...result].sort(
+                    (a, b) => b.ventas_totales - a.ventas_totales,
+                );
                 break;
-            case 'name':
-                result = [...result].sort((a, b) => a.nombre.localeCompare(b.nombre));
+            case "name":
+                result = [...result].sort((a, b) =>
+                    a.nombre.localeCompare(b.nombre),
+                );
                 break;
             default:
                 break;
@@ -74,7 +96,10 @@ export default function Shop({ productos = [], categorias = [] }) {
         <MainLayout>
             <Head title="Tienda - TierOne" />
             <Head>
-                <meta name="description" content="Tienda oficial TierOne Gaming. Periféricos, componentes, merchandising y más. Envío rápido y productos de calidad." />
+                <meta
+                    name="description"
+                    content="Tienda oficial TierOne Gaming. Periféricos, componentes, merchandising y más. Envío rápido y productos de calidad."
+                />
             </Head>
 
             {/* 1. Hero */}
@@ -92,8 +117,11 @@ export default function Shop({ productos = [], categorias = [] }) {
 
                     {/* Panel de filtros desplegable */}
                     <div
-                        className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilter ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-                            }`}
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            showFilter
+                                ? "max-h-[800px] opacity-100"
+                                : "max-h-0 opacity-0"
+                        }`}
                     >
                         <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-5">
                             {/* Categorías */}
@@ -117,11 +145,14 @@ export default function Shop({ productos = [], categorias = [] }) {
                                     {SORT_OPTIONS.map((option) => (
                                         <button
                                             key={option.value}
-                                            onClick={() => setSortBy(option.value)}
-                                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${sortBy === option.value
-                                                ? 'bg-red-600 text-white border-red-600'
-                                                : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white'
-                                                }`}
+                                            onClick={() =>
+                                                setSortBy(option.value)
+                                            }
+                                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${
+                                                sortBy === option.value
+                                                    ? "bg-red-600 text-white border-red-600"
+                                                    : "bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-white"
+                                            }`}
                                         >
                                             {option.label}
                                         </button>
@@ -136,7 +167,11 @@ export default function Shop({ productos = [], categorias = [] }) {
                                         <input
                                             type="checkbox"
                                             checked={onlyFeatured}
-                                            onChange={(e) => setOnlyFeatured(e.target.checked)}
+                                            onChange={(e) =>
+                                                setOnlyFeatured(
+                                                    e.target.checked,
+                                                )
+                                            }
                                             className="sr-only peer"
                                         />
                                         <div className="w-10 h-5 rounded-full bg-gray-700 peer-checked:bg-red-600 transition-colors" />
@@ -150,10 +185,10 @@ export default function Shop({ productos = [], categorias = [] }) {
                                 {/* Botón limpiar filtros */}
                                 <button
                                     onClick={() => {
-                                        setSortBy('default');
+                                        setSortBy("default");
                                         setOnlyFeatured(false);
-                                        setSearchTerm('');
-                                        setActiveCategory('TODOS');
+                                        setSearchTerm("");
+                                        setActiveCategory("TODOS");
                                     }}
                                     className="text-sm text-gray-500 hover:text-red-500 transition-colors underline underline-offset-2 ml-auto"
                                 >

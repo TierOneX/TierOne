@@ -110,7 +110,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Orden::class, 'id_usuario');
     }
-
     // --- Relaciones de Torneos ---
 
     /**

@@ -11,6 +11,8 @@ class ImagenProducto extends Model
 
     protected $table = 'imagenes_producto';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_producto',
         'url',

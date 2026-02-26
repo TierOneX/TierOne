@@ -285,7 +285,7 @@ class ProductoSeeder extends Seeder
                 'destacado' => false,
             ],
             [
-                'id_categoria' => $figuras->id ?? $merchandising->id ?? 1,
+                'id_categoria' => $merchandising->id ?? 1,
                 'nombre' => 'Mochila Gaming TierOne 30L',
                 'slug' => 'mochila-gaming-tierone-30l',
                 'descripcion' => 'Mochila resistente al agua con compartimento acolchado para portátil 17" y organización para periféricos.',
@@ -295,7 +295,6 @@ class ProductoSeeder extends Seeder
                 'destacado' => true,
             ],
         ];
-
 
         foreach ($productos as $item) {
             Producto::updateOrCreate(

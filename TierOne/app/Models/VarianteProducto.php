@@ -11,6 +11,8 @@ class VarianteProducto extends Model
 
     protected $table = 'variantes_productos';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_producto',
         'nombre',

@@ -92,10 +92,6 @@ class Torneo extends Model
     ];
 
     /**
-     * Timestamps automáticos de Laravel (created_at, updated_at)
-     */
-
-    /**
      * Relación: Juego del torneo
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

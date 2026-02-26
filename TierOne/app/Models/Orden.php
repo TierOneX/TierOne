@@ -39,6 +39,8 @@ class Orden extends Model
      */
     protected $table = 'ordenes';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      * 
@@ -96,7 +98,7 @@ class Orden extends Model
      */
     public function usuario()
     {
-        return $this->belongsTo(User::class , 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 
     /**
@@ -106,7 +108,7 @@ class Orden extends Model
      */
     public function canceladoPor()
     {
-        return $this->belongsTo(User::class , 'id_cancelado_por');
+        return $this->belongsTo(User::class, 'id_cancelado_por');
     }
 
     /**
@@ -116,7 +118,7 @@ class Orden extends Model
      */
     public function transacciones()
     {
-        return $this->hasMany(Transaccion::class , 'id_orden');
+        return $this->hasMany(Transaccion::class, 'id_orden');
     }
 
     /**
@@ -126,7 +128,7 @@ class Orden extends Model
      */
     public function items()
     {
-        return $this->hasMany(ItemOrden::class , 'id_orden');
+        return $this->hasMany(ItemOrden::class, 'id_orden');
     }
 
     /**
@@ -136,7 +138,7 @@ class Orden extends Model
      */
     public function direccionEnvio()
     {
-        return $this->belongsTo(DireccionEnvio::class , 'id_direccion_envio');
+        return $this->belongsTo(DireccionEnvio::class, 'id_direccion_envio');
     }
 
     /**
@@ -146,6 +148,7 @@ class Orden extends Model
      */
     public function pagos()
     {
-        return $this->hasMany(Pago::class , 'id_orden');
+        return $this->hasMany(Pago::class, 'id_orden');
     }
+
 }

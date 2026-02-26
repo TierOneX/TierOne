@@ -34,6 +34,8 @@ class Transaccion extends Model
      */
     protected $table = 'transacciones';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      * 

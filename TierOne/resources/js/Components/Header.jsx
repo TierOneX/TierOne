@@ -1,5 +1,5 @@
-import { Link, usePage, router } from "@inertiajs/react";
-import { useState, useEffect, useRef } from "react";
+import { Link, usePage } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/Contexts/CartContext";
 
 export default function Header() {
@@ -90,8 +90,8 @@ export default function Header() {
             ),
         },
         {
-            name: user ? "PERFIL" : "CUENTA",
-            href: user ? "/profile" : "/login",
+            name: "CUENTA",
+            href: "/login",
             icon: (
                 <svg
                     className="w-6 h-6"

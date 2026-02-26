@@ -34,6 +34,8 @@ class Partida extends Model
      */
     protected $table = 'partidas';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */
