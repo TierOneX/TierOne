@@ -1,32 +1,54 @@
+import { Link } from "@inertiajs/react";
+import * as Lucide from "lucide-react";
 
-import { Link } from '@inertiajs/react';
+export default function Sidebar({
+    menuItems,
+    activeItem,
+    user,
+    isSidebarOpen,
+}) {
+    // Función para renderizar el icono dinámicamente
+    const renderIcon = (iconName) => {
+        const IconComponent = Lucide[iconName];
+        return IconComponent ? <IconComponent size={18} /> : null;
+    };
 
-export default function Sidebar({ menuItems, activeItem, user, isSidebarOpen }) {
     return (
-        <aside className={`sidebar ${isSidebarOpen ? 'active' : ''}`} id="sidebar">
-            <Link href={route('panel.ecommerce.dashboard')} className="logo-sidebar group">
-                <span className="group-hover:opacity-80 transition-opacity">TIERONE</span>
+        <aside
+            className={`sidebar ${isSidebarOpen ? "active" : ""}`}
+            id="sidebar"
+        >
+            <Link
+                href={route("panel.ecommerce.dashboard")}
+                className="logo-sidebar group"
+            >
+                <span className="group-hover:opacity-80 transition-opacity uppercase tracking-[0.2em] font-black text-white">
+                    TIERONE
+                </span>
             </Link>
 
             <nav>
-                {/* Agrupamos los items si tienen 'section' definida, si no, los mostramos directos. 
-                    Para simplificar basado en el array plano del ejemplo: */}
-
                 {menuItems.map((section, index) => (
                     <div key={index} className="nav-section">
                         {section.title && (
-                            <div className="nav-section-title">{section.title}</div>
+                            <div className="nav-section-title">
+                                {section.title}
+                            </div>
                         )}
 
                         {section.items.map((item, idx) => (
                             <Link
                                 key={idx}
-                                href={item.link || '#'}
-                                className={`nav-item ${activeItem === item.label ? 'active' : ''}`}
+                                href={item.link || "#"}
+                                className={`nav-item ${activeItem === item.label ? "active" : ""}`}
                             >
-                                <span className="icon">{item.icon}</span>
+                                <span className="icon">
+                                    {renderIcon(item.icon)}
+                                </span>
                                 <span>{item.label}</span>
-                                {item.badge && <span className="badge">{item.badge}</span>}
+                                {item.badge && (
+                                    <span className="badge">{item.badge}</span>
+                                )}
                             </Link>
                         ))}
                     </div>
@@ -39,7 +61,9 @@ export default function Sidebar({ menuItems, activeItem, user, isSidebarOpen }) 
                 </div>
                 <div className="user-info">
                     <div className="user-name">{user.name}</div>
-                    <div className="user-role">{user.role}</div>
+                    <div className="user-role tracking-widest uppercase text-[8px] font-black opacity-50">
+                        {user.role}
+                    </div>
                 </div>
             </div>
         </aside>
