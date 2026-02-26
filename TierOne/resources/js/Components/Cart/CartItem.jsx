@@ -2,6 +2,12 @@ import React from 'react';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '@/Contexts/CartContext';
 
+/** Normaliza rutas de imagen relativas a absolutas */
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
+
 export default function CartItem({ item }) {
     const { updateQuantity, removeFromCart } = useCart();
 
@@ -10,7 +16,7 @@ export default function CartItem({ item }) {
             {/* Imagen del producto */}
             <div className="w-full sm:w-40 h-40 bg-[#1a1a1a] rounded-xl overflow-hidden shrink-0">
                 <img
-                    src={item.imagen_principal}
+                    src={imgUrl(item.imagen_principal)}
                     alt={item.nombre}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
