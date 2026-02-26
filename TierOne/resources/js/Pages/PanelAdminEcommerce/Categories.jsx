@@ -160,7 +160,7 @@ export default function Categories({
             </td>
             <td className="px-6 py-4 text-center">
                 {cat.subcategorias > 0 ? (
-                    <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full text-[10px] font-black">
+                    <span className="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[10px] font-black">
                         {cat.subcategorias}
                     </span>
                 ) : (
@@ -181,7 +181,7 @@ export default function Categories({
                             e.stopPropagation();
                             openDetailsModal(cat);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         <Eye size={14} />
@@ -221,7 +221,7 @@ export default function Categories({
                 </h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 tracking-widest flex items-center gap-2"
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-md shadow-red-200 tracking-widest flex items-center gap-2"
                 >
                     <Plus size={14} /> Nueva Categoría
                 </button>
@@ -262,7 +262,7 @@ export default function Categories({
                         <input
                             type="text"
                             readOnly={isReadOnly}
-                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 ${isReadOnly ? "border-gray-100 bg-gray-100" : errors.nombre ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-red-500 ${isReadOnly ? "border-gray-100 bg-gray-100" : errors.nombre ? "border-red-500" : "border-gray-200"}`}
                             value={data.nombre}
                             onChange={(e) => setData("nombre", e.target.value)}
                             placeholder="Ej: Camisetas"
@@ -281,7 +281,7 @@ export default function Categories({
                         <input
                             type="text"
                             readOnly={isReadOnly}
-                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-mono text-xs focus:ring-2 focus:ring-blue-500 ${isReadOnly ? "border-gray-100 bg-gray-100" : errors.slug ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-full p-3 bg-gray-50 border rounded-xl outline-none text-black font-mono text-xs focus:ring-2 focus:ring-red-500 ${isReadOnly ? "border-gray-100 bg-gray-100" : errors.slug ? "border-red-500" : "border-gray-200"}`}
                             value={data.slug}
                             onChange={(e) => setData("slug", e.target.value)}
                             placeholder="Dejar vacío para auto-generar"
@@ -304,7 +304,7 @@ export default function Categories({
                         </label>
                         <select
                             disabled={isReadOnly}
-                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black font-bold focus:ring-2 focus:ring-red-500 disabled:opacity-50"
                             value={data.id_parent}
                             onChange={(e) =>
                                 setData("id_parent", e.target.value)
@@ -327,7 +327,7 @@ export default function Categories({
                         </label>
                         <textarea
                             readOnly={isReadOnly}
-                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-black focus:ring-2 focus:ring-red-500 min-h-[100px]"
                             rows="3"
                             value={data.descripcion}
                             onChange={(e) =>
@@ -342,7 +342,7 @@ export default function Categories({
                             <input
                                 type="checkbox"
                                 id="activa"
-                                className="w-4 h-4 bg-white border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+                                className="w-4 h-4 bg-white border-gray-300 rounded text-red-600 focus:ring-red-500"
                                 checked={data.activa}
                                 onChange={(e) =>
                                     setData("activa", e.target.checked)
@@ -369,7 +369,7 @@ export default function Categories({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-6 py-2 bg-blue-600 text-white text-xs font-black uppercase rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-md shadow-blue-200"
+                                className="px-6 py-2 bg-red-600 text-white text-xs font-black uppercase rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 shadow-md shadow-red-200"
                             >
                                 {editingCategory
                                     ? "Guardar Cambios"

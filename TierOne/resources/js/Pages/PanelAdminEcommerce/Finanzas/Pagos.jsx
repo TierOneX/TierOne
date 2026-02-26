@@ -80,7 +80,7 @@ export default function Pagos({ pagos, filters = {} }) {
             </td>
             <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
-                    <Receipt size={14} className="text-blue-500" />
+                    <Receipt size={14} className="text-red-500" />
                     <span className="font-bold text-gray-900">
                         #{pago.numero_orden}
                     </span>
@@ -150,11 +150,10 @@ export default function Pagos({ pagos, filters = {} }) {
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
-                                    ? "bg-blue-600 text-white border-blue-600"
+                            className={`px-3 py-1 rounded text-sm border ${link.active
+                                    ? "bg-red-600 text-white border-red-600"
                                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                            } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
+                                } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}

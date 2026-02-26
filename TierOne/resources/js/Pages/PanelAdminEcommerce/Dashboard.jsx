@@ -16,7 +16,7 @@ import {
 const estadoBadge = (estado) => {
     const map = {
         pendiente: "bg-orange-50 text-orange-700 border-orange-200",
-        procesando: "bg-blue-50 text-blue-700 border-blue-200",
+        procesando: "bg-red-50 text-red-700 border-red-200",
         enviada: "bg-purple-50 text-purple-700 border-purple-200",
         entregada: "bg-green-50 text-green-700 border-green-200",
         cancelada: "bg-gray-100 text-gray-700 border-gray-200",
@@ -40,7 +40,7 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                     </p>
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                    <Calendar size={12} className="text-blue-500" />
+                    <Calendar size={12} className="text-red-500" />
                     {new Date().toLocaleDateString("es-ES", {
                         month: "long",
                         year: "numeric",
@@ -75,10 +75,10 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                 {/* PEDIDOS HOY */}
                 <div className="stat-card group hover:scale-[1.02] transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 shadow-sm border border-blue-100">
+                        <div className="p-3 bg-red-50 rounded-2xl text-red-600 shadow-sm border border-red-100">
                             <Package size={20} />
                         </div>
-                        <span className="text-[10px] font-black text-blue-500 bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100 uppercase">
+                        <span className="text-[10px] font-black text-red-500 bg-red-50/50 px-2 py-1 rounded-lg border border-red-100 uppercase">
                             Hoy
                         </span>
                     </div>
@@ -136,12 +136,12 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                 <div className="lg:col-span-2 section shadow-xl border-gray-50">
                     <div className="section-header border-b border-gray-50 pb-4 mb-6">
                         <h3 className="section-title text-black text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                            <Activity size={16} className="text-blue-500" />
+                            <Activity size={16} className="text-red-500" />
                             Últimas Operaciones
                         </h3>
                         <Link
                             href={route("panel.ecommerce.orders")}
-                            className="text-[10px] font-black text-blue-600 uppercase tracking-tighter hover:underline flex items-center gap-1 group"
+                            className="text-[10px] font-black text-red-600 uppercase tracking-tighter hover:underline flex items-center gap-1 group"
                         >
                             Gestionar Todo{" "}
                             <ArrowRight
@@ -198,7 +198,7 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="py-4 text-right font-black text-black group-hover:text-blue-600 transition-colors">
+                                            <td className="py-4 text-right font-black text-black group-hover:text-red-600 transition-colors">
                                                 €
                                                 {Number(orden.total).toFixed(2)}
                                             </td>
@@ -245,24 +245,24 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                                 <span className="text-gray-400 font-bold uppercase tracking-tight">
                                     Sinc. Proveedores
                                 </span>
-                                <span className="text-blue-400 font-black">
+                                <span className="text-red-400 font-black">
                                     ACTIVA
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-2xl border border-blue-500 shadow-xl relative overflow-hidden group">
+                    <div className="bg-gradient-to-br from-red-600 to-red-800 p-6 rounded-2xl border border-red-500 shadow-xl relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
                         <h4 className="text-white text-sm font-black uppercase tracking-widest mb-2 flex items-center gap-2">
                             <Package size={18} /> Acceso Rápido
                         </h4>
-                        <p className="text-blue-100 text-xs font-medium mb-4 opacity-80 leading-relaxed">
+                        <p className="text-red-100 text-xs font-medium mb-4 opacity-80 leading-relaxed">
                             ¿Necesitas lanzar un nuevo producto?
                         </p>
                         <Link
                             href={route("panel.ecommerce.products")}
-                            className="inline-block bg-white text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
+                            className="inline-block bg-white text-red-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
                         >
                             Ir a Catálogo
                         </Link>

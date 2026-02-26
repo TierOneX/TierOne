@@ -84,7 +84,7 @@ export default function Reviews({ reviews, filters = {} }) {
                     {r.usuario}
                     {r.verificado && (
                         <span
-                            className="flex items-center gap-1 text-blue-600 text-[10px] font-black uppercase tracking-tighter bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100"
+                            className="flex items-center gap-1 text-red-600 text-[10px] font-black uppercase tracking-tighter bg-red-50 px-1.5 py-0.5 rounded border border-red-100"
                             title="Compra verificada"
                         >
                             <CheckCircle2 size={10} /> Verificado
@@ -167,8 +167,8 @@ export default function Reviews({ reviews, filters = {} }) {
                             key={i}
                             href={link.url ?? "#"}
                             className={`px-3 py-1 rounded text-sm border font-bold ${link.active
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50"
+                                ? "bg-red-600 text-white border-red-600"
+                                : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50"
                                 } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />

@@ -209,7 +209,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                 </h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-blue-200"
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-red-200"
                 >
                     <Plus size={14} /> Nuevo Proveedor
                 </button>
@@ -237,8 +237,8 @@ export default function Proveedores({ proveedores, filters = {} }) {
                             key={i}
                             href={link.url ?? "#"}
                             className={`px-3 py-1 rounded text-sm border ${link.active
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                ? "bg-red-600 text-white border-red-600"
+                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                                 } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
@@ -385,7 +385,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-6 py-2 bg-blue-600 text-white text-sm font-black rounded-lg hover:bg-blue-700 disabled:opacity-50 shadow-md"
+                                className="px-6 py-2 bg-red-600 text-white text-sm font-black rounded-lg hover:bg-red-700 disabled:opacity-50 shadow-md"
                             >
                                 {editingProveedor
                                     ? "Guardar Cambios"

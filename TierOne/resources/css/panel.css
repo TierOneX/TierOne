@@ -368,8 +368,8 @@
 }
 
 .stat-icon.blue {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3B82F6;
+    background: rgba(225, 6, 0, 0.15);
+    color: var(--primary-red);
 }
 
 .stat-icon.purple {
@@ -616,7 +616,7 @@ tr:last-child td {
 }
 
 .alert-item.info {
-    border-left-color: #3B82F6;
+    border-left-color: var(--primary-red);
 }
 
 .alert-item.success {

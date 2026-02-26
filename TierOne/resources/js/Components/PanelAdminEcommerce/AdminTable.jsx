@@ -37,15 +37,15 @@ export default function AdminTable({
                             {columns.map((col, idx) => (
                                 <th
                                     key={idx}
-                                    className={`px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider ${col.sortable ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''} ${getAlignClass(col.align).split(' ')[0]}`}
+                                    className={`px-6 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider ${col.sortable ? 'cursor-pointer hover:text-red-600 transition-colors' : ''} ${getAlignClass(col.align).split(' ')[0]}`}
                                     onClick={() => col.sortable && onSort && onSort(col.key)}
                                 >
                                     <div className={`flex items-center gap-1.5 ${getAlignClass(col.align).split(' ')[1]}`}>
                                         {col.label}
                                         {col.sortable && (
                                             <span className="inline-flex flex-col text-[10px] leading-[0.5] text-gray-300">
-                                                <span className={filters.sort_by === col.key && filters.sort_dir === 'asc' ? 'text-blue-600' : ''}>▴</span>
-                                                <span className={filters.sort_by === col.key && filters.sort_dir === 'desc' ? 'text-blue-600' : ''}>▾</span>
+                                                <span className={filters.sort_by === col.key && filters.sort_dir === 'asc' ? 'text-red-600' : ''}>▴</span>
+                                                <span className={filters.sort_by === col.key && filters.sort_dir === 'desc' ? 'text-red-600' : ''}>▾</span>
                                             </span>
                                         )}
                                     </div>

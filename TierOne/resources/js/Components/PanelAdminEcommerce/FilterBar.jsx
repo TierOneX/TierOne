@@ -70,7 +70,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
                             placeholder="Buscar en todas las columnas..."
                             value={values.search || ''}
                             onChange={(e) => handleChange('search', e.target.value)}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-black focus:outline-none focus:border-blue-500 shadow-sm"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-black focus:outline-none focus:border-red-500 shadow-sm"
                         />
                         <p className="text-[10px] text-gray-400 mt-1 ml-1 italic">
                             * Escribe cualquier dato (ID, nombre, email...) para buscar de forma general.
@@ -88,7 +88,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
                                     <select
                                         value={values[filter.name] || ''}
                                         onChange={(e) => handleChange(filter.name, e.target.value)}
-                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-blue-500"
+                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-red-500"
                                     >
                                         <option value="">Todos</option>
                                         {filter.options?.map(opt => (
@@ -100,7 +100,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
                                         type="date"
                                         value={values[filter.name] || ''}
                                         onChange={(e) => handleChange(filter.name, e.target.value)}
-                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-blue-500"
+                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-red-500"
                                     />
                                 ) : (
                                     <input
@@ -108,7 +108,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
                                         placeholder={`Buscar por ${filter.label.toLowerCase()}...`}
                                         value={values[filter.name] || ''}
                                         onChange={(e) => handleChange(filter.name, e.target.value)}
-                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-blue-500"
+                                        className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-black focus:outline-none focus:border-red-500"
                                     />
                                 )}
                             </div>
@@ -125,7 +125,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
                         </button>
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 shadow-sm transition-colors"
+                            className="bg-red-600 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-red-700 shadow-sm transition-colors"
                         >
                             Aplicar Filtros
                         </button>

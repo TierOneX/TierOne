@@ -17,7 +17,7 @@ const tipoBadge = (tipo) => {
         deposito: "bg-green-50 text-green-700 border-green-200",
         retiro: "bg-red-50 text-red-700 border-red-200",
         premio: "bg-yellow-50 text-yellow-700 border-yellow-200",
-        compra: "bg-blue-50 text-blue-700 border-blue-200",
+        compra: "bg-red-50 text-red-700 border-red-200",
         reembolso: "bg-gray-50 text-gray-700 border-gray-200",
         comision: "bg-purple-50 text-purple-700 border-purple-200",
     };
@@ -155,11 +155,10 @@ export default function Transacciones({ transacciones, filters = {} }) {
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
-                                    ? "bg-blue-600 text-white border-blue-600"
+                            className={`px-3 py-1 rounded text-sm border ${link.active
+                                    ? "bg-red-600 text-white border-red-600"
                                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                            } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
+                                } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}
