@@ -1,6 +1,11 @@
-import { Link, usePage } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Link, usePage, router } from "@inertiajs/react";
 import { useCart } from "@/Contexts/CartContext";
+
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
 
 export default function Header() {
     const { cartCount } = useCart();
@@ -109,9 +114,8 @@ export default function Header() {
             {/* ========== HEADER PRINCIPAL ========== */}
             <header
                 id="main-header"
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#111111] ${
-                    scrolled ? "shadow-lg shadow-black/50" : ""
-                }`}
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#111111] ${scrolled ? "shadow-lg shadow-black/50" : ""
+                    }`}
                 style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
             >
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,7 +126,7 @@ export default function Header() {
                             className="flex items-center gap-2.5 group shrink-0"
                         >
                             <img
-                                src="/images/Logo.png"
+                                src={imgUrl("images/Logo.png")}
                                 alt="TierOne"
                                 className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                             />
@@ -300,11 +304,10 @@ export default function Header() {
                 {/* === MENÚ MÓVIL DESPLEGABLE (hamburguesa) === */}
                 <div
                     id="mobile-menu-dropdown"
-                    className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-                        isMobileMenuOpen
+                    className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen
                             ? "max-h-[400px] opacity-100"
                             : "max-h-0 opacity-0"
-                    }`}
+                        }`}
                     style={{
                         background:
                             "linear-gradient(180deg, #111111 0%, #0a0a0a 100%)",
