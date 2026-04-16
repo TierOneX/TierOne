@@ -232,7 +232,7 @@ export default function Products({
                                         : product.id,
                                 );
                             }}
-                            className="text-gray-400 hover:text-blue-600 transition-colors w-4"
+                            className="text-gray-400 hover:text-red-600 transition-colors w-4"
                         >
                             {expandedProduct === product.id ? (
                                 <ChevronDown size={14} />
@@ -260,7 +260,7 @@ export default function Products({
                                     {product.categoria?.nombre || "General"}
                                 </span>
                                 {product.variantes?.length > 0 && (
-                                    <span className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100 uppercase font-black tracking-tighter">
+                                    <span className="text-[9px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 uppercase font-black tracking-tighter">
                                         {product.variantes.length} Variantes
                                     </span>
                                 )}
@@ -291,21 +291,21 @@ export default function Products({
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                             onClick={() => openViewModal(product)}
-                            className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
                             title="Ver Detalles"
                         >
                             <Eye size={14} />
                         </button>
                         <button
                             onClick={() => openEditModal(product)}
-                            className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
                             title="Editar"
                         >
                             <Edit2 size={14} />
                         </button>
                         <button
                             onClick={() => handleDelete(product.id)}
-                            className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
                             title="Eliminar"
                         >
                             <Trash2 size={14} />
@@ -318,12 +318,12 @@ export default function Products({
             {expandedProduct === product.id && (
                 <tr className="bg-gray-50/50">
                     <td colSpan={6} className="px-12 py-6">
-                        <div className="border-l-2 border-blue-500/30 pl-6 py-2">
+                        <div className="border-l-2 border-red-500/30 pl-6 py-2">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     Variantes Disponibles
                                 </h3>
-                                <button className="text-[10px] font-black text-blue-600 hover:text-blue-700 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 transition-all flex items-center gap-2">
+                                <button className="text-[10px] font-black text-red-600 hover:text-red-700 uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 transition-all flex items-center gap-2">
                                     <Plus size={12} /> Añadir Variante
                                 </button>
                             </div>
@@ -337,7 +337,7 @@ export default function Products({
                                     {product.variantes.map((v) => (
                                         <div
                                             key={v.id}
-                                            className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between group/v transition-all hover:border-blue-400/30"
+                                            className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between group/v transition-all hover:border-red-400/30"
                                         >
                                             <div className="flex justify-between items-start mb-3">
                                                 <div>
@@ -357,7 +357,7 @@ export default function Products({
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-center mt-3 border-t border-gray-50 pt-3">
-                                                <span className="text-sm font-black text-blue-600">
+                                                <span className="text-sm font-black text-red-600">
                                                     €
                                                     {Number(v.precio).toFixed(
                                                         2,
@@ -394,7 +394,7 @@ export default function Products({
                 <div className="flex gap-2">
                     <button
                         onClick={openCreateModal}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-blue-200"
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-red-200"
                     >
                         <Plus size={14} /> Nuevo Producto
                     </button>
@@ -424,8 +424,8 @@ export default function Products({
                     modalMode === "create"
                         ? "Nuevo Producto"
                         : modalMode === "edit"
-                          ? "Editar Producto"
-                          : "Detalles del Producto"
+                            ? "Editar Producto"
+                            : "Detalles del Producto"
                 }
                 maxWidth="max-w-2xl"
             >
@@ -438,7 +438,7 @@ export default function Products({
                             <input
                                 type="text"
                                 readOnly={modalMode === "view"}
-                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all ${errors.nombre ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black font-bold transition-all ${errors.nombre ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                 value={formData.nombre}
                                 onChange={(e) =>
                                     setData("nombre", e.target.value)
@@ -458,7 +458,7 @@ export default function Products({
                             </label>
                             <select
                                 disabled={modalMode === "view"}
-                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all text-xs ${errors.id_categoria ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black font-bold transition-all text-xs ${errors.id_categoria ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                 value={formData.id_categoria}
                                 onChange={(e) =>
                                     setData("id_categoria", e.target.value)
@@ -484,7 +484,7 @@ export default function Products({
                             </label>
                             <select
                                 disabled={modalMode === "view"}
-                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold transition-all text-xs ${errors.id_proveedor ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                className={`w-full p-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black font-bold transition-all text-xs ${errors.id_proveedor ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                 value={formData.id_proveedor}
                                 onChange={(e) =>
                                     setData("id_proveedor", e.target.value)
@@ -511,7 +511,7 @@ export default function Products({
                             <div className="grid grid-cols-2 gap-3 items-center">
                                 <div className="space-y-2">
                                     <label
-                                        className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer transition-all ${modalMode === "view" ? "opacity-50 cursor-not-allowed bg-gray-50" : "hover:bg-gray-50 border-gray-200 hover:border-blue-400"}`}
+                                        className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer transition-all ${modalMode === "view" ? "opacity-50 cursor-not-allowed bg-gray-50" : "hover:bg-gray-50 border-gray-200 hover:border-red-400"}`}
                                     >
                                         <div className="flex flex-col items-center justify-center py-2">
                                             <FolderOpen
@@ -521,7 +521,7 @@ export default function Products({
                                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center px-2 truncate w-full mt-1">
                                                 {formData.imagen_archivo
                                                     ? formData.imagen_archivo
-                                                          .name
+                                                        .name
                                                     : "Subir archivo"}
                                             </p>
                                         </div>
@@ -536,7 +536,7 @@ export default function Products({
                                     <input
                                         type="text"
                                         readOnly={modalMode === "view"}
-                                        className={`w-full p-2.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-bold text-[10px] transition-all ${errors.imagen_principal ? "border-red-500" : "border-gray-200"}`}
+                                        className={`w-full p-2.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black font-bold text-[10px] transition-all ${errors.imagen_principal ? "border-red-500" : "border-gray-200"}`}
                                         value={formData.imagen_principal}
                                         onChange={(e) =>
                                             setData(
@@ -598,7 +598,7 @@ export default function Products({
                                     <input
                                         type="checkbox"
                                         disabled={modalMode === "view"}
-                                        className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                                        className="w-4 h-4 rounded border-gray-300 text-red-600"
                                         checked={formData.activo}
                                         onChange={(e) =>
                                             setData("activo", e.target.checked)
@@ -637,7 +637,7 @@ export default function Products({
                                     type="number"
                                     step="0.01"
                                     readOnly={modalMode === "view"}
-                                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black font-black text-sm"
+                                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black font-black text-sm"
                                     value={formData.precio_venta}
                                     onChange={(e) =>
                                         setData("precio_venta", e.target.value)
@@ -670,7 +670,7 @@ export default function Products({
                             </label>
                             <textarea
                                 readOnly={modalMode === "view"}
-                                className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-black text-xs min-h-[80px] ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-black text-xs min-h-[80px] ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                 rows="2"
                                 value={formData.descripcion}
                                 onChange={(e) =>
@@ -693,13 +693,13 @@ export default function Products({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-8 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 transition-all"
+                                className="px-8 py-2.5 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-red-700 shadow-md shadow-red-200 disabled:opacity-50 transition-all"
                             >
                                 {processing
                                     ? "Procesando..."
                                     : modalMode === "create"
-                                      ? "Crear Producto"
-                                      : "Guardar Cambios"}
+                                        ? "Crear Producto"
+                                        : "Guardar Cambios"}
                             </button>
                         )}
                     </div>
@@ -713,11 +713,10 @@ export default function Products({
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${
-                                link.active
-                                    ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                                    : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-black"
-                            } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${link.active
+                                ? "bg-red-600 text-white border-red-500 shadow-sm"
+                                : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-black"
+                                } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}

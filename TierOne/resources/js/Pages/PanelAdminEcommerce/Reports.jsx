@@ -33,7 +33,7 @@ const tipoBadge = (tipo) => {
     const map = {
         trampa: "bg-red-50 text-red-600 border border-red-100",
         insulto: "bg-orange-50 text-orange-600 border border-orange-100",
-        bug: "bg-blue-50 text-blue-600 border border-blue-100",
+        bug: "bg-red-50 text-red-600 border border-red-100",
         otro: "bg-gray-50 text-gray-600 border border-gray-100",
     };
     return map[tipo] ?? "bg-gray-50 text-gray-600";
@@ -166,7 +166,7 @@ export default function Reports({
             <td className="px-6 py-4 font-mono text-sm text-gray-400">
                 #{reporte.id}
             </td>
-            <td className="px-6 py-4 font-mono text-sm text-blue-600 font-bold">
+            <td className="px-6 py-4 font-mono text-sm text-red-600 font-bold">
                 #{reporte.id_partida || "—"}
             </td>
             <td className="px-6 py-4">
@@ -193,21 +193,21 @@ export default function Reports({
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => openDetails(reporte, false)}
-                        className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Ver Detalles"
                     >
                         <Eye size={14} />
                     </button>
                     <button
                         onClick={() => openDetails(reporte, true)}
-                        className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
                         title="Gestionar"
                     >
                         <Edit2 size={14} />
                     </button>
                 </div>
             </td>
-        </tr>
+        </tr >
     );
 
     return (
@@ -220,7 +220,7 @@ export default function Reports({
                 </h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 tracking-widest"
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-md shadow-red-200 tracking-widest"
                 >
                     + Nuevo Reporte
                 </button>
@@ -267,8 +267,8 @@ export default function Reports({
                     modalMode === "create"
                         ? "Crear Nuevo Reporte"
                         : modalMode === "edit"
-                          ? `Gestión de Reporte #${selectedReport?.id}`
-                          : `Detalles del Reporte #${selectedReport?.id}`
+                            ? `Gestión de Reporte #${selectedReport?.id}`
+                            : `Detalles del Reporte #${selectedReport?.id}`
                 }
                 maxWidth="max-w-2xl"
             >
@@ -282,7 +282,7 @@ export default function Reports({
                                     </label>
                                     <input
                                         type="number"
-                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.id_partida ? "border-red-500" : "border-gray-200"}`}
+                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all ${errors.id_partida ? "border-red-500" : "border-gray-200"}`}
                                         value={formData.id_partida}
                                         onChange={(e) =>
                                             setData(
@@ -303,7 +303,7 @@ export default function Reports({
                                         Usuario Reporta
                                     </label>
                                     <select
-                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.id_usuario_reporta ? "border-red-500" : "border-gray-200"}`}
+                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all ${errors.id_usuario_reporta ? "border-red-500" : "border-gray-200"}`}
                                         value={formData.id_usuario_reporta}
                                         onChange={(e) =>
                                             setData(
@@ -333,7 +333,7 @@ export default function Reports({
                                     Tipo de Reporte
                                 </label>
                                 <select
-                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.tipo ? "border-red-500" : "border-gray-200"}`}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all ${errors.tipo ? "border-red-500" : "border-gray-200"}`}
                                     value={formData.tipo}
                                     onChange={(e) =>
                                         setData("tipo", e.target.value)
@@ -355,7 +355,7 @@ export default function Reports({
                                     Descripción
                                 </label>
                                 <textarea
-                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all min-h-[120px] ${errors.descripcion ? "border-red-500" : "border-gray-200"}`}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all min-h-[120px] ${errors.descripcion ? "border-red-500" : "border-gray-200"}`}
                                     value={formData.descripcion}
                                     onChange={(e) =>
                                         setData("descripcion", e.target.value)
@@ -378,7 +378,7 @@ export default function Reports({
                                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                                 Partida Relacionada
                                             </label>
-                                            <p className="font-bold text-blue-600 font-mono text-lg">
+                                            <p className="font-bold text-red-600 font-mono text-lg">
                                                 #
                                                 {selectedReport.id_partida ||
                                                     "—"}
@@ -397,7 +397,7 @@ export default function Reports({
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
                                             <FileText
                                                 size={12}
-                                                className="text-blue-600"
+                                                className="text-red-600"
                                             />{" "}
                                             Descripción del Problema
                                         </label>
@@ -410,7 +410,7 @@ export default function Reports({
                                 {modalMode === "edit" ? (
                                     <div className="space-y-4 px-1 mt-6">
                                         <h4 className="font-black text-black border-b border-gray-100 pb-3 flex items-center gap-2 uppercase text-xs tracking-widest">
-                                            <span className="bg-blue-50 text-blue-600 p-1.5 rounded-lg flex items-center justify-center">
+                                            <span className="bg-red-50 text-red-600 p-1.5 rounded-lg flex items-center justify-center">
                                                 <Shield size={14} />
                                             </span>
                                             Gestión Administrativa
@@ -428,7 +428,7 @@ export default function Reports({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                                                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                                                 >
                                                     <option value="pendiente">
                                                         Pendiente
@@ -458,7 +458,7 @@ export default function Reports({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                                                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm font-bold text-black outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                                                 >
                                                     <option value="">
                                                         Sin Asignar
@@ -479,7 +479,7 @@ export default function Reports({
                                                 Resolución / Comentarios
                                             </label>
                                             <textarea
-                                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm min-h-[120px]"
+                                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-red-500 shadow-sm min-h-[120px]"
                                                 value={formData.resolucion}
                                                 onChange={(e) =>
                                                     setData(
@@ -548,13 +548,13 @@ export default function Reports({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-black hover:bg-blue-700 disabled:opacity-50 uppercase text-xs tracking-widest shadow-md shadow-blue-200"
+                                className="px-6 py-2 bg-red-600 text-white rounded-lg font-black hover:bg-red-700 disabled:opacity-50 uppercase text-xs tracking-widest shadow-md shadow-red-200"
                             >
                                 {processing
                                     ? "Guardando..."
                                     : modalMode === "create"
-                                      ? "Crear Reporte"
-                                      : "Aplicar Resolución"}
+                                        ? "Crear Reporte"
+                                        : "Aplicar Resolución"}
                             </button>
                         )}
                     </div>

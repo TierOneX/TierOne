@@ -19,7 +19,7 @@ import {
 const estadoBadge = (estado) => {
     const map = {
         pendiente: "bg-orange-50 text-orange-700 border-orange-200",
-        procesando: "bg-blue-50 text-blue-700 border-blue-200",
+        procesando: "bg-red-50 text-red-700 border-red-200",
         enviada: "bg-purple-50 text-purple-700 border-purple-200",
         entregada: "bg-green-50 text-green-700 border-green-200",
         cancelada: "bg-gray-100 text-gray-800 border-gray-200",
@@ -207,7 +207,7 @@ export default function Orders({
                                         : orden.id,
                                 );
                             }}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                            className="text-gray-400 hover:text-red-600 transition-colors"
                         >
                             {expandedOrder === orden.id ? (
                                 <ChevronDown size={14} />
@@ -251,21 +251,21 @@ export default function Orders({
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                             onClick={() => openViewModal(orden)}
-                            className="p-2 bg-white text-gray-400 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
                             title="Ver detalles"
                         >
                             <Eye size={14} />
                         </button>
                         <button
                             onClick={() => openEditModal(orden)}
-                            className="p-2 bg-white text-gray-400 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
                             title="Editar"
                         >
                             <Edit2 size={14} />
                         </button>
                         <button
                             onClick={() => handleDelete(orden.id)}
-                            className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
                             title="Eliminar"
                         >
                             <Trash2 size={14} />
@@ -276,7 +276,7 @@ export default function Orders({
             {expandedOrder === orden.id && (
                 <tr className="bg-gray-50/50">
                     <td colSpan={7} className="px-12 py-6">
-                        <div className="border-l-2 border-blue-500/30 pl-6 py-2">
+                        <div className="border-l-2 border-red-500/30 pl-6 py-2">
                             <h4 className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-[0.2em]">
                                 Artículos del Pedido
                             </h4>
@@ -288,7 +288,7 @@ export default function Orders({
                                             className="flex justify-between items-center text-sm bg-white p-3 rounded-xl border border-gray-100 shadow-sm"
                                         >
                                             <div className="flex gap-4 items-center">
-                                                <span className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-black text-blue-600 text-[10px]">
+                                                <span className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-black text-red-600 text-[10px]">
                                                     x{item.cantidad}
                                                 </span>
                                                 <span className="text-gray-900 font-bold">
@@ -337,7 +337,7 @@ export default function Orders({
                 <div className="flex gap-2">
                     <button
                         onClick={openCreateModal}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 tracking-widest flex items-center gap-2"
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-md shadow-red-200 tracking-widest flex items-center gap-2"
                     >
                         <Plus size={14} /> Crear Pedido
                     </button>
@@ -367,8 +367,8 @@ export default function Orders({
                     modalMode === "create"
                         ? "Nueva Orden Manual"
                         : modalMode === "edit"
-                          ? "Gestionar Pedido"
-                          : "Detalles de la Orden"
+                            ? "Gestionar Pedido"
+                            : "Detalles de la Orden"
                 }
                 maxWidth="max-w-2xl"
             >
@@ -384,7 +384,7 @@ export default function Orders({
                             </label>
                             {modalMode === "create" ? (
                                 <select
-                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.id_usuario ? "border-red-500" : "border-gray-200"}`}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all ${errors.id_usuario ? "border-red-500" : "border-gray-200"}`}
                                     value={formData.id_usuario}
                                     onChange={(e) =>
                                         setData("id_usuario", e.target.value)
@@ -427,7 +427,7 @@ export default function Orders({
                                         onClick={() =>
                                             setIsManualAddress(!isManualAddress)
                                         }
-                                        className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                        className="text-[10px] font-black text-red-600 uppercase tracking-widest hover:underline"
                                     >
                                         {isManualAddress
                                             ? "← Seleccionar existente"
@@ -436,7 +436,7 @@ export default function Orders({
                                 </div>
                                 {!isManualAddress ? (
                                     <select
-                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all ${errors.id_direccion_envio ? "border-red-500" : "border-gray-200"}`}
+                                        className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all ${errors.id_direccion_envio ? "border-red-500" : "border-gray-200"}`}
                                         value={formData.id_direccion_envio}
                                         onChange={(e) =>
                                             setData(
@@ -457,7 +457,7 @@ export default function Orders({
                                         ))}
                                     </select>
                                 ) : (
-                                    <div className="grid grid-cols-2 gap-3 p-4 bg-blue-50/30 border border-blue-100 rounded-xl">
+                                    <div className="grid grid-cols-2 gap-3 p-4 bg-red-50/30 border border-red-100 rounded-xl">
                                         <div className="col-span-2">
                                             <input
                                                 type="text"
@@ -551,7 +551,7 @@ export default function Orders({
                                 <input
                                     type="text"
                                     readOnly={modalMode === "view"}
-                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all border-gray-200 ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all border-gray-200 ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                     value={formData.tracking_number}
                                     onChange={(e) =>
                                         setData(
@@ -570,7 +570,7 @@ export default function Orders({
                             </label>
                             <select
                                 disabled={modalMode === "view"}
-                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black disabled:opacity-70 disabled:cursor-not-allowed"
                                 value={formData.estado}
                                 onChange={(e) =>
                                     setData("estado", e.target.value)
@@ -592,7 +592,7 @@ export default function Orders({
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all"
                                         value={formData.subtotal}
                                         onChange={(e) =>
                                             setData("subtotal", e.target.value)
@@ -605,7 +605,7 @@ export default function Orders({
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all"
                                         value={formData.impuestos}
                                         onChange={(e) =>
                                             setData("impuestos", e.target.value)
@@ -618,7 +618,7 @@ export default function Orders({
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all"
                                         value={formData.costo_envio}
                                         onChange={(e) =>
                                             setData(
@@ -634,7 +634,7 @@ export default function Orders({
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-black transition-all"
+                                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-bold text-black transition-all"
                                         value={formData.descuento}
                                         onChange={(e) =>
                                             setData("descuento", e.target.value)
@@ -642,12 +642,12 @@ export default function Orders({
                                     />
                                 </div>
                                 <div className="col-span-2">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 font-black text-blue-600">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 font-black text-red-600">
                                         Total Final (€)
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-6 bg-blue-50 border border-blue-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-3xl text-blue-900 transition-all"
+                                        className="w-full p-6 bg-red-50 border border-red-200 rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-black text-3xl text-red-900 transition-all"
                                         value={formData.total}
                                         onChange={(e) =>
                                             setData("total", e.target.value)
@@ -669,7 +669,7 @@ export default function Orders({
                                     type="number"
                                     step="0.01"
                                     readOnly={modalMode === "view"}
-                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-lg transition-all ${errors.total ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
+                                    className={`w-full p-4 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-red-500 font-black text-lg transition-all ${errors.total ? "border-red-500" : "border-gray-200"} ${modalMode === "view" ? "opacity-70 cursor-not-allowed" : ""}`}
                                     value={formData.total}
                                     onChange={(e) =>
                                         setData("total", e.target.value)
@@ -729,13 +729,13 @@ export default function Orders({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-8 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 disabled:opacity-50 transition-all"
+                                className="px-8 py-2.5 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl hover:bg-red-700 shadow-md shadow-red-200 disabled:opacity-50 transition-all"
                             >
                                 {processing
                                     ? "Procesando..."
                                     : modalMode === "create"
-                                      ? "Crear Orden"
-                                      : "Guardar Cambios"}
+                                        ? "Crear Orden"
+                                        : "Guardar Cambios"}
                             </button>
                         )}
                     </div>
@@ -749,11 +749,10 @@ export default function Orders({
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${
-                                link.active
-                                    ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                                    : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-black"
-                            } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
+                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all border ${link.active
+                                ? "bg-red-600 text-white border-red-500 shadow-sm"
+                                : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50 hover:text-black"
+                                } ${!link.url ? "opacity-30 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}

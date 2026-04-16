@@ -84,7 +84,7 @@ export default function Reviews({ reviews, filters = {} }) {
                     {r.usuario}
                     {r.verificado && (
                         <span
-                            className="flex items-center gap-1 text-blue-600 text-[10px] font-black uppercase tracking-tighter bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100"
+                            className="flex items-center gap-1 text-red-600 text-[10px] font-black uppercase tracking-tighter bg-red-50 px-1.5 py-0.5 rounded border border-red-100"
                             title="Compra verificada"
                         >
                             <CheckCircle2 size={10} /> Verificado
@@ -126,7 +126,7 @@ export default function Reviews({ reviews, filters = {} }) {
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => deleteReview(r.id)}
-                        className="p-2 bg-white text-gray-400 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
                         title="Eliminar Reseña"
                     >
                         <Trash2 size={14} />
@@ -166,11 +166,10 @@ export default function Reviews({ reviews, filters = {} }) {
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-3 py-1 rounded text-sm border font-bold ${
-                                link.active
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50"
-                            } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
+                            className={`px-3 py-1 rounded text-sm border font-bold ${link.active
+                                ? "bg-red-600 text-white border-red-600"
+                                : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50"
+                                } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}

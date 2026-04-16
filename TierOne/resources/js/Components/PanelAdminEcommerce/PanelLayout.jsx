@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react"; // Añadimos usePage
 import Sidebar from "@/Components/PanelAdminEcommerce/Sidebar";
+import { Home } from "lucide-react";
 
 // Importamos el CSS específico del panel
 // Nota: En Vite, esto puede requerir configuración adicional si no es global,
@@ -50,7 +51,13 @@ export default function PanelLayout({ title, activeItem, children }) {
                     <h1 className="page-title">{title}</h1>
                 </div>
                 <div className="header-actions">
-                    {/* Botones de acción eliminados por simplificación */}
+                    <Link
+                        href={route("home")}
+                        className="btn-secondary"
+                    >
+                        <Home size={16} />
+                        <span>Volver a la Web</span>
+                    </Link>
                 </div>
             </header>
             {/* MAIN CONTENT */}
