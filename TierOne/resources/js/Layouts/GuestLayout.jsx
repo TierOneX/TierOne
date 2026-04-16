@@ -81,7 +81,7 @@ export default function GuestLayout({
     }, []);
     /* ── Panel izquierdo: logo + TIER ONE centrado + brandContent ── */
     const BrandPanel = (
-        <div className="relative z-10 hidden lg:flex lg:w-[55%] flex-col items-center justify-start pt-16 bg-[#0d0d0d] overflow-hidden">
+        <div className="relative z-10 hidden lg:flex lg:w-[55%] flex-col items-center justify-start pt-16 bg-[#0d0d0d] overflow-hidden min-h-screen">
             <ParticleCanvas />
 
             <div className="orb-1 absolute top-[20%] left-[30%] w-[28rem] h-[28rem] bg-[#e31837]/10 blur-[140px] rounded-full pointer-events-none" />
@@ -141,11 +141,13 @@ export default function GuestLayout({
             <div className="orb-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-[#e31837]/4 blur-[150px] rounded-full pointer-events-none" />
 
             {/* MÓVIL/TABLET: logo + TIER ONE centrado + toggle */}
-            <div className="lg:hidden flex flex-col items-center gap-2 px-6 pt-20 pb-0 text-center">
+            <div className="lg:hidden flex flex-col items-center gap-2 px-6 pt-10 pb-0 text-center">
                 <Link href="/" className="flex justify-center logo-float">
                     <HydraLogo size="xl" />
                 </Link>
-                {toggleSlot && <div className="mt-8">{toggleSlot}</div>}
+                {/* Mostramos el brandContent (título) también en mobile */}
+                {brandContent && <div className="mt-3">{brandContent}</div>}
+                {toggleSlot && <div className="mt-4">{toggleSlot}</div>}
                 <Link
                     href="/"
                     className="mt-2 inline-flex items-center gap-1.5 text-[10px] text-gray-500 hover:text-white transition-colors font-bold uppercase tracking-[0.2em] opacity-80"
@@ -190,11 +192,11 @@ export default function GuestLayout({
             </div>
 
             {/* Formulario centrado */}
-            <div className="flex-1 flex items-center justify-center px-4 pt-1 pb-4 lg:p-10 lg:mt-8 page-enter overflow-y-auto">
-                <div className="relative w-full max-w-[520px]">
+            <div className="flex-1 flex items-start lg:items-center justify-center px-4 pt-4 pb-8 lg:p-10 lg:mt-8 page-enter overflow-y-auto">
+                <div className="relative w-full max-w-[520px] mx-auto">
                     <div
                         className="card-breath relative overflow-hidden
-                        px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12
+                        px-5 py-7 sm:px-8 sm:py-8 lg:px-12 lg:py-12
                         bg-[#131313] border border-white/[0.05] rounded-2xl
                         shadow-[0_25px_80px_rgba(0,0,0,0.8)]"
                     >
@@ -223,7 +225,7 @@ export default function GuestLayout({
     );
 
     return (
-        <div className="relative h-screen w-screen bg-[#0d0d0d] flex overflow-hidden font-sans antialiased">
+        <div className="relative min-h-screen w-full bg-[#0d0d0d] flex flex-col lg:flex-row lg:h-screen lg:overflow-hidden font-sans antialiased">
             {/* Overlay de Carga Inicial (Pixel Sweep) */}
             {isLoading && (
                 <div

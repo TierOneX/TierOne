@@ -98,7 +98,7 @@ export default function Login({ status, canResetPassword }) {
 
                 {/* Password */}
                 <div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1">
                         <InputLabel
                             htmlFor="password"
                             value="Contraseña"
@@ -107,7 +107,7 @@ export default function Login({ status, canResetPassword }) {
                         {canResetPassword && (
                             <Link
                                 href="/forgot-password"
-                                className="text-xs font-bold text-[#e31837]/50 hover:text-[#e31837] transition-colors uppercase tracking-[0.15em]"
+                                className="text-xs font-bold text-[#e31837]/50 hover:text-[#e31837] transition-colors uppercase tracking-[0.15em] shrink-0"
                             >
                                 ¿Olvidaste la contraseña?
                             </Link>

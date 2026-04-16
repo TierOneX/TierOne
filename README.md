@@ -74,7 +74,6 @@ Navega por nuestro [Hub de Documentación](docs/README.md) para acceder a inform
 
 ---
 
-<<<<<<< HEAD
 ## 🤝 Contribuir
 
 Para contribuir al proyecto:
@@ -101,8 +100,4 @@ Para preguntas o soporte, contacta al equipo de desarrollo.
 
 ---
 
-**Última actualización:** Enero 2026  
-**Versión:** 0.1.0-dev
-=======
 **Última actualización:** Febrero 2026 | **Versión:** 0.2.0-alpha
->>>>>>> origin/dev
