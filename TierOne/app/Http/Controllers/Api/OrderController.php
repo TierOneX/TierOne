@@ -1,19 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Orden;
-use App\Models\ItemOrden;
+use App\Services\OrderService;
 use App\Traits\ApiResponseTrait;
 use App\Http\Requests\StoreOrdenRequest;
 use App\Http\Requests\UpdateOrdenRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class OrdenController extends Controller
+class OrderController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(
+        protected OrderService $orderService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -22,7 +26,7 @@ class OrdenController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $ordenes = Orden::with(['usuario', 'items', 'direccionEnvio'])->get();
+            $ordenes = $this->orderService->getAllOrders();
             return $this->successResponse($ordenes, 'Órdenes obtenidas correctamente');
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener las órdenes', $e->getMessage());
@@ -38,26 +42,7 @@ class OrdenController extends Controller
     {
         try {
             $validated = $request->validated();
-
-            $orden = DB::transaction(function () use ($validated) {
-                // 1. Crear la cabecera de la orden
-                $orden = Orden::create($validated);
-
-                // 2. Crear los detalles (Items)
-                foreach ($validated['items'] as $item) {
-                    ItemOrden::create([
-                        'id_orden' => $orden->id,
-                        'id_producto' => $item['id_producto'],
-                        'id_variante' => $item['id_variante'] ?? null,
-                        'id_proveedor' => $item['id_proveedor'],
-                        'cantidad' => $item['cantidad'],
-                        'precio_unitario' => $item['precio_unitario'],
-                        'subtotal' => $item['cantidad'] * $item['precio_unitario'],
-                    ]);
-                }
-
-                return $orden;
-            });
+            $orden = $this->orderService->createOrder($validated);
 
             return $this->successResponse($orden, 'Orden creada correctamente', 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -75,7 +60,7 @@ class OrdenController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $orden = Orden::with(['usuario', 'items.producto', 'direccionEnvio', 'transacciones', 'canceladoPor'])->findOrFail($id);
+            $orden = $this->orderService->getOrderById($id);
             return $this->successResponse($orden, 'Orden obtenida correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Orden no encontrada');
@@ -94,7 +79,7 @@ class OrdenController extends Controller
     {
         try {
             $orden = Orden::findOrFail($id);
-            $orden->update($request->validated());
+            $orden = $this->orderService->updateOrder($orden, $request->validated());
             return $this->successResponse($orden, 'Orden actualizada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Orden no encontrada');
@@ -112,7 +97,7 @@ class OrdenController extends Controller
     {
         try {
             $orden = Orden::findOrFail($id);
-            $orden->delete();
+            $this->orderService->deleteOrder($orden);
             return $this->successResponse(null, 'Orden eliminada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Orden no encontrada');
@@ -121,3 +106,4 @@ class OrdenController extends Controller
         }
     }
 }
+

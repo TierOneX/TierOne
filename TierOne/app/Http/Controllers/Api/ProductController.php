@@ -1,17 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Producto;
+use App\Services\ProductService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Requests\UpdateProductoRequest;
 
-class ProductoController extends Controller
+class ProductController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(
+        protected ProductService $productService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -20,8 +27,7 @@ class ProductoController extends Controller
     public function index(): JsonResponse
     {
         try {
-            // Eager load relationships for efficiency
-            $productos = Producto::with(['categoria', 'proveedor', 'imagenes', 'variantes'])->get();
+            $productos = $this->productService->getAllProducts();
             return $this->successResponse($productos, 'Productos obtenidos correctamente');
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener los productos', $e->getMessage());
@@ -37,10 +43,7 @@ class ProductoController extends Controller
     {
         try {
             $validated = $request->validated();
-
-            $producto = Producto::create($validated);
-
-            // Reload with relations to return full object (optional but nice)
+            $producto = $this->productService->createProduct($validated, $request->file('imagen_archivo'));
             $producto->load(['categoria', 'proveedor']);
 
             return $this->successResponse($producto, 'Producto creado correctamente', 201);
@@ -59,12 +62,12 @@ class ProductoController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $producto = Producto::with(['categoria', 'proveedor', 'imagenes', 'variantes', 'reviews'])->findOrFail($id);
+            $producto = $this->productService->getProductById($id);
             return $this->successResponse($producto, 'Producto obtenido correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Producto no encontrado');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener the product', $e->getMessage());
+            return $this->errorResponse('Error al obtener el producto', $e->getMessage());
         }
     }
 
@@ -79,8 +82,10 @@ class ProductoController extends Controller
         try {
             $producto = Producto::findOrFail($id);
             $validated = $request->validated();
-            $producto->update($validated);
+            
+            $producto = $this->productService->updateProduct($producto, $validated, $request->file('imagen_archivo'));
             $producto->load(['categoria', 'proveedor']);
+            
             return $this->successResponse($producto, 'Producto actualizado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Producto no encontrado');
@@ -100,7 +105,7 @@ class ProductoController extends Controller
     {
         try {
             $producto = Producto::findOrFail($id);
-            $producto->delete();
+            $this->productService->deleteProduct($producto);
             return $this->successResponse(null, 'Producto eliminado correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Producto no encontrado');
@@ -109,3 +114,4 @@ class ProductoController extends Controller
         }
     }
 }
+

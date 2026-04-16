@@ -1,15 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Categoria;
+use App\Services\CategoryService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-class CategoriaController extends Controller
+class CategoryController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(
+        protected CategoryService $categoryService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -18,7 +25,7 @@ class CategoriaController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $categorias = Categoria::all();
+            $categorias = $this->categoryService->getAllCategories();
             return $this->successResponse($categorias, 'Categorías obtenidas correctamente');
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener los datos', $e->getMessage());
@@ -41,7 +48,7 @@ class CategoriaController extends Controller
                 'activa' => 'nullable|boolean',
             ]);
 
-            $categoria = Categoria::create($validated);
+            $categoria = $this->categoryService->createCategory($validated);
             return $this->successResponse($categoria, 'Categoría creada correctamente', 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->validationErrorResponse($e->validator->errors());
@@ -58,7 +65,7 @@ class CategoriaController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $categoria = Categoria::findOrFail($id);
+            $categoria = $this->categoryService->getCategoryById($id);
             return $this->successResponse($categoria, 'Categoria obtenida correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
@@ -86,7 +93,7 @@ class CategoriaController extends Controller
                 'activa' => 'nullable|boolean',
             ]);
 
-            $categoria->update($validated);
+            $categoria = $this->categoryService->updateCategory($categoria, $validated);
             return $this->successResponse($categoria, 'Categoría actualizada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
@@ -106,7 +113,7 @@ class CategoriaController extends Controller
     {
         try {
             $categoria = Categoria::findOrFail($id);
-            $categoria->delete();
+            $this->categoryService->deleteCategory($categoria);
             return $this->successResponse(null, 'Categoría eliminada correctamente');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('Categoría no encontrada');
@@ -115,3 +122,4 @@ class CategoriaController extends Controller
         }
     }
 }
+

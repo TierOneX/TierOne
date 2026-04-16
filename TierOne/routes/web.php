@@ -84,18 +84,18 @@ Route::get('/cart', function () {
 
 Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products');
-    Route::post('/products', [App\Http\Controllers\ProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{producto}', [App\Http\Controllers\ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{producto}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
-    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
-    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{categoria}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
-    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
-    Route::post('/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
-    Route::put('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'update'])->name('orders.update');
-    Route::delete('/orders/{orden}', [App\Http\Controllers\OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/products', [App\Http\Controllers\Web\ProductController::class, 'index'])->name('products');
+    Route::post('/products', [App\Http\Controllers\Web\ProductController::class, 'store'])->name('products.store');
+    Route::put('/products/{producto}', [App\Http\Controllers\Web\ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{producto}', [App\Http\Controllers\Web\ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/categories', [App\Http\Controllers\Web\CategoryController::class, 'index'])->name('categories');
+    Route::post('/categories', [App\Http\Controllers\Web\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{categoria}', [App\Http\Controllers\Web\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{categoria}', [App\Http\Controllers\Web\CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/orders', [App\Http\Controllers\Web\OrderController::class, 'index'])->name('orders');
+    Route::post('/orders', [App\Http\Controllers\Web\OrderController::class, 'store'])->name('orders.store');
+    Route::put('/orders/{orden}', [App\Http\Controllers\Web\OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{orden}', [App\Http\Controllers\Web\OrderController::class, 'destroy'])->name('orders.destroy');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');
     Route::post('/proveedores', [App\Http\Controllers\ProveedorController::class, 'store'])->name('proveedores.store');
     Route::put('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'update'])->name('proveedores.update');
