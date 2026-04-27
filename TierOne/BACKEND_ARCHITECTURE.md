@@ -76,3 +76,20 @@ Para asegurar la legibilidad por distintos ingenieros de software, se establecen
 - **Controladores y Servicios:** Nombre en Inglés y en Singular (`OrderController`, `ProductService`).
 - **Modelos de Eloquent:** En Español y en Singular (`Producto`, `Orden`, `Categoria`), para que representen de manera natural la Base de Datos que está esquematizada en Español.
 - **Rutas API/Web:** URLs en plural. Web pueden ser Inglés (`/products`) y API en español (`/api/productos`) si así se requiere para consumo público, pero el código fuente interno usa las clases en Inglés.
+
+---
+
+## 6. Módulo de Facturación y PDFs (Generación Documental)
+
+Para dar soporte a la creación de facturas (Invoices) posteriores a una compra, el backend emplea la librería estandarizada `barryvdh/laravel-dompdf`.
+
+### Arquitectura de Exportación:
+1. **Lógica de Generación (`App\Services\InvoiceService`):**
+   - Abstrae todo el motor de compilación del PDF.
+   - Recibe como entrada una instancia de el modelo `Orden` y determina una vía de salida a través de sus parámetros (Modo visualización *Stream* nativo en navegador, *descarga nativa*, o *guardado seguro en disco* para automatización o adjunto de emails).
+2. **Plantilla Visual (`resources/views/pdf/invoice.blade.php`):**
+   - El diseño de la factura en PDF se apoya fuertemente en maquetación pura de HTML y tablas jerárquicas (evitando floats y layouts modernos no soportados).
+   - El logo se inyecta como una cadena **base64** desde el servicio para garantizar que DomPDF lo renderice correctamente sin problemas de permisos o rutas locales.
+   - Se alimenta de datos inyectando directamente los objetos generados en la capa del servicio hacia la plantilla de Blade.
+3. **Endpoint (`App\Http\Controllers\Web\OrderController`):**
+   - Se proporciona el endpoint HTTP `GET /orders/{orden}/invoice`, el cual invoca exclusivamente a `$this->invoiceService->generateInvoice($orden, 'download')`. Esto mantiene la capa del controlador completamente ajena y desacoplada a la complejidad técnica de la instanciación de un renderizador de archivos.

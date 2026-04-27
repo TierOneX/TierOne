@@ -9,13 +9,15 @@ use App\Models\User;
 use App\Models\Producto;
 use App\Models\DireccionEnvio;
 use App\Services\OrderService;
+use App\Services\InvoiceService;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     public function __construct(
-        protected OrderService $orderService
+        protected OrderService $orderService,
+        protected InvoiceService $invoiceService
     ) {}
 
     /**
@@ -107,6 +109,14 @@ class OrderController extends Controller
     {
         $this->orderService->deleteOrder($orden);
         return redirect()->back()->with('success', 'Orden eliminada correctamente');
+    }
+
+    /**
+     * Descarga la factura en PDF de la orden.
+     */
+    public function downloadInvoice(Orden $orden)
+    {
+        return $this->invoiceService->generateInvoice($orden, 'stream');
     }
 }
 

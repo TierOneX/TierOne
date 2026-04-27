@@ -96,6 +96,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     Route::post('/orders', [App\Http\Controllers\Web\OrderController::class, 'store'])->name('orders.store');
     Route::put('/orders/{orden}', [App\Http\Controllers\Web\OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{orden}', [App\Http\Controllers\Web\OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/{orden}/invoice', [App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
     Route::get('/proveedores', [App\Http\Controllers\ProveedorController::class, 'index'])->name('proveedores');
     Route::post('/proveedores', [App\Http\Controllers\ProveedorController::class, 'store'])->name('proveedores.store');
     Route::put('/proveedores/{proveedor}', [App\Http\Controllers\ProveedorController::class, 'update'])->name('proveedores.update');
