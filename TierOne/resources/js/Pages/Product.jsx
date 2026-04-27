@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Trophy, Zap, Gamepad2 } from 'lucide-react';
 
@@ -54,6 +54,15 @@ export default function Product({ producto, relacionados = [] }) {
                                 selectedVariant={selectedVariant}
                                 variantes={producto.variantes}
                             />
+
+                            {producto.personalizable && (
+                                <Link
+                                    href={route('product.customize', producto.slug)}
+                                    className="flex w-full py-4 rounded-lg font-black text-sm uppercase tracking-widest items-center justify-center gap-3 transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 active:scale-[0.98] mb-4"
+                                >
+                                    <span>✨</span> PERSONALIZAR ESTE PRODUCTO
+                                </Link>
+                            )}
 
                             {/* Acordeón de info */}
                             <ProductAccordion producto={producto} />

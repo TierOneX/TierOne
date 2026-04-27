@@ -19,12 +19,15 @@ class ItemOrden extends Model
         'cantidad',
         'precio_unitario',
         'subtotal',
+        'personalizacion_data',
+        'personalizacion_imagen',
     ];
 
     protected $casts = [
         'cantidad' => 'integer',
         'precio_unitario' => 'decimal:2',
         'subtotal' => 'decimal:2',
+        'personalizacion_data' => 'array',
     ];
 
     public function orden()

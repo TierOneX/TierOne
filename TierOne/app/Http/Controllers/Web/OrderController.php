@@ -47,6 +47,8 @@ class OrderController extends Controller
                     'cantidad' => $i->cantidad,
                     'precio'   => $i->precio_unitario,
                     'subtotal' => $i->subtotal,
+                    'personalizacion_data'   => $i->personalizacion_data,
+                    'personalizacion_imagen' => $i->personalizacion_imagen,
                 ]),
             ]),
             'filters' => $filters,

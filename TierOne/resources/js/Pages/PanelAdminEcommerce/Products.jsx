@@ -17,6 +17,7 @@ import {
     FolderOpen,
     Search,
     Filter,
+    Layers,
 } from "lucide-react";
 
 export default function Products({
@@ -113,6 +114,7 @@ export default function Products({
         precio_proveedor: "",
         activo: true,
         destacado: false,
+        personalizable: false,
         descripcion: "",
         imagen_principal: "",
         imagen_archivo: null,
@@ -139,6 +141,7 @@ export default function Products({
             precio_proveedor: product.precio_proveedor || "",
             activo: !!product.activo,
             destacado: !!product.destacado,
+            personalizable: !!product.personalizable,
             descripcion: product.descripcion || "",
             imagen_principal: product.imagen_principal || "",
             imagen_archivo: null,
@@ -159,6 +162,7 @@ export default function Products({
             precio_proveedor: product.precio_proveedor || "",
             activo: !!product.activo,
             destacado: !!product.destacado,
+            personalizable: !!product.personalizable,
             descripcion: product.descripcion || "",
             imagen_principal: product.imagen_principal || "",
             imagen_archivo: null,
@@ -264,6 +268,11 @@ export default function Products({
                                         {product.variantes.length} Variantes
                                     </span>
                                 )}
+                                {product.personalizable && (
+                                    <span className="text-[9px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded border border-purple-100 uppercase font-black tracking-tighter">
+                                        Personalizable
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -303,6 +312,16 @@ export default function Products({
                         >
                             <Edit2 size={14} />
                         </button>
+                        {product.personalizable && (
+                            <Link
+                                href={route('panel.ecommerce.products.zonas', product.id)}
+                                className="p-2 bg-gray-50 text-gray-600 hover:text-purple-600 rounded-lg border border-gray-200 hover:border-purple-200 shadow-sm"
+                                title="Configurar Zonas"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Layers size={14} />
+                            </Link>
+                        )}
                         <button
                             onClick={() => handleDelete(product.id)}
                             className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
@@ -623,6 +642,23 @@ export default function Products({
                                     />
                                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                         Destacado
+                                    </span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        disabled={modalMode === "view"}
+                                        className="w-4 h-4 rounded border-gray-300 text-purple-600"
+                                        checked={formData.personalizable}
+                                        onChange={(e) =>
+                                            setData(
+                                                "personalizable",
+                                                e.target.checked,
+                                            )
+                                        }
+                                    />
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Personalizable
                                     </span>
                                 </label>
                             </div>

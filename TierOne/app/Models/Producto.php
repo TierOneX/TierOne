@@ -46,6 +46,7 @@ class Producto extends Model
         'precio_proveedor',
         'precio_venta',
         'imagen_principal',
+        'personalizable',
         'destacado',
         'activo',
         'fecha_creacion',
@@ -59,6 +60,7 @@ class Producto extends Model
     protected $casts = [
         'precio_proveedor' => 'decimal:2',
         'precio_venta' => 'decimal:2',
+        'personalizable' => 'boolean',
         'destacado' => 'boolean',
         'activo' => 'boolean',
         'fecha_creacion' => 'datetime',
@@ -108,5 +110,21 @@ class Producto extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class, 'id_producto');
+    }
+
+    /**
+     * Relación: Un producto tiene muchas zonas de personalización
+     */
+    public function zonasPersonalizacion()
+    {
+        return $this->hasMany(ZonaPersonalizacion::class, 'id_producto')->orderBy('orden');
+    }
+
+    /**
+     * Relación: Un producto tiene precios de personalización específicos
+     */
+    public function preciosPersonalizacion()
+    {
+        return $this->hasMany(PrecioPersonalizacion::class, 'id_producto');
     }
 }

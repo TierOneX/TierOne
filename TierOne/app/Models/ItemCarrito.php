@@ -40,6 +40,7 @@ class ItemCarrito extends Model
         'cantidad',
         'precio_unitario',
         'subtotal',
+        'personalizacion_data',
         'fecha_agregado',
     ];
 
@@ -49,6 +50,7 @@ class ItemCarrito extends Model
     protected $casts = [
         'precio_unitario' => 'decimal:2',
         'subtotal' => 'decimal:2',
+        'personalizacion_data' => 'array',
         'fecha_agregado' => 'datetime',
     ];
 
