@@ -9,6 +9,8 @@ Bienvenido al hub central de documentación del proyecto **TierOne**. Aquí enco
 ### 📋 Guías de Instalación
 
 - **[📖 Guía de Instalación Completa](INSTALLATION.md)** - Instalación paso a paso del proyecto
+- **[🔄 Flujo Backend Laravel](guides/BACKEND_FLOW.md)** - Guía sobre el flujo de peticiones y estructura
+- **[📄 Módulo Facturación PDF](guides/01_Modulo_Facturas_PDF.md)** - Documentación técnica del generador de PDFs
   - Requisitos previos (PHP, MySQL, Node.js)
   - Configuración de entorno (.env)
   - Instalación de dependencias
@@ -65,6 +67,8 @@ Arquitectura y diseño del esquema MySQL:
 
 Documentación de endpoints y contratos API:
 
+- **[📑 Detalle de Rutas API](api/API_ROUTES.md)** - Listado completo de endpoints y ejemplos de uso
+
 #### Contratos por Módulo
 
 **Autenticación:**
@@ -109,6 +113,23 @@ Documentación de React + Inertia.js (en construcción)
 
 ---
 
+### 📋 Planificación y Auditoría
+
+**[📁 Carpeta planning/](planning/)**
+
+- **[👁️ Visión del Proyecto](VISION_PROYECTO.md)** - Objetivos y visión general
+- **[🔍 Auditoría Backend Senior](planning/auditoria_backend_senior.md)** - Revisión técnica profunda
+- **[🛠️ Plan de Corrección Backend](planning/plan_correccion_backend.md)** - Hoja de ruta para mejoras
+- **[📋 Repaso Rama Migrations](planning/REPASO_RAMA_MIGRATIONS_MODELS_CONTROLLERS.md)** - Análisis de estructura actual
+
+---
+
+### 💻 Ejemplos de Código
+
+- **[🚀 Ejemplos Backend](examples/ejemplos_codigo_backend.md)** - Snippets y patrones de código utilizados
+
+---
+
 ### 📦 Archivos
 
 **[📁 Carpeta archive/](archive/)**
@@ -143,16 +164,19 @@ docs/
 │
 ├── api/                         # Documentación de API
 │   ├── README.md
+│   ├── API_ROUTES.md            # RUTAS DETALLADAS
 │   └── contracts/               # Contratos por endpoint
-│       ├── Auth-API.md
-│       ├── Cart-API.md
-│       ├── Games-API.md
-│       ├── Matches-API.md
-│       ├── Reviews-API.md
-│       ├── Shop-API.md
-│       ├── Tournaments-API.md
-│       ├── Users-API.md
-│       └── _TEMPLATE.md
+│
+├── guides/                      # Guías técnicas
+│   ├── BACKEND_FLOW.md
+│   └── 01_Modulo_Facturas_PDF.md
+│
+├── planning/                    # Auditorías y Planes
+│   ├── auditoria_backend_senior.md
+│   └── plan_correccion_backend.md
+│
+├── examples/                    # Ejemplos de código
+│   └── ejemplos_codigo_backend.md
 │
 ├── database/                    # Documentación de BD
 │   ├── README.md
