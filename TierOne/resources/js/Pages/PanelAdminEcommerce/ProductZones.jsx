@@ -7,155 +7,163 @@ import {
     Move, Save, DollarSign, Image as ImageIcon
 } from "lucide-react";
 
-/**
- * Componente para dibujar un rectángulo arrastrando sobre una imagen.
- * El usuario sube una imagen del producto, y arrastra para definir el área imprimible.
- */
-function ZoneDrawer({ imageSrc, initialArea, canvasWidth, canvasHeight, onAreaChange }) {
-    const containerRef = useRef(null);
-    const [drawing, setDrawing] = useState(false);
-    const [startPoint, setStartPoint] = useState(null);
-    const [area, setArea] = useState(initialArea || { x: 0, y: 0, width: 200, height: 250 });
-    const [dragging, setDragging] = useState(false);
-    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-    // Refs para evitar state stale en los event handlers
-    const areaRef = useRef(area);
-    const drawingRef = useRef(false);
-    const draggingRef = useRef(false);
-    const updateArea = (newArea) => { areaRef.current = newArea; setArea(newArea); };
+// Colores por tipo de zona
+const ZONE_COLORS = {
+    impresion:        { border: 'border-purple-400', bg: 'bg-purple-500/15', label: 'bg-purple-600', text: 'Impresión',        overlay: 'bg-black/40' },
+    bloqueada:        { border: 'border-red-400',    bg: 'bg-red-500/15',    label: 'bg-red-600',    text: 'Bloqueada',        overlay: 'bg-red-900/30' },
+    baja_visibilidad: { border: 'border-amber-400',  bg: 'bg-amber-500/15',  label: 'bg-amber-600',  text: 'Baja Visibilidad', overlay: 'bg-amber-900/25' },
+};
 
-    // Escala de la imagen mostrada vs el canvas real
+const HANDLE_DIRS = ['nw','n','ne','e','se','s','sw','w'];
+const HANDLE_CURSORS = { nw:'nwse-resize', n:'ns-resize', ne:'nesw-resize', e:'ew-resize', se:'nwse-resize', s:'ns-resize', sw:'nesw-resize', w:'ew-resize' };
+const MIN_SIZE = 50;
+
+/**
+ * Componente para definir el área de una zona sobre la imagen del producto.
+ * Soporta mover (arrastrar cuerpo) y redimensionar (8 handles).
+ */
+function ZoneDrawer({ imageSrc, initialArea, canvasWidth, canvasHeight, zoneType = 'impresion', onAreaChange }) {
+    const containerRef = useRef(null);
+    const [area, setArea] = useState(initialArea || { x: 0, y: 0, width: 200, height: 250 });
     const [displayScale, setDisplayScale] = useState(1);
 
+    // Refs for stale-free event handlers
+    const areaRef = useRef(area);
+    const modeRef = useRef(null); // null | 'drag' | 'resize'
+    const resizeDirRef = useRef(null);
+    const dragOffsetRef = useRef({ x: 0, y: 0 });
+    const [interacting, setInteracting] = useState(false);
+
+    const updateArea = (a) => { areaRef.current = a; setArea(a); };
+
     useEffect(() => {
-        const updateScale = () => {
+        const sync = () => {
             if (containerRef.current && canvasWidth && containerRef.current.offsetWidth > 0) {
-                const containerWidth = containerRef.current.offsetWidth;
-                setDisplayScale(containerWidth / canvasWidth);
+                setDisplayScale(containerRef.current.offsetWidth / canvasWidth);
             }
         };
-
-        // Actualizar escala al montar, cuando cambia el canvasWidth o cuando carga la imagen
-        updateScale();
-        
-        // También observar cambios de tamaño del contenedor (por si el modal tarda en abrirse)
-        const observer = new ResizeObserver(updateScale);
-        if (containerRef.current) observer.observe(containerRef.current);
-        
-        return () => observer.disconnect();
+        sync();
+        const obs = new ResizeObserver(sync);
+        if (containerRef.current) obs.observe(containerRef.current);
+        return () => obs.disconnect();
     }, [canvasWidth, imageSrc]);
 
-    const getRelativePos = (e) => {
-        const rect = containerRef.current.getBoundingClientRect();
-        return {
-            x: Math.round((e.clientX - rect.left) / displayScale),
-            y: Math.round((e.clientY - rect.top) / displayScale),
-        };
+    // Sync initialArea when it changes externally
+    useEffect(() => {
+        if (initialArea) { updateArea(initialArea); }
+    }, [initialArea?.x, initialArea?.y, initialArea?.width, initialArea?.height]);
+
+    const getPos = (e) => {
+        const r = containerRef.current.getBoundingClientRect();
+        return { x: Math.round((e.clientX - r.left) / displayScale), y: Math.round((e.clientY - r.top) / displayScale) };
     };
 
     const handleMouseDown = (e) => {
-        // closest() funciona aunque el click sea sobre un hijo con pointer-events-none
-        if (e.target.closest?.('.zone-handle')) {
-            draggingRef.current = true;
-            setDragging(true);
-            const pos = getRelativePos(e);
-            setDragOffset({ x: pos.x - areaRef.current.x, y: pos.y - areaRef.current.y });
+        const handleDir = e.target.dataset?.handleDir;
+        if (handleDir) {
+            modeRef.current = 'resize';
+            resizeDirRef.current = handleDir;
+        } else if (e.target.closest?.('.zone-body')) {
+            modeRef.current = 'drag';
+            const p = getPos(e);
+            dragOffsetRef.current = { x: p.x - areaRef.current.x, y: p.y - areaRef.current.y };
         } else {
-            drawingRef.current = true;
-            setDrawing(true);
-            setStartPoint(getRelativePos(e));
+            return; // click outside → nothing
         }
+        setInteracting(true);
     };
 
     const handleMouseMove = (e) => {
-        if (drawingRef.current && startPoint) {
-            const pos = getRelativePos(e);
+        if (!modeRef.current) return;
+        const p = getPos(e);
+        const a = areaRef.current;
+
+        if (modeRef.current === 'drag') {
             updateArea({
-                x: Math.min(startPoint.x, pos.x),
-                y: Math.min(startPoint.y, pos.y),
-                width: Math.abs(pos.x - startPoint.x),
-                height: Math.abs(pos.y - startPoint.y),
+                ...a,
+                x: Math.max(0, Math.min(canvasWidth - a.width, p.x - dragOffsetRef.current.x)),
+                y: Math.max(0, Math.min(canvasHeight - a.height, p.y - dragOffsetRef.current.y)),
             });
-        } else if (draggingRef.current) {
-            const pos = getRelativePos(e);
-            updateArea({
-                ...areaRef.current,
-                x: Math.max(0, Math.min(canvasWidth - areaRef.current.width, pos.x - dragOffset.x)),
-                y: Math.max(0, Math.min(canvasHeight - areaRef.current.height, pos.y - dragOffset.y)),
-            });
+        } else if (modeRef.current === 'resize') {
+            const d = resizeDirRef.current;
+            let { x, y, width: w, height: h } = a;
+
+            if (d.includes('w')) { const nx = Math.max(0, Math.min(p.x, x + w - MIN_SIZE)); w += x - nx; x = nx; }
+            if (d.includes('e')) { w = Math.max(MIN_SIZE, Math.min(canvasWidth - x, p.x - x)); }
+            if (d.includes('n')) { const ny = Math.max(0, Math.min(p.y, y + h - MIN_SIZE)); h += y - ny; y = ny; }
+            if (d.includes('s')) { h = Math.max(MIN_SIZE, Math.min(canvasHeight - y, p.y - y)); }
+
+            updateArea({ x, y, width: w, height: h });
         }
     };
 
     const handleMouseUp = () => {
-        if (drawingRef.current || draggingRef.current) {
-            drawingRef.current = false;
-            draggingRef.current = false;
-            setDrawing(false);
-            setDragging(false);
-            setStartPoint(null);
-            onAreaChange(areaRef.current); // usar ref, no state stale
+        if (modeRef.current) {
+            modeRef.current = null;
+            resizeDirRef.current = null;
+            setInteracting(false);
+            onAreaChange(areaRef.current);
         }
     };
 
-    const scaledArea = {
-        left: area.x * displayScale,
-        top: area.y * displayScale,
-        width: area.width * displayScale,
-        height: area.height * displayScale,
+    const colors = ZONE_COLORS[zoneType] || ZONE_COLORS.impresion;
+    const sa = { left: area.x * displayScale, top: area.y * displayScale, width: area.width * displayScale, height: area.height * displayScale };
+
+    // Handle positions (relative to scaled area)
+    const handlePositions = {
+        nw: { left: -5, top: -5 }, n: { left: sa.width / 2 - 5, top: -5 }, ne: { left: sa.width - 5, top: -5 },
+        w: { left: -5, top: sa.height / 2 - 5 }, e: { left: sa.width - 5, top: sa.height / 2 - 5 },
+        sw: { left: -5, top: sa.height - 5 }, s: { left: sa.width / 2 - 5, top: sa.height - 5 }, se: { left: sa.width - 5, top: sa.height - 5 },
     };
 
     return (
         <div className="relative">
             <div
                 ref={containerRef}
-                className="relative select-none overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-100 max-h-[450px]"
-                style={{ aspectRatio: `${canvasWidth} / ${canvasHeight}`, cursor: dragging ? 'grabbing' : 'crosshair' }}
+                className="relative select-none overflow-visible rounded-xl border-2 border-gray-200 bg-gray-100 max-h-[450px]"
+                style={{ aspectRatio: `${canvasWidth} / ${canvasHeight}`, cursor: interacting ? 'grabbing' : 'default' }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
             >
                 {imageSrc && (
-                    <img
-                        src={imageSrc}
-                        alt="Producto"
-                        className="w-full h-full object-contain pointer-events-none"
-                        draggable={false}
-                    />
+                    <img src={imageSrc} alt="Producto" className="w-full h-full object-contain pointer-events-none" draggable={false} />
                 )}
 
-                {/* Overlay oscuro mejorado (4 áreas para crear el hueco central) */}
+                {/* Overlay */}
                 <div className="absolute inset-0 pointer-events-none">
-                    {/* Top */}
-                    <div className="absolute top-0 left-0 right-0 bg-black/40" style={{ height: scaledArea.top }} />
-                    {/* Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/40" style={{ top: scaledArea.top + scaledArea.height }} />
-                    {/* Left */}
-                    <div className="absolute top-0 bottom-0 bg-black/40" style={{ left: 0, width: scaledArea.left, top: scaledArea.top, height: scaledArea.height }} />
-                    {/* Right */}
-                    <div className="absolute top-0 bottom-0 bg-black/40" style={{ left: scaledArea.left + scaledArea.width, right: 0, top: scaledArea.top, height: scaledArea.height }} />
+                    <div className={`absolute top-0 left-0 right-0 ${colors.overlay}`} style={{ height: sa.top }} />
+                    <div className={`absolute bottom-0 left-0 right-0 ${colors.overlay}`} style={{ top: sa.top + sa.height }} />
+                    <div className={`absolute ${colors.overlay}`} style={{ left: 0, width: sa.left, top: sa.top, height: sa.height }} />
+                    <div className={`absolute ${colors.overlay}`} style={{ left: sa.left + sa.width, right: 0, top: sa.top, height: sa.height }} />
                 </div>
 
-                {/* Rectángulo del área imprimible */}
+                {/* Zone rectangle */}
                 <div
-                    className="zone-handle absolute border-2 border-dashed border-purple-400 bg-purple-500/15 cursor-grab active:cursor-grabbing"
-                    style={{
-                        left: scaledArea.left,
-                        top: scaledArea.top,
-                        width: Math.max(scaledArea.width, 0),
-                        height: Math.max(scaledArea.height, 0),
-                    }}
+                    className={`zone-body absolute border-2 border-dashed ${colors.border} ${colors.bg} cursor-grab active:cursor-grabbing`}
+                    style={{ left: sa.left, top: sa.top, width: Math.max(sa.width, 0), height: Math.max(sa.height, 0) }}
                 >
-                    <div className="absolute -top-6 left-0 bg-purple-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider pointer-events-none whitespace-nowrap">
-                        Zona de impresión
+                    <div className={`absolute -top-6 left-0 ${colors.label} text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider pointer-events-none whitespace-nowrap`}>
+                        {colors.text}
                     </div>
                     <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-mono pointer-events-none">
                         {area.width}×{area.height}px
                     </div>
+
+                    {/* 8 Resize handles */}
+                    {HANDLE_DIRS.map(dir => (
+                        <div
+                            key={dir}
+                            data-handle-dir={dir}
+                            className="absolute w-[10px] h-[10px] bg-white border-2 border-gray-600 rounded-sm z-10 hover:bg-purple-200 transition-colors"
+                            style={{ ...handlePositions[dir], cursor: HANDLE_CURSORS[dir] }}
+                        />
+                    ))}
                 </div>
             </div>
             <p className="text-[10px] text-gray-400 mt-2 text-center">
-                Arrastra para dibujar el área imprimible · Arrastra el rectángulo para moverlo
+                Arrastra el rectángulo para moverlo · Arrastra los handles para redimensionar
             </p>
         </div>
     );
@@ -174,6 +182,7 @@ export default function ProductZones({
 
     const { data: formData, setData, post, put, processing, errors, reset } = useForm({
         nombre: '',
+        tipo: 'impresion',
         imagen_base: null,
         area_x: 100,
         area_y: 80,
@@ -188,6 +197,15 @@ export default function ProductZones({
         precio_imagen: precioImagen,
         usar_global: false,
     });
+
+    // Auto-calcular canvas desde las dimensiones de la imagen
+    const autoCalcCanvas = (src) => {
+        const img = new Image();
+        img.onload = () => {
+            setData(prev => ({ ...prev, canvas_width: img.naturalWidth, canvas_height: img.naturalHeight }));
+        };
+        img.src = src;
+    };
 
     const openCreateModal = () => {
         setModalMode("create");
@@ -208,7 +226,8 @@ export default function ProductZones({
         });
         setData({
             nombre: zona.nombre,
-            imagen_base: null,
+            tipo: zona.tipo || 'impresion',
+            imagen_base: null, // null = no cambiar la imagen
             area_x: zona.area_x,
             area_y: zona.area_y,
             area_width: zona.area_width,
@@ -235,9 +254,18 @@ export default function ProductZones({
         if (file) {
             setData('imagen_base', file);
             const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+                autoCalcCanvas(reader.result);
+            };
             reader.readAsDataURL(file);
         }
+    };
+
+    const selectImageFromGallery = (url) => {
+        setData('imagen_base', url);
+        setImagePreview(url);
+        autoCalcCanvas(url);
     };
 
     const handleSubmitZone = (e) => {
@@ -248,9 +276,10 @@ export default function ProductZones({
                 onSuccess: () => { setIsModalOpen(false); reset(); setImagePreview(null); },
             });
         } else {
-            // Usar router.post con _method para enviar archivos correctamente
             const fd = new FormData();
             Object.entries(formData).forEach(([k, v]) => {
+                // Skip null imagen_base so backend doesn't require re-upload
+                if (k === 'imagen_base' && v === null) return;
                 if (v !== null && v !== undefined) fd.append(k, v);
             });
             fd.append('_method', 'put');
@@ -302,20 +331,34 @@ export default function ProductZones({
 
             {/* Grid de zonas existentes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {zonas.map((zona) => (
+                {zonas.map((zona) => {
+                    const tc = ZONE_COLORS[zona.tipo] || ZONE_COLORS.impresion;
+                    return (
                     <div key={zona.id} className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden group">
                         <div className="aspect-[6/7] relative bg-gray-950">
                             <img src={zona.imagen_base} alt={zona.nombre} className="w-full h-full object-contain" />
-                            {/* Overlay con las dimensiones del área */}
+                            {/* Zone rectangle overlay (proportional) */}
+                            <div
+                                className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} pointer-events-none`}
+                                style={{
+                                    left: `${(zona.area_x / zona.canvas_width) * 100}%`,
+                                    top: `${(zona.area_y / zona.canvas_height) * 100}%`,
+                                    width: `${(zona.area_width / zona.canvas_width) * 100}%`,
+                                    height: `${(zona.area_height / zona.canvas_height) * 100}%`,
+                                }}
+                            />
                             <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[9px] px-2 py-1 rounded font-mono">
                                 {zona.area_width}×{zona.area_height}px
                             </div>
                         </div>
                         <div className="p-4 flex justify-between items-center">
-                            <div>
+                            <div className="flex items-center gap-2 flex-wrap">
                                 <h3 className="text-white font-black text-sm uppercase">{zona.nombre}</h3>
                                 <span className={`text-[9px] px-1.5 py-0.5 rounded font-black border ${zona.activa ? 'bg-green-900/50 text-green-400 border-green-800' : 'bg-red-900/50 text-red-400 border-red-800'}`}>
                                     {zona.activa ? "ACTIVA" : "INACTIVA"}
+                                </span>
+                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black ${tc.label} text-white`}>
+                                    {tc.text}
                                 </span>
                             </div>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -328,7 +371,7 @@ export default function ProductZones({
                             </div>
                         </div>
                     </div>
-                ))}
+                ); })}
 
                 {zonas.length === 0 && (
                     <div className="col-span-full text-center py-12 text-gray-500">
@@ -392,17 +435,33 @@ export default function ProductZones({
                 maxWidth="max-w-3xl"
             >
                 <form onSubmit={handleSubmitZone} className="max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar space-y-4">
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                            Nombre de la Zona
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-black font-bold"
-                            value={formData.nombre}
-                            onChange={(e) => setData('nombre', e.target.value)}
-                            placeholder='Ej: "Frontal", "Espalda", "Manga Derecha"'
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Nombre de la Zona
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-black font-bold"
+                                value={formData.nombre}
+                                onChange={(e) => setData('nombre', e.target.value)}
+                                placeholder='Ej: "Frontal", "Espalda"'
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Tipo de Zona
+                            </label>
+                            <select
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-black font-bold text-sm"
+                                value={formData.tipo}
+                                onChange={(e) => setData('tipo', e.target.value)}
+                            >
+                                <option value="impresion">Impresión (Estándar)</option>
+                                <option value="bloqueada">Bloqueada (Solo Admin)</option>
+                                <option value="baja_visibilidad">Baja Visibilidad (Aviso)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
@@ -425,10 +484,7 @@ export default function ProductZones({
                                         <button
                                             key={img.id || idx}
                                             type="button"
-                                            onClick={() => {
-                                                setData('imagen_base', img.url);
-                                                setImagePreview(img.url);
-                                            }}
+                                            onClick={() => selectImageFromGallery(img.url)}
                                             className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${imagePreview === img.url ? 'border-purple-600 ring-2 ring-purple-100' : 'border-gray-200 opacity-60 hover:opacity-100'}`}
                                         >
                                             <img src={img.url} className="w-full h-full object-contain bg-white" alt="Miniatura" />
@@ -450,28 +506,9 @@ export default function ProductZones({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Ancho Canvas (px)
-                            </label>
-                            <input type="number" min="200"
-                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-black font-bold text-sm"
-                                value={formData.canvas_width}
-                                onChange={(e) => setData('canvas_width', parseInt(e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Alto Canvas (px)
-                            </label>
-                            <input type="number" min="200"
-                                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-black font-bold text-sm"
-                                value={formData.canvas_height}
-                                onChange={(e) => setData('canvas_height', parseInt(e.target.value))}
-                            />
-                        </div>
-                    </div>
+                    {/* Inputs de canvas ocultos ya que son automáticos */}
+                    <input type="hidden" value={formData.canvas_width} />
+                    <input type="hidden" value={formData.canvas_height} />
 
                     {/* Editor visual: arrastrar rectángulo */}
                     {imagePreview && (
@@ -485,6 +522,7 @@ export default function ProductZones({
                                 initialArea={zoneArea}
                                 canvasWidth={formData.canvas_width}
                                 canvasHeight={formData.canvas_height}
+                                zoneType={formData.tipo}
                                 onAreaChange={handleAreaChange}
                             />
                         </div>

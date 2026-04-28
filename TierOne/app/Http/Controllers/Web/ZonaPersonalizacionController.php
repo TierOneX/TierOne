@@ -49,6 +49,7 @@ class ZonaPersonalizacionController extends Controller
     {
         $rules = [
             'nombre'        => 'required|string|max:100',
+            'tipo'          => 'sometimes|in:impresion,bloqueada,baja_visibilidad',
             'area_x'        => 'required|integer|min:0',
             'area_y'        => 'required|integer|min:0',
             'area_width'    => 'required|integer|min:50',
@@ -89,6 +90,7 @@ class ZonaPersonalizacionController extends Controller
     {
         $rules = [
             'nombre'        => 'sometimes|string|max:100',
+            'tipo'          => 'sometimes|in:impresion,bloqueada,baja_visibilidad',
             'area_x'        => 'sometimes|integer|min:0',
             'area_y'        => 'sometimes|integer|min:0',
             'area_width'    => 'sometimes|integer|min:50',

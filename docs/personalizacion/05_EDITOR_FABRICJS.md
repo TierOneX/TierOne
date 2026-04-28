@@ -19,7 +19,7 @@ npm install fabric
 
 **Archivo**: `TierOne/TierOne/resources/js/Pages/ProductCustomizer.jsx`
 
-Esta página recibe del backend (vía Inertia): `producto`, `zonas` (array de ZonaPersonalizacion), `precios` (`{texto: float, imagen: float}`).
+Esta página recibe del backend (vía Inertia): `producto`, `zonas` (array de ZonaPersonalizacion **filtradas**: solo `impresion` y `baja_visibilidad`, las `bloqueada` se excluyen en el backend), `precios` (`{texto: float, imagen: float}`).
 
 **Layout del editor**:
 - **Izquierda**: Panel de herramientas (añadir texto, subir imagen) + panel de capas
@@ -34,6 +34,11 @@ Esta página recibe del backend (vía Inertia): `producto`, `zonas` (array de Zo
 5. Los elementos son arrastrables, redimensionables y rotables dentro del área (usar clipPath para restringir)
 6. Al cambiar de zona (tab), se guarda el estado del canvas actual y se carga el de la nueva zona
 7. El precio se calcula en tiempo real: cuenta textos + imágenes × precio unitario
+
+**Manejo de tipos de zona en el editor del cliente**:
+- Las zonas de tipo `bloqueada` **no llegan al frontend** — se filtran en `CustomizationService.getProductCustomizationData()` antes de enviarlas
+- Las zonas de tipo `baja_visibilidad` se muestran con un overlay ámbar semi-transparente y un icono de warning, pero el cliente puede añadir elementos
+- Las zonas de tipo `impresion` funcionan normalmente
 
 **Estructura del componente**:
 
@@ -484,3 +489,6 @@ Añadir debajo del componente `AddToCartBar`, condicionalmente:
 5. Se puede subir imagen → se sube al backend, aparece en el canvas
 6. El precio se actualiza en tiempo real
 7. Los tabs de zonas funcionan si hay más de una zona
+8. **Zonas bloqueadas**: verificar que NO aparecen en el editor del cliente
+9. **Zonas baja visibilidad**: verificar que aparecen con overlay ámbar y warning
+10. **Superposición**: si hay una zona bloqueada dentro de una de impresión, solo se ve la de impresión en el cliente

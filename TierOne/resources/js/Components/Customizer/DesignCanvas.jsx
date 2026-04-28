@@ -37,20 +37,37 @@ const DesignCanvas = forwardRef(({ zona, savedData, onLayersUpdate }, ref) => {
         // Guardar referencia para aplicarlo a nuevos objetos
         canvas._clipRect = clipRect;
 
-        // Dibujar borde del área imprimible (visual, no funcional)
+        // Dibujar borde del área (color dinámico según tipo)
+        const isBajaVisibilidad = zona.tipo === 'baja_visibilidad';
         const areaBorder = new fabric.Rect({
             left: zona.area_x,
             top: zona.area_y,
             width: zona.area_width,
             height: zona.area_height,
-            fill: 'transparent',
-            stroke: 'rgba(168, 85, 247, 0.4)',
+            fill: isBajaVisibilidad ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+            stroke: isBajaVisibilidad ? 'rgba(245, 158, 11, 0.6)' : 'rgba(168, 85, 247, 0.4)',
             strokeDashArray: [8, 4],
             strokeWidth: 2,
             selectable: false,
             evented: false,
         });
         canvas.add(areaBorder);
+
+        // Si es baja visibilidad, añadir una etiqueta de aviso
+        if (isBajaVisibilidad) {
+            const warningText = new fabric.IText('⚠️ VISIBILIDAD REDUCIDA', {
+                left: zona.area_x + 5,
+                top: zona.area_y + 5,
+                fontSize: 10,
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: '900',
+                fill: '#f59e0b',
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                selectable: false,
+                evented: false,
+            });
+            canvas.add(warningText);
+        }
 
         // Restaurar datos guardados si existen
         if (savedData?.fabricJSON) {

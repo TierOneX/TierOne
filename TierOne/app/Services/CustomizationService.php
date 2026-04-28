@@ -91,6 +91,7 @@ class CustomizationService
     {
         $zonas = ZonaPersonalizacion::where('id_producto', $productoId)
             ->where('activa', true)
+            ->where('tipo', '!=', 'bloqueada') // Zonas bloqueadas no se envían al cliente
             ->orderBy('orden')
             ->get();
 

@@ -8,8 +8,16 @@ class ZonaPersonalizacion extends Model
 {
     protected $table = 'zonas_personalizacion';
 
+    /**
+     * Tipos de zona disponibles.
+     * - impresion: el cliente puede personalizar esta zona
+     * - bloqueada: zona con elemento fijo, excluida del editor del cliente
+     * - baja_visibilidad: se puede personalizar pero se muestra un aviso
+     */
+    const TIPOS = ['impresion', 'bloqueada', 'baja_visibilidad'];
+
     protected $fillable = [
-        'id_producto', 'nombre', 'slug', 'imagen_base',
+        'id_producto', 'nombre', 'slug', 'tipo', 'imagen_base',
         'area_x', 'area_y', 'area_width', 'area_height',
         'canvas_width', 'canvas_height', 'orden', 'activa',
     ];
