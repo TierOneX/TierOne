@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\Web\MatchController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -54,6 +55,10 @@ Route::get('/shop', function () {
             ->get(),
     ]);
 })->name('shop');
+
+Route::get('/matches', [MatchController::class, 'index'])->name('matches');
+Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])
