@@ -88,21 +88,19 @@ class MatchController extends Controller
             ->sort()
             ->values();
 
-        $demoUser = $this->resolvePlayableUser(request());
-
         return Inertia::render('Matches', [
             'juegos' => $juegos,
             'categorias' => $categorias,
-            'demoUser' => $demoUser ? [
-                'id' => $demoUser->id,
-                'username' => $demoUser->username,
-                'nombre' => trim($demoUser->nombre . ' ' . $demoUser->apellido),
-            ] : null,
+            'demoUser' => null,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        if (! $request->user()) {
+            return back()->with('error', 'Debes iniciar sesion para crear una partida.');
+        }
+
         $validated = $request->validate([
             'id_juego' => ['required', 'exists:juegos,id'],
             'titulo' => ['required', 'string', 'max:255'],
@@ -112,12 +110,7 @@ class MatchController extends Controller
             'fecha_inicio' => ['nullable', 'date'],
         ]);
 
-        $creador = $this->resolvePlayableUser($request);
-
-        if (! $creador) {
-            return back()->with('error', 'No hay usuarios disponibles para crear partidas.');
-        }
-
+        $creador = $request->user();
         $buyIn = (float) ($validated['buy_in'] ?? 0);
         $premioTotal = (float) ($validated['premio_total'] ?? max($buyIn * $this->matchCapacity($validated['tipo']), 0));
         $partida = Partida::create([
@@ -148,10 +141,14 @@ class MatchController extends Controller
 
     public function join(Request $request, Partida $partida): RedirectResponse
     {
+        if (! $request->user()) {
+            return back()->with('error', 'Debes iniciar sesion para unirte a una partida.');
+        }
+
         $jugador = $this->resolveJoinUser($request, $partida);
 
         if (! $jugador) {
-            return back()->with('error', 'No hay jugadores disponibles para unirse a esta partida.');
+            return back()->with('error', 'No puedes unirte a esta partida.');
         }
 
         if ($partida->estado !== 'pendiente') {
@@ -159,7 +156,7 @@ class MatchController extends Controller
         }
 
         if ($partida->participantes()->where('id_usuario', $jugador->id)->exists()) {
-            return back()->with('error', 'Ese usuario ya forma parte de la partida.');
+            return back()->with('error', 'Ya formas parte de esta partida.');
         }
 
         $capacidad = $this->matchCapacity($partida->tipo);
@@ -181,33 +178,13 @@ class MatchController extends Controller
         return back()->with('success', 'Te has unido a la partida correctamente.');
     }
 
-    private function resolvePlayableUser(Request $request): ?User
-    {
-        if ($request->user() instanceof User) {
-            return $request->user();
-        }
-
-        return User::query()
-            ->where('activo', true)
-            ->orderByRaw("case when rol = 'player' then 0 else 1 end")
-            ->orderBy('id')
-            ->first();
-    }
-
     private function resolveJoinUser(Request $request, Partida $partida): ?User
     {
         if ($request->user() instanceof User && ! $partida->participantes()->where('id_usuario', $request->user()->id)->exists()) {
             return $request->user();
         }
 
-        $usedIds = $partida->participantes()->pluck('id_usuario');
-
-        return User::query()
-            ->where('activo', true)
-            ->whereNotIn('id', $usedIds)
-            ->orderByRaw("case when rol = 'player' then 0 else 1 end")
-            ->orderBy('id')
-            ->first();
+        return null;
     }
 
     private function matchCapacity(string $tipo): int

@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
-import { useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 
 const modeLabels = {
     '1v1': 'Duelo 1v1',
@@ -22,8 +22,10 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', {
 });
 
 export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
+    const isAuthenticated = Boolean(auth?.user);
     const [activeTab, setActiveTab] = useState('list');
+    const [drawerMessage, setDrawerMessage] = useState(null);
     const createForm = useForm({
         id_juego: game?.id ?? '',
         titulo: game ? `Sala de ${game.nombre}` : '',
@@ -42,6 +44,19 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
             createForm.setData('titulo', `Sala de ${game.nombre}`);
         }
     }, [game]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setDrawerMessage(null);
+            return;
+        }
+
+        if (flash?.success) {
+            setDrawerMessage({ type: 'success', text: flash.success });
+        } else if (flash?.error) {
+            setDrawerMessage({ type: 'error', text: flash.error });
+        }
+    }, [flash, isOpen]);
 
     const openMatches = useMemo(
         () => (game?.partidas ?? []).filter((match) => match.estado === 'pendiente'),
@@ -65,6 +80,11 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
         });
     };
 
+    const handleClose = () => {
+        setDrawerMessage(null);
+        onClose();
+    };
+
     if (!game) return null;
 
     return (
@@ -72,7 +92,7 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
             <button
                 type="button"
                 aria-label="Cerrar panel"
-                onClick={onClose}
+                onClick={handleClose}
                 className={`fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             />
 
@@ -92,7 +112,7 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                             </div>
                             <button
                                 type="button"
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="rounded-full border border-white/10 p-2 text-gray-400 transition hover:border-white/20 hover:text-white"
                             >
                                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -111,8 +131,8 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                                 <p className="mt-2 text-2xl font-black text-white">{game.total_partidas}</p>
                             </div>
                             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Jugador demo</p>
-                                <p className="mt-2 truncate text-sm font-black uppercase text-white">{demoUser?.username ?? 'Sin usuario'}</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Estado</p>
+                                <p className="mt-2 truncate text-sm font-black uppercase text-white">{isAuthenticated ? auth.user.username : 'Invitado'}</p>
                             </div>
                         </div>
                     </div>
@@ -138,14 +158,29 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                             </button>
                         ))}
                     </div>
-                    {(flash?.success || flash?.error) && (
-                        <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold ${flash?.success ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border-red-500/20 bg-red-500/10 text-red-300'}`}>
-                            {flash?.success ?? flash?.error}
+                    {drawerMessage && (
+                        <div className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-semibold ${drawerMessage.type === 'success' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border-red-500/20 bg-red-500/10 text-red-300'}`}>
+                            {drawerMessage.text}
                         </div>
                     )}
                 </div>
 
                 <div className="custom-scrollbar flex-1 overflow-y-auto px-6 py-6">
+                    {!isAuthenticated && (
+                        <div className="mb-5 rounded-[22px] border border-amber-500/20 bg-amber-500/10 p-4">
+                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-300">Acceso requerido</p>
+                            <p className="mt-2 text-sm leading-6 text-amber-100/90">
+                                Para crear una partida o unirte a una existente necesitas iniciar sesion.
+                            </p>
+                            <Link
+                                href="/login"
+                                className="mt-4 inline-flex rounded-xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white"
+                            >
+                                Iniciar sesion
+                            </Link>
+                        </div>
+                    )}
+
                     {activeTab === 'list' ? (
                         <div className="space-y-4">
                             {openMatches.length > 0 ? (
@@ -191,7 +226,7 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                                             <button
                                                 type="button"
                                                 onClick={() => joinMatch(match.id)}
-                                                disabled={joinForm.processing || match.slots_disponibles === 0}
+                                                disabled={!isAuthenticated || joinForm.processing || match.slots_disponibles === 0}
                                                 className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
                                             >
                                                 Unirse
@@ -295,15 +330,15 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                             </div>
 
                             <div className="rounded-[26px] border border-red-500/15 bg-red-500/5 p-5">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">Modo local</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">Publicacion</p>
                                 <p className="mt-3 text-sm leading-6 text-gray-300">
-                                    Si no hay sesion iniciada, la partida se crea con el usuario demo disponible para que puedas probar el flujo completo en localhost.
+                                    La partida se publica en la base de datos y aparece en la lista de este juego en cuanto se crea correctamente.
                                 </p>
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={createForm.processing}
+                                disabled={!isAuthenticated || createForm.processing}
                                 className="w-full rounded-[22px] bg-red-600 px-5 py-4 text-sm font-black uppercase tracking-[0.25em] text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-900/60"
                             >
                                 {createForm.processing ? 'Creando...' : 'Crear partida'}

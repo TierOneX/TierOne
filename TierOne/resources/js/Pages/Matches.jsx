@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+﻿import { Head, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import MatchesHero from '@/Components/Matches/MatchesHero';
@@ -10,7 +10,7 @@ export default function Matches({ juegos = [], categorias = [], demoUser = null 
     const { flash } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('TODOS');
-    const [selectedGame, setSelectedGame] = useState(juegos[0] ?? null);
+    const [selectedGame, setSelectedGame] = useState(null);
 
     const filteredGames = useMemo(() => {
         return juegos.filter((game) => {
