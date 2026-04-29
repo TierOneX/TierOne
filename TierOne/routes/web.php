@@ -32,9 +32,9 @@ Route::get('/home', function () {
     ]);
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::redirect('/dashboard', '/profile')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // =========================================================================
 // SHOP & PRODUCT ROUTES

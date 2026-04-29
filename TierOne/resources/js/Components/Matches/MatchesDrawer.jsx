@@ -58,6 +58,12 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
         }
     }, [flash, isOpen]);
 
+    useEffect(() => {
+        if (activeTab === 'create') {
+            setDrawerMessage(null);
+        }
+    }, [activeTab]);
+
     const openMatches = useMemo(
         () => (game?.partidas ?? []).filter((match) => match.estado === 'pendiente'),
         [game],
@@ -147,7 +153,12 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                             <button
                                 key={tab.key}
                                 type="button"
-                                onClick={() => setActiveTab(tab.key)}
+                                onClick={() => {
+                                    if (tab.key === 'create') {
+                                        setDrawerMessage(null);
+                                    }
+                                    setActiveTab(tab.key);
+                                }}
                                 className={`rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.2em] transition ${
                                     activeTab === tab.key
                                         ? 'border-red-500 bg-red-600 text-white'
