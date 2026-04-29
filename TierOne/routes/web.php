@@ -59,6 +59,7 @@ Route::get('/shop', function () {
 Route::get('/matches', [MatchController::class, 'index'])->name('matches');
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
+Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])

@@ -56,6 +56,7 @@ class MatchController extends Controller
                         ],
                         'participantes' => $partida->participantes->map(fn (ParticipantePartida $participante) => [
                             'id' => $participante->id,
+                            'id_usuario' => $participante->id_usuario,
                             'username' => $participante->usuario?->username,
                             'nombre' => $participante->usuario?->nombre,
                             'equipo_asignado' => $participante->equipo_asignado,
@@ -178,6 +179,25 @@ class MatchController extends Controller
         return back()->with('success', 'Te has unido a la partida correctamente.');
     }
 
+    public function leave(Request $request, Partida $partida): RedirectResponse
+    {
+        if (! $request->user()) {
+            return back()->with('error', 'Debes iniciar sesion para salir de una partida.');
+        }
+
+        $participacion = $partida->participantes()
+            ->where('id_usuario', $request->user()->id)
+            ->first();
+
+        if (! $participacion) {
+            return back()->with('error', 'No formas parte de esta partida.');
+        }
+
+        $participacion->delete();
+
+        return back()->with('success', 'Has salido de la partida correctamente.');
+    }
+
     private function resolveJoinUser(Request $request, Partida $partida): ?User
     {
         if ($request->user() instanceof User && ! $partida->participantes()->where('id_usuario', $request->user()->id)->exists()) {
@@ -197,3 +217,4 @@ class MatchController extends Controller
         };
     }
 }
+

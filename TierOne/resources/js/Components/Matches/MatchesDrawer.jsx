@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 
 const modeLabels = {
@@ -21,11 +21,13 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', {
     minute: '2-digit',
 });
 
-export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }) {
-    const { auth, flash } = usePage().props;
+export default function MatchesDrawer({ isOpen, game, games, onClose }) {
+    const { auth } = usePage().props;
     const isAuthenticated = Boolean(auth?.user);
+    const currentUserId = auth?.user?.id ?? null;
     const [activeTab, setActiveTab] = useState('list');
     const [drawerMessage, setDrawerMessage] = useState(null);
+    const lastFlashKeyRef = useRef(null);
     const createForm = useForm({
         id_juego: game?.id ?? '',
         titulo: game ? `Sala de ${game.nombre}` : '',
@@ -48,21 +50,8 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
     useEffect(() => {
         if (!isOpen) {
             setDrawerMessage(null);
-            return;
         }
-
-        if (flash?.success) {
-            setDrawerMessage({ type: 'success', text: flash.success });
-        } else if (flash?.error) {
-            setDrawerMessage({ type: 'error', text: flash.error });
-        }
-    }, [flash, isOpen]);
-
-    useEffect(() => {
-        if (activeTab === 'create') {
-            setDrawerMessage(null);
-        }
-    }, [activeTab]);
+    }, [isOpen]);
 
     const openMatches = useMemo(
         () => (game?.partidas ?? []).filter((match) => match.estado === 'pendiente'),
@@ -73,9 +62,21 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
         event.preventDefault();
         createForm.post('/matches', {
             preserveScroll: true,
-            onSuccess: () => {
+            onSuccess: (page) => {
                 setActiveTab('list');
                 createForm.reset('titulo', 'buy_in', 'premio_total', 'fecha_inicio');
+
+                const success = page.props?.flash?.success;
+                const error = page.props?.flash?.error;
+                if (success) {
+                    const key = `success:${success}:${Date.now()}`;
+                    lastFlashKeyRef.current = key;
+                    setDrawerMessage({ type: 'success', text: success, key });
+                } else if (error) {
+                    const key = `error:${error}:${Date.now()}`;
+                    lastFlashKeyRef.current = key;
+                    setDrawerMessage({ type: 'error', text: error, key });
+                }
             },
         });
     };
@@ -83,6 +84,19 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
     const joinMatch = (matchId) => {
         joinForm.post(`/matches/${matchId}/join`, {
             preserveScroll: true,
+            onSuccess: (page) => {
+                const success = page.props?.flash?.success;
+                const error = page.props?.flash?.error;
+                if (success) {
+                    const key = `success:${success}:${matchId}:${Date.now()}`;
+                    lastFlashKeyRef.current = key;
+                    setDrawerMessage({ type: 'success', text: success, key });
+                } else if (error) {
+                    const key = `error:${error}:${matchId}:${Date.now()}`;
+                    lastFlashKeyRef.current = key;
+                    setDrawerMessage({ type: 'error', text: error, key });
+                }
+            },
         });
     };
 
@@ -195,56 +209,62 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                     {activeTab === 'list' ? (
                         <div className="space-y-4">
                             {openMatches.length > 0 ? (
-                                openMatches.map((match) => (
-                                    <article key={match.id} className="rounded-[26px] border border-white/10 bg-[#101010] p-5">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div>
-                                                <h3 className="text-lg font-black uppercase text-white">{match.titulo}</h3>
-                                                <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-                                                    {modeLabels[match.tipo] ?? match.tipo}
+                                openMatches.map((match) => {
+                                    const isJoined = (match.participantes ?? []).some(
+                                        (participant) => participant.id_usuario === currentUserId,
+                                    );
+
+                                    return (
+                                        <article key={match.id} className="rounded-[26px] border border-white/10 bg-[#101010] p-5">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <h3 className="text-lg font-black uppercase text-white">{match.titulo}</h3>
+                                                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+                                                        {modeLabels[match.tipo] ?? match.tipo}
+                                                    </p>
+                                                </div>
+                                                <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">
+                                                    {match.participantes_count}/{match.capacidad}
+                                                </span>
+                                            </div>
+
+                                            <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-300">
+                                                <div className="rounded-2xl bg-white/[0.03] p-3">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Entrada</p>
+                                                    <p className="mt-2 text-base font-black text-white">{currency.format(match.buy_in)}</p>
+                                                </div>
+                                                <div className="rounded-2xl bg-white/[0.03] p-3">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Premio</p>
+                                                    <p className="mt-2 text-base font-black text-white">{currency.format(match.premio_total)}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 p-4">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Creador</p>
+                                                <p className="mt-2 text-sm font-semibold text-white">
+                                                    {match.creador?.nombre || match.creador?.username || 'TierOne Lobby'}
+                                                </p>
+                                                <p className="mt-2 text-xs text-gray-400">
+                                                    Inicio {match.fecha_inicio ? dateFormatter.format(new Date(match.fecha_inicio)) : 'pendiente de confirmar'}
                                                 </p>
                                             </div>
-                                            <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">
-                                                {match.participantes_count}/{match.capacidad}
-                                            </span>
-                                        </div>
 
-                                        <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-300">
-                                            <div className="rounded-2xl bg-white/[0.03] p-3">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Entrada</p>
-                                                <p className="mt-2 text-base font-black text-white">{currency.format(match.buy_in)}</p>
+                                            <div className="mt-4 flex items-center justify-between gap-3">
+                                                <p className="text-xs font-semibold text-gray-400">
+                                                    {match.slots_disponibles} plazas disponibles
+                                                </p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => joinMatch(match.id)}
+                                                    disabled={!isAuthenticated || isJoined || joinForm.processing || match.slots_disponibles === 0}
+                                                    className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
+                                                >
+                                                    {isJoined ? 'Unido' : 'Unirse'}
+                                                </button>
                                             </div>
-                                            <div className="rounded-2xl bg-white/[0.03] p-3">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Premio</p>
-                                                <p className="mt-2 text-base font-black text-white">{currency.format(match.premio_total)}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 p-4">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Creador</p>
-                                            <p className="mt-2 text-sm font-semibold text-white">
-                                                {match.creador?.nombre || match.creador?.username || 'TierOne Lobby'}
-                                            </p>
-                                            <p className="mt-2 text-xs text-gray-400">
-                                                Inicio {match.fecha_inicio ? dateFormatter.format(new Date(match.fecha_inicio)) : 'pendiente de confirmar'}
-                                            </p>
-                                        </div>
-
-                                        <div className="mt-4 flex items-center justify-between gap-3">
-                                            <p className="text-xs font-semibold text-gray-400">
-                                                {match.slots_disponibles} plazas disponibles
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={() => joinMatch(match.id)}
-                                                disabled={!isAuthenticated || joinForm.processing || match.slots_disponibles === 0}
-                                                className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
-                                            >
-                                                Unirse
-                                            </button>
-                                        </div>
-                                    </article>
-                                ))
+                                        </article>
+                                    );
+                                })
                             ) : (
                                 <div className="rounded-[26px] border border-dashed border-white/10 bg-[#101010] px-6 py-14 text-center">
                                     <p className="text-sm font-black uppercase tracking-[0.2em] text-white">No hay partidas abiertas ahora mismo</p>
@@ -338,13 +358,6 @@ export default function MatchesDrawer({ isOpen, game, games, demoUser, onClose }
                                     />
                                     {createForm.errors.premio_total && <p className="mt-2 text-xs font-semibold text-red-400">{createForm.errors.premio_total}</p>}
                                 </div>
-                            </div>
-
-                            <div className="rounded-[26px] border border-red-500/15 bg-red-500/5 p-5">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">Publicacion</p>
-                                <p className="mt-3 text-sm leading-6 text-gray-300">
-                                    La partida se publica en la base de datos y aparece en la lista de este juego en cuanto se crea correctamente.
-                                </p>
                             </div>
 
                             <button

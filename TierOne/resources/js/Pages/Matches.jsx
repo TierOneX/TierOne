@@ -5,12 +5,13 @@ import MatchesHero from '@/Components/Matches/MatchesHero';
 import MatchesSearchBar from '@/Components/Matches/MatchesSearchBar';
 import MatchesGameGrid from '@/Components/Matches/MatchesGameGrid';
 import MatchesDrawer from '@/Components/Matches/MatchesDrawer';
+import MyMatchesSection from '@/Components/Matches/MyMatchesSection';
 
-export default function Matches({ juegos = [], categorias = [], demoUser = null }) {
-    const { flash } = usePage().props;
+export default function Matches({ juegos = [], categorias = [] }) {
+    const { auth, flash } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('TODOS');
-    const [selectedGame, setSelectedGame] = useState(null);
+    const [selectedGameId, setSelectedGameId] = useState(null);
 
     const filteredGames = useMemo(() => {
         return juegos.filter((game) => {
@@ -33,6 +34,34 @@ export default function Matches({ juegos = [], categorias = [], demoUser = null 
 
         return source.slice(0, 4);
     }, [activeCategory, juegos]);
+
+    const selectedGame = useMemo(
+        () => juegos.find((game) => game.id === selectedGameId) ?? null,
+        [juegos, selectedGameId],
+    );
+
+    const myMatches = useMemo(() => {
+        if (!auth?.user) {
+            return [];
+        }
+
+        return juegos.flatMap((game) =>
+            (game.partidas ?? [])
+                .filter((match) =>
+                    match.creador?.username === auth.user.username ||
+                    (match.participantes ?? []).some((participant) => participant.id_usuario === auth.user.id),
+                )
+                .map((match) => ({
+                    ...match,
+                    juego: {
+                        id: game.id,
+                        nombre: game.nombre,
+                        imagen_url: game.imagen_url,
+                        categoria: game.categoria,
+                    },
+                })),
+        );
+    }, [auth?.user, juegos]);
 
     return (
         <MainLayout>
@@ -75,16 +104,21 @@ export default function Matches({ juegos = [], categorias = [], demoUser = null 
 
             <MatchesGameGrid
                 games={filteredGames}
-                selectedGameId={selectedGame?.id}
-                onSelectGame={setSelectedGame}
+                selectedGameId={selectedGameId}
+                onSelectGame={(game) => setSelectedGameId(game.id)}
+            />
+
+            <MyMatchesSection
+                matches={myMatches}
+                isAuthenticated={Boolean(auth?.user)}
+                onOpenGame={(gameId) => setSelectedGameId(gameId)}
             />
 
             <MatchesDrawer
                 isOpen={Boolean(selectedGame)}
                 game={selectedGame}
                 games={juegos}
-                demoUser={demoUser}
-                onClose={() => setSelectedGame(null)}
+                onClose={() => setSelectedGameId(null)}
             />
         </MainLayout>
     );
