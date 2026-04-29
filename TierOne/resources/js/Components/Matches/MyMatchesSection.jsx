@@ -1,4 +1,6 @@
-﻿const imgUrl = (src) => {
+﻿import { router } from '@inertiajs/react';
+
+const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
@@ -18,6 +20,12 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', {
 });
 
 export default function MyMatchesSection({ matches = [], isAuthenticated, onOpenGame }) {
+    const leaveMatch = (matchId) => {
+        router.delete(`/matches/${matchId}/leave`, {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <section className="bg-[#090909] px-4 pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1400px]">
@@ -45,33 +53,47 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
                 ) : (
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                         {matches.map((match) => (
-                            <button
+                            <article
                                 key={`${match.juego.id}-${match.id}`}
-                                type="button"
-                                onClick={() => onOpenGame(match.juego.id)}
                                 className="group flex items-center gap-4 rounded-[28px] border border-white/10 bg-[#111111] p-4 text-left transition hover:-translate-y-1 hover:border-red-500/40"
                             >
-                                <img
-                                    src={imgUrl(match.juego.imagen_url)}
-                                    alt={match.juego.nombre}
-                                    className="h-24 w-20 rounded-2xl object-cover"
-                                />
-                                <div className="flex-1">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">
-                                        {match.juego.categoria}
-                                    </p>
-                                    <h3 className="mt-2 text-lg font-black uppercase text-white">{match.titulo}</h3>
-                                    <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-                                        {match.juego.nombre} · {modeLabels[match.tipo] ?? match.tipo}
-                                    </p>
-                                    <p className="mt-2 text-xs text-gray-500">
-                                        {match.fecha_inicio ? dateFormatter.format(new Date(match.fecha_inicio)) : 'Pendiente de confirmar'}
-                                    </p>
+                                <button
+                                    type="button"
+                                    onClick={() => onOpenGame(match.juego.id)}
+                                    className="flex flex-1 items-center gap-4 text-left"
+                                >
+                                    <img
+                                        src={imgUrl(match.juego.imagen_url)}
+                                        alt={match.juego.nombre}
+                                        className="h-24 w-20 rounded-2xl object-cover"
+                                    />
+                                    <div className="flex-1">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-400">
+                                            {match.juego.categoria}
+                                        </p>
+                                        <h3 className="mt-2 text-lg font-black uppercase text-white">{match.titulo}</h3>
+                                        <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+                                            {match.juego.nombre} · {modeLabels[match.tipo] ?? match.tipo}
+                                        </p>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            {match.fecha_inicio ? dateFormatter.format(new Date(match.fecha_inicio)) : 'Pendiente de confirmar'}
+                                        </p>
+                                    </div>
+                                </button>
+
+                                <div className="flex flex-col items-end gap-3">
+                                    <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                                        {match.participantes_count}/{match.capacidad}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => leaveMatch(match.id)}
+                                        className="rounded-xl border border-red-500/30 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-500 hover:text-white"
+                                    >
+                                        Salir
+                                    </button>
                                 </div>
-                                <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                                    {match.participantes_count}/{match.capacidad}
-                                </span>
-                            </button>
+                            </article>
                         ))}
                     </div>
                 )}
