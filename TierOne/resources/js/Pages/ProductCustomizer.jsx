@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useCart } from '@/Contexts/CartContext';
 import MainLayout from '@/Layouts/MainLayout';
@@ -12,11 +12,38 @@ import { Type, ImagePlus, Layers, ShoppingCart, ArrowLeft } from 'lucide-react';
 
 export default function ProductCustomizer({ producto, zonas, precios }) {
     const { addToCart } = useCart();
-    const [activeZoneIndex, setActiveZoneIndex] = useState(0);
+
+    const imgUrl = (src) => {
+        if (!src) return null;
+        if (src.startsWith('data:')) return src; // Blobs/Base64
+        return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+    };
+
+    // Agrupar zonas por imagen base (Vistas)
+    const views = Array.from(new Set(zonas.map(z => imgUrl(z.imagen_base)))).map(img => ({
+        image: img,
+        nombre: zonas.find(z => imgUrl(z.imagen_base) === img && z.tipo === 'impresion')?.nombre || 
+                zonas.find(z => imgUrl(z.imagen_base) === img)?.nombre || 'Vista',
+        zonas: zonas.filter(z => imgUrl(z.imagen_base) === img)
+    }));
+
+    const [activeViewIndex, setActiveViewIndex] = useState(0);
+    const activeView = views[activeViewIndex];
+    
+    // De las zonas de la vista actual, cuál es la activa para añadir capas
+    const [activeZoneId, setActiveZoneId] = useState(null);
+
+    useEffect(() => {
+        if (activeView) {
+            const firstImpresion = activeView.zonas.find(z => z.tipo === 'impresion')?.id;
+            setActiveZoneId(firstImpresion || activeView.zonas[0]?.id);
+        }
+    }, [activeViewIndex]);
+
     const [zonesData, setZonesData] = useState({}); // { zonaId: { layers: [], fabricJSON: {} } }
     const canvasRef = useRef(null);
 
-    const activeZone = zonas[activeZoneIndex];
+    const activeZone = zonas.find(z => z.id === activeZoneId);
 
     // Inicializar datos de zonas
     useEffect(() => {
@@ -55,21 +82,22 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     };
 
     const handleLayersUpdate = (layers) => {
+        if (!activeZoneId) return;
         setZonesData(prev => ({
             ...prev,
-            [activeZone.id]: { ...prev[activeZone.id], layers }
+            [activeZoneId]: { ...prev[activeZoneId], layers }
         }));
     };
 
-    const handleZoneChange = (index) => {
-        if (canvasRef.current) {
+    const handleViewChange = (index) => {
+        if (canvasRef.current && activeZoneId) {
             const currentData = canvasRef.current.exportData();
             setZonesData(prev => ({
                 ...prev,
-                [activeZone.id]: currentData
+                [activeZoneId]: currentData
             }));
         }
-        setActiveZoneIndex(index);
+        setActiveViewIndex(index);
     };
 
     const handleAddToCart = async () => {
@@ -130,11 +158,11 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                         </div>
                     </div>
 
-                    {/* Zone Selector */}
+                    {/* Zone Selector (Vistas) */}
                     <ZoneSelector
-                        zonas={zonas}
-                        activeIndex={activeZoneIndex}
-                        onChange={handleZoneChange}
+                        zonas={views}
+                        activeIndex={activeViewIndex}
+                        onChange={handleViewChange}
                     />
 
                     {/* Main Grid: Tools | Canvas | Price */}
@@ -152,12 +180,15 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
 
                         {/* Center: Canvas */}
                         <div className="flex flex-col items-center">
-                            {activeZone && (
+                            {activeView && (
                                 <DesignCanvas
                                     ref={canvasRef}
                                     zona={activeZone}
-                                    savedData={zonesData[activeZone.id]}
+                                    imgUrl={imgUrl}
+                                    allViewZones={activeView.zonas}
+                                    savedData={zonesData[activeZoneId]}
                                     onLayersUpdate={handleLayersUpdate}
+                                    onZoneActivate={(id) => setActiveZoneId(id)}
                                 />
                             )}
                         </div>

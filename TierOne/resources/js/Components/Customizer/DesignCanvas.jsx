@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
 
-const DesignCanvas = forwardRef(({ zona, savedData, onLayersUpdate }, ref) => {
+const DesignCanvas = forwardRef(({ zona, allViewZones = [], savedData, onLayersUpdate, onZoneActivate, imgUrl }, ref) => {
     const canvasElRef = useRef(null);
     const fabricRef = useRef(null);
     const [layers, setLayers] = useState([]);
@@ -19,55 +19,77 @@ const DesignCanvas = forwardRef(({ zona, savedData, onLayersUpdate }, ref) => {
         fabricRef.current = canvas;
 
         // Cargar imagen base como fondo
-        fabric.FabricImage.fromURL(zona.imagen_base, { crossOrigin: 'anonymous' }).then((img) => {
+        const src = imgUrl ? imgUrl(zona.imagen_base) : zona.imagen_base;
+        fabric.FabricImage.fromURL(src, { crossOrigin: 'anonymous' }).then((img) => {
             img.scaleToWidth(zona.canvas_width);
             img.set({ selectable: false, evented: false });
             canvas.setBackgroundImage(img);
             canvas.renderAll();
         });
 
-        // ClipPath: restringir objetos al área imprimible
-        const clipRect = new fabric.Rect({
-            left: zona.area_x,
-            top: zona.area_y,
-            width: zona.area_width,
-            height: zona.area_height,
-            absolutePositioned: true,
-        });
-        // Guardar referencia para aplicarlo a nuevos objetos
-        canvas._clipRect = clipRect;
-
-        // Dibujar borde del área (color dinámico según tipo)
-        const isBajaVisibilidad = zona.tipo === 'baja_visibilidad';
-        const areaBorder = new fabric.Rect({
-            left: zona.area_x,
-            top: zona.area_y,
-            width: zona.area_width,
-            height: zona.area_height,
-            fill: isBajaVisibilidad ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
-            stroke: isBajaVisibilidad ? 'rgba(245, 158, 11, 0.6)' : 'rgba(168, 85, 247, 0.4)',
-            strokeDashArray: [8, 4],
-            strokeWidth: 2,
-            selectable: false,
-            evented: false,
-        });
-        canvas.add(areaBorder);
-
-        // Si es baja visibilidad, añadir una etiqueta de aviso
-        if (isBajaVisibilidad) {
-            const warningText = new fabric.IText('⚠️ VISIBILIDAD REDUCIDA', {
-                left: zona.area_x + 5,
-                top: zona.area_y + 5,
-                fontSize: 10,
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '900',
-                fill: '#f59e0b',
-                backgroundColor: 'rgba(0,0,0,0.6)',
+        // DIBUJAR TODAS LAS ZONAS DE LA VISTA
+        allViewZones.forEach(z => {
+            const isActive = z.id === zona?.id;
+            const isBloqueada = z.tipo === 'bloqueada';
+            const isBajaVisibilidad = z.tipo === 'baja_visibilidad';
+            
+            // Rectángulo de la zona
+            const rect = new fabric.Rect({
+                left: z.area_x,
+                top: z.area_y,
+                width: z.area_width,
+                height: z.area_height,
+                fill: isBloqueada ? 'rgba(239, 68, 68, 0.2)' : (isBajaVisibilidad ? 'rgba(245, 158, 11, 0.05)' : 'transparent'),
+                stroke: isBloqueada ? 'rgba(239, 68, 68, 0.4)' : (isActive ? 'rgba(168, 85, 247, 0.8)' : 'rgba(168, 85, 247, 0.2)'),
+                strokeDashArray: [8, 4],
+                strokeWidth: isActive ? 2 : 1,
                 selectable: false,
-                evented: false,
+                evented: !isActive && !isBloqueada, // Permitir click en otras zonas para activarlas
+                hoverCursor: !isActive && !isBloqueada ? 'pointer' : 'default',
             });
-            canvas.add(warningText);
+            
+            rect._zoneId = z.id;
+            canvas.add(rect);
+
+            // Etiqueta
+            if (isActive || isBloqueada || isBajaVisibilidad) {
+                let labelText = z.nombre.toUpperCase();
+                if (isBloqueada) labelText = '🚫 ' + labelText;
+                if (isBajaVisibilidad) labelText = '⚠️ ' + labelText;
+
+                const label = new fabric.IText(labelText, {
+                    left: z.area_x + 5,
+                    top: z.area_y + 5,
+                    fontSize: 9,
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: '900',
+                    fill: isBloqueada ? '#ef4444' : (isBajaVisibilidad ? '#f59e0b' : '#a855f7'),
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    selectable: false,
+                    evented: false,
+                });
+                canvas.add(label);
+            }
+        });
+
+        // ClipPath: restringir objetos al área imprimible ACTUAL
+        if (zona) {
+            const clipRect = new fabric.Rect({
+                left: zona.area_x,
+                top: zona.area_y,
+                width: zona.area_width,
+                height: zona.area_height,
+                absolutePositioned: true,
+            });
+            canvas._clipRect = clipRect;
         }
+
+        // Listener para activar zonas al hacer click
+        canvas.on('mouse:down', (e) => {
+            if (e.target && e.target._zoneId && onZoneActivate) {
+                onZoneActivate(e.target._zoneId);
+            }
+        });
 
         // Restaurar datos guardados si existen
         if (savedData?.fabricJSON) {
@@ -123,7 +145,7 @@ const DesignCanvas = forwardRef(({ zona, savedData, onLayersUpdate }, ref) => {
         });
 
         return () => { canvas.dispose(); };
-    }, [zona?.id]);
+    }, [zona?.id, allViewZones.length]);
 
     // Métodos expuestos al padre
     useImperativeHandle(ref, () => ({

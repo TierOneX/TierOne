@@ -124,6 +124,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     // Zonas de personalización
     Route::get('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'index'])->name('products.zonas');
     Route::post('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'store'])->name('products.zonas.store');
+    Route::post('/products/{producto}/zonas/sync', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'bulkSync'])->name('products.zonas.sync');
     Route::put('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'update'])->name('zonas.update');
     Route::delete('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'destroy'])->name('zonas.destroy');
     Route::put('/products/{producto}/precios-personalizacion', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'updatePrecios'])->name('products.precios');

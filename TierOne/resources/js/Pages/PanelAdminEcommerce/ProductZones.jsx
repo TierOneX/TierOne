@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
-import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
 import {
     Plus, Trash2, Edit2, Eye, EyeOff, ArrowLeft,
-    Move, Save, DollarSign, Image as ImageIcon
+    Move, Save, DollarSign, Image as ImageIcon,
+    Layout
 } from "lucide-react";
+import FabricZoneEditor from "@/Components/PanelAdminEcommerce/FabricZoneEditor";
 
 // Colores por tipo de zona
 const ZONE_COLORS = {
@@ -14,182 +15,23 @@ const ZONE_COLORS = {
     baja_visibilidad: { border: 'border-amber-400',  bg: 'bg-amber-500/15',  label: 'bg-amber-600',  text: 'Baja Visibilidad', overlay: 'bg-amber-900/25' },
 };
 
-const HANDLE_DIRS = ['nw','n','ne','e','se','s','sw','w'];
-const HANDLE_CURSORS = { nw:'nwse-resize', n:'ns-resize', ne:'nesw-resize', e:'ew-resize', se:'nwse-resize', s:'ns-resize', sw:'nesw-resize', w:'ew-resize' };
-const MIN_SIZE = 50;
-
-/**
- * Componente para definir el área de una zona sobre la imagen del producto.
- * Soporta mover (arrastrar cuerpo) y redimensionar (8 handles).
- */
-function ZoneDrawer({ imageSrc, initialArea, canvasWidth, canvasHeight, zoneType = 'impresion', onAreaChange }) {
-    const containerRef = useRef(null);
-    const [area, setArea] = useState(initialArea || { x: 0, y: 0, width: 200, height: 250 });
-    const [displayScale, setDisplayScale] = useState(1);
-
-    // Refs for stale-free event handlers
-    const areaRef = useRef(area);
-    const modeRef = useRef(null); // null | 'drag' | 'resize'
-    const resizeDirRef = useRef(null);
-    const dragOffsetRef = useRef({ x: 0, y: 0 });
-    const [interacting, setInteracting] = useState(false);
-
-    const updateArea = (a) => { areaRef.current = a; setArea(a); };
-
-    useEffect(() => {
-        const sync = () => {
-            if (containerRef.current && canvasWidth && containerRef.current.offsetWidth > 0) {
-                setDisplayScale(containerRef.current.offsetWidth / canvasWidth);
-            }
-        };
-        sync();
-        const obs = new ResizeObserver(sync);
-        if (containerRef.current) obs.observe(containerRef.current);
-        return () => obs.disconnect();
-    }, [canvasWidth, imageSrc]);
-
-    // Sync initialArea when it changes externally
-    useEffect(() => {
-        if (initialArea) { updateArea(initialArea); }
-    }, [initialArea?.x, initialArea?.y, initialArea?.width, initialArea?.height]);
-
-    const getPos = (e) => {
-        const r = containerRef.current.getBoundingClientRect();
-        return { x: Math.round((e.clientX - r.left) / displayScale), y: Math.round((e.clientY - r.top) / displayScale) };
-    };
-
-    const handleMouseDown = (e) => {
-        const handleDir = e.target.dataset?.handleDir;
-        if (handleDir) {
-            modeRef.current = 'resize';
-            resizeDirRef.current = handleDir;
-        } else if (e.target.closest?.('.zone-body')) {
-            modeRef.current = 'drag';
-            const p = getPos(e);
-            dragOffsetRef.current = { x: p.x - areaRef.current.x, y: p.y - areaRef.current.y };
-        } else {
-            return; // click outside → nothing
-        }
-        setInteracting(true);
-    };
-
-    const handleMouseMove = (e) => {
-        if (!modeRef.current) return;
-        const p = getPos(e);
-        const a = areaRef.current;
-
-        if (modeRef.current === 'drag') {
-            updateArea({
-                ...a,
-                x: Math.max(0, Math.min(canvasWidth - a.width, p.x - dragOffsetRef.current.x)),
-                y: Math.max(0, Math.min(canvasHeight - a.height, p.y - dragOffsetRef.current.y)),
-            });
-        } else if (modeRef.current === 'resize') {
-            const d = resizeDirRef.current;
-            let { x, y, width: w, height: h } = a;
-
-            if (d.includes('w')) { const nx = Math.max(0, Math.min(p.x, x + w - MIN_SIZE)); w += x - nx; x = nx; }
-            if (d.includes('e')) { w = Math.max(MIN_SIZE, Math.min(canvasWidth - x, p.x - x)); }
-            if (d.includes('n')) { const ny = Math.max(0, Math.min(p.y, y + h - MIN_SIZE)); h += y - ny; y = ny; }
-            if (d.includes('s')) { h = Math.max(MIN_SIZE, Math.min(canvasHeight - y, p.y - y)); }
-
-            updateArea({ x, y, width: w, height: h });
-        }
-    };
-
-    const handleMouseUp = () => {
-        if (modeRef.current) {
-            modeRef.current = null;
-            resizeDirRef.current = null;
-            setInteracting(false);
-            onAreaChange(areaRef.current);
-        }
-    };
-
-    const colors = ZONE_COLORS[zoneType] || ZONE_COLORS.impresion;
-    const sa = { left: area.x * displayScale, top: area.y * displayScale, width: area.width * displayScale, height: area.height * displayScale };
-
-    // Handle positions (relative to scaled area)
-    const handlePositions = {
-        nw: { left: -5, top: -5 }, n: { left: sa.width / 2 - 5, top: -5 }, ne: { left: sa.width - 5, top: -5 },
-        w: { left: -5, top: sa.height / 2 - 5 }, e: { left: sa.width - 5, top: sa.height / 2 - 5 },
-        sw: { left: -5, top: sa.height - 5 }, s: { left: sa.width / 2 - 5, top: sa.height - 5 }, se: { left: sa.width - 5, top: sa.height - 5 },
-    };
-
-    return (
-        <div className="relative">
-            <div
-                ref={containerRef}
-                className="relative select-none overflow-visible rounded-xl border-2 border-gray-200 bg-gray-100 max-h-[450px]"
-                style={{ aspectRatio: `${canvasWidth} / ${canvasHeight}`, cursor: interacting ? 'grabbing' : 'default' }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-            >
-                {imageSrc && (
-                    <img src={imageSrc} alt="Producto" className="w-full h-full object-contain pointer-events-none" draggable={false} />
-                )}
-
-                {/* Overlay */}
-                <div className="absolute inset-0 pointer-events-none">
-                    <div className={`absolute top-0 left-0 right-0 ${colors.overlay}`} style={{ height: sa.top }} />
-                    <div className={`absolute bottom-0 left-0 right-0 ${colors.overlay}`} style={{ top: sa.top + sa.height }} />
-                    <div className={`absolute ${colors.overlay}`} style={{ left: 0, width: sa.left, top: sa.top, height: sa.height }} />
-                    <div className={`absolute ${colors.overlay}`} style={{ left: sa.left + sa.width, right: 0, top: sa.top, height: sa.height }} />
-                </div>
-
-                {/* Zone rectangle */}
-                <div
-                    className={`zone-body absolute border-2 border-dashed ${colors.border} ${colors.bg} cursor-grab active:cursor-grabbing`}
-                    style={{ left: sa.left, top: sa.top, width: Math.max(sa.width, 0), height: Math.max(sa.height, 0) }}
-                >
-                    <div className={`absolute -top-6 left-0 ${colors.label} text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider pointer-events-none whitespace-nowrap`}>
-                        {colors.text}
-                    </div>
-                    <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded font-mono pointer-events-none">
-                        {area.width}×{area.height}px
-                    </div>
-
-                    {/* 8 Resize handles */}
-                    {HANDLE_DIRS.map(dir => (
-                        <div
-                            key={dir}
-                            data-handle-dir={dir}
-                            className="absolute w-[10px] h-[10px] bg-white border-2 border-gray-600 rounded-sm z-10 hover:bg-purple-200 transition-colors"
-                            style={{ ...handlePositions[dir], cursor: HANDLE_CURSORS[dir] }}
-                        />
-                    ))}
-                </div>
-            </div>
-            <p className="text-[10px] text-gray-400 mt-2 text-center">
-                Arrastra el rectángulo para moverlo · Arrastra los handles para redimensionar
-            </p>
-        </div>
-    );
-}
+/** Normaliza rutas de imagen relativas a absolutas */
+const imgUrl = (src) => {
+    if (!src) return null;
+    if (src.startsWith('data:')) return src; // Blobs/Base64
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
 
 export default function ProductZones({
     producto, zonas = [],
     precioTexto, precioImagen,
     precioTextoGlobal, precioImagenGlobal
 }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState("create");
-    const [selectedZone, setSelectedZone] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
-    const [zoneArea, setZoneArea] = useState({ x: 100, y: 80, width: 300, height: 350 });
+    const [editingView, setEditingView] = useState(null); // { imgBase: string, zones: [] } | null
 
-    const { data: formData, setData, post, put, processing, errors, reset } = useForm({
-        nombre: '',
-        tipo: 'impresion',
+    const { data: formData, setData, post, processing, reset } = useForm({
         imagen_base: null,
-        area_x: 100,
-        area_y: 80,
-        area_width: 300,
-        area_height: 350,
-        canvas_width: 600,
-        canvas_height: 700,
+        zonas: [],
     });
 
     const { data: preciosData, setData: setPreciosData, put: putPrecios, processing: processingPrecios } = useForm({
@@ -198,96 +40,26 @@ export default function ProductZones({
         usar_global: false,
     });
 
-    // Auto-calcular canvas desde las dimensiones de la imagen
-    const autoCalcCanvas = (src) => {
-        const img = new Image();
-        img.onload = () => {
-            setData(prev => ({ ...prev, canvas_width: img.naturalWidth, canvas_height: img.naturalHeight }));
-        };
-        img.src = src;
-    };
-
-    const openCreateModal = () => {
-        setModalMode("create");
-        setSelectedZone(null);
-        setImagePreview(null);
-        setZoneArea({ x: 100, y: 80, width: 300, height: 350 });
-        reset();
-        setIsModalOpen(true);
-    };
-
-    const openEditModal = (zona) => {
-        setModalMode("edit");
-        setSelectedZone(zona);
-        setImagePreview(zona.imagen_base);
-        setZoneArea({
-            x: zona.area_x, y: zona.area_y,
-            width: zona.area_width, height: zona.area_height,
-        });
+    const enterStudio = (imgBase, existingZones = []) => {
+        setEditingView({ imgBase, zones: existingZones });
         setData({
-            nombre: zona.nombre,
-            tipo: zona.tipo || 'impresion',
-            imagen_base: null, // null = no cambiar la imagen
-            area_x: zona.area_x,
-            area_y: zona.area_y,
-            area_width: zona.area_width,
-            area_height: zona.area_height,
-            canvas_width: zona.canvas_width,
-            canvas_height: zona.canvas_height,
+            imagen_base: imgBase,
+            zonas: existingZones
         });
-        setIsModalOpen(true);
     };
 
-    const handleAreaChange = (area) => {
-        setZoneArea(area);
-        setData(prev => ({
-            ...prev,
-            area_x: area.x,
-            area_y: area.y,
-            area_width: area.width,
-            area_height: area.height,
-        }));
+    const exitStudio = () => {
+        setEditingView(null);
+        reset();
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('imagen_base', file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-                autoCalcCanvas(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const selectImageFromGallery = (url) => {
-        setData('imagen_base', url);
-        setImagePreview(url);
-        autoCalcCanvas(url);
-    };
-
-    const handleSubmitZone = (e) => {
-        e.preventDefault();
-        if (modalMode === "create") {
-            post(route('panel.ecommerce.products.zonas.store', producto.id), {
-                forceFormData: true,
-                onSuccess: () => { setIsModalOpen(false); reset(); setImagePreview(null); },
-            });
-        } else {
-            const fd = new FormData();
-            Object.entries(formData).forEach(([k, v]) => {
-                // Skip null imagen_base so backend doesn't require re-upload
-                if (k === 'imagen_base' && v === null) return;
-                if (v !== null && v !== undefined) fd.append(k, v);
-            });
-            fd.append('_method', 'put');
-            router.post(route('panel.ecommerce.zonas.update', selectedZone.id), fd, {
-                onSuccess: () => { setIsModalOpen(false); reset(); setImagePreview(null); },
-                onError: (errs) => console.error('Errores zona:', errs),
-            });
-        }
+    const handleSubmitSync = (e) => {
+        if (e) e.preventDefault();
+        post(route('panel.ecommerce.products.zonas.sync', producto.id), {
+            onSuccess: () => { 
+                exitStudio();
+            },
+        });
     };
 
     const handleDeleteZone = (zonaId) => {
@@ -321,69 +93,201 @@ export default function ProductZones({
                         <p className="text-xs text-gray-500">{producto.nombre}</p>
                     </div>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-purple-700 transition-colors flex items-center gap-2 tracking-widest shadow-md"
-                >
-                    <Plus size={14} /> Nueva Zona
-                </button>
-            </div>
-
-            {/* Grid de zonas existentes */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {zonas.map((zona) => {
-                    const tc = ZONE_COLORS[zona.tipo] || ZONE_COLORS.impresion;
-                    return (
-                    <div key={zona.id} className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden group">
-                        <div className="aspect-[6/7] relative bg-gray-950">
-                            <img src={zona.imagen_base} alt={zona.nombre} className="w-full h-full object-contain" />
-                            {/* Zone rectangle overlay (proportional) */}
-                            <div
-                                className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} pointer-events-none`}
-                                style={{
-                                    left: `${(zona.area_x / zona.canvas_width) * 100}%`,
-                                    top: `${(zona.area_y / zona.canvas_height) * 100}%`,
-                                    width: `${(zona.area_width / zona.canvas_width) * 100}%`,
-                                    height: `${(zona.area_height / zona.canvas_height) * 100}%`,
-                                }}
-                            />
-                            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[9px] px-2 py-1 rounded font-mono">
-                                {zona.area_width}×{zona.area_height}px
-                            </div>
-                        </div>
-                        <div className="p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="text-white font-black text-sm uppercase">{zona.nombre}</h3>
-                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black border ${zona.activa ? 'bg-green-900/50 text-green-400 border-green-800' : 'bg-red-900/50 text-red-400 border-red-800'}`}>
-                                    {zona.activa ? "ACTIVA" : "INACTIVA"}
-                                </span>
-                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black ${tc.label} text-white`}>
-                                    {tc.text}
-                                </span>
-                            </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => openEditModal(zona)} className="p-2 text-gray-400 hover:text-purple-400 transition-colors">
-                                    <Edit2 size={14} />
-                                </button>
-                                <button onClick={() => handleDeleteZone(zona.id)} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
-                                    <Trash2 size={14} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ); })}
-
-                {zonas.length === 0 && (
-                    <div className="col-span-full text-center py-12 text-gray-500">
-                        <ImageIcon size={48} className="mx-auto mb-4 opacity-30" />
-                        <p className="font-bold">No hay zonas configuradas</p>
-                        <p className="text-sm mt-1">Crea la primera zona de personalización</p>
-                    </div>
+                {!editingView && (
+                    <button
+                        onClick={() => enterStudio(producto.imagen_principal || '')}
+                        className="bg-purple-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-purple-700 transition-colors flex items-center gap-2 tracking-widest shadow-md"
+                    >
+                        <Plus size={14} /> Nueva Vista / Zona
+                    </button>
                 )}
             </div>
 
+            {editingView ? (
+                /* MODO ESTUDIO: Editor Interactivo Inline */
+                <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 mb-8 animate-in fade-in zoom-in duration-300">
+                    <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
+                        <div className="flex items-center gap-4">
+                            <button 
+                                onClick={exitStudio}
+                                className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg border border-gray-700 transition-colors"
+                            >
+                                <ArrowLeft size={16} />
+                            </button>
+                            <div>
+                                <h3 className="text-white font-black text-sm uppercase tracking-widest">
+                                    Estudio de Personalización
+                                </h3>
+                                <p className="text-[10px] text-gray-500 uppercase font-bold">Editando zonas de la vista seleccionada</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={exitStudio}
+                                className="px-6 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-gray-800 rounded-xl transition-all"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSubmitSync}
+                                disabled={processing}
+                                className="px-8 py-2.5 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-900/20 flex items-center gap-2"
+                            >
+                                <Save size={14} /> {processing ? "Guardando..." : "Guardar Cambios"}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-12">
+                        {/* Editor Principal */}
+                        <div className="space-y-6">
+                            <FabricZoneEditor
+                                key={editingView.imgBase}
+                                imageSrc={editingView.imgBase}
+                                zones={editingView.zones}
+                                onZonesChange={(updated) => setData('zonas', updated)}
+                            />
+                        </div>
+
+                        {/* Controles Laterales */}
+                        <div className="space-y-8">
+                            <section>
+                                <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-800 pb-2">
+                                    Cambiar Imagen de esta Vista
+                                </h4>
+                                <div className="grid grid-cols-4 gap-2 mb-4">
+                                    {[
+                                        ...(producto.imagen_principal ? [{ id: 'main', url: producto.imagen_principal }] : []),
+                                        ...producto.imagenes
+                                    ].map((img, idx) => (
+                                        <button
+                                            key={img.id || idx}
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingView(prev => ({ ...prev, imgBase: img.url }));
+                                                setData('imagen_base', img.url);
+                                            }}
+                                            className={`aspect-square rounded-lg border-2 overflow-hidden transition-all ${editingView.imgBase === img.url ? 'border-purple-600 ring-2 ring-purple-500/20' : 'border-gray-800 opacity-50 hover:opacity-100'}`}
+                                        >
+                                            <img src={imgUrl(img.url)} className="w-full h-full object-contain bg-black" alt="Miniatura" />
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-[9px] text-gray-500 font-medium leading-relaxed">
+                                    Selecciona una imagen de la galería para esta vista. Todas las zonas que dibujes se asociarán a esta imagen.
+                                </p>
+                            </section>
+
+                            <section className="bg-gray-800/30 p-6 rounded-2xl border border-gray-800">
+                                <h4 className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-4">
+                                    Instrucciones de Uso
+                                </h4>
+                                <ul className="space-y-3">
+                                    <li className="flex gap-3 text-[11px] text-gray-400">
+                                        <span className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[9px] font-bold text-white shrink-0">1</span>
+                                        Usa los botones superiores para añadir rectángulos de diferentes tipos.
+                                    </li>
+                                    <li className="flex gap-3 text-[11px] text-gray-400">
+                                        <span className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[9px] font-bold text-white shrink-0">2</span>
+                                        Haz clic en un rectángulo para redimensionarlo o moverlo sobre la imagen.
+                                    </li>
+                                    <li className="flex gap-3 text-[11px] text-gray-400">
+                                        <span className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[9px] font-bold text-white shrink-0">3</span>
+                                        Puedes cambiar el tipo de una zona seleccionada usando los iconos de acceso rápido.
+                                    </li>
+                                </ul>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                /* MODO LISTADO: Grid de vistas agrupadas */
+                <div className="space-y-8 mb-8">
+                    {Object.entries(zonas.reduce((acc, z) => {
+                        const normalizedUrl = imgUrl(z.imagen_base);
+                        if (!acc[normalizedUrl]) acc[normalizedUrl] = [];
+                        acc[normalizedUrl].push(z);
+                        return acc;
+                    }, {})).map(([imgBase, groupZones], viewIdx) => (
+                        <div key={imgBase} className="bg-gray-900/50 rounded-2xl border border-gray-800 p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-white font-black text-sm uppercase tracking-widest flex items-center gap-2">
+                                    <ImageIcon size={16} className="text-purple-400" />
+                                    Vista {viewIdx + 1}: {groupZones[0].nombre}
+                                </h3>
+                                <span className="text-[10px] text-gray-500 font-bold uppercase">
+                                    {groupZones.length} {groupZones.length === 1 ? 'Zona' : 'Zonas'} en esta imagen
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
+                                {/* Previsualización combinada */}
+                                <div className="bg-gray-950 rounded-xl overflow-hidden border border-gray-800 relative aspect-[6/7] max-h-[500px]">
+                                    <img src={imgUrl(imgBase)} alt="Vista" className="w-full h-full object-contain" />
+                                    
+                                    {groupZones.map((z) => {
+                                        const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
+                                        return (
+                                            <div
+                                                key={z.id}
+                                                className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} group/zone`}
+                                                style={{
+                                                    left: `${(z.area_x / z.canvas_width) * 100}%`,
+                                                    top: `${(z.area_y / z.canvas_height) * 100}%`,
+                                                    width: `${(z.area_width / z.canvas_width) * 100}%`,
+                                                    height: `${(z.area_height / z.canvas_height) * 100}%`,
+                                                }}
+                                            >
+                                                <div className={`absolute -top-6 left-0 ${tc.label} text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter opacity-80 group-hover/zone:opacity-100 transition-opacity`}>
+                                                    {z.nombre}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Lista de zonas para esta vista */}
+                                <div className="space-y-3">
+                                    {groupZones.map((z) => {
+                                        const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
+                                        return (
+                                            <div key={z.id} className="bg-gray-800/50 rounded-xl border border-gray-700 p-4 flex justify-between items-center group">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h4 className="text-white font-bold text-xs uppercase">{z.nombre}</h4>
+                                                        <span className={`text-[8px] px-1.5 py-0.5 rounded font-black ${tc.label} text-white`}>
+                                                            {tc.text}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500 font-mono">
+                                                        {z.area_width}x{z.area_height}px @ {z.area_x},{z.area_y}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => enterStudio(imgBase, groupZones)} className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-purple-700 transition-colors">
+                                                        <Edit2 size={12} /> Gestionar Vista
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {zonas.length === 0 && (
+                        <div className="bg-gray-900 rounded-xl border border-gray-800 text-center py-12 text-gray-500">
+                            <ImageIcon size={48} className="mx-auto mb-4 opacity-30" />
+                            <p className="font-bold">No hay zonas configuradas</p>
+                            <p className="text-sm mt-1">Crea la primera zona de personalización</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Sección de Precios */}
-            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mt-8">
                 <h3 className="text-white font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
                     <DollarSign size={16} className="text-green-400" />
                     Precios por Elemento
@@ -426,122 +330,6 @@ export default function ProductZones({
                     </div>
                 </form>
             </div>
-
-            {/* Modal para crear/editar zona */}
-            <AdminModal
-                show={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={modalMode === "create" ? "Nueva Zona de Personalización" : "Editar Zona"}
-                maxWidth="max-w-3xl"
-            >
-                <form onSubmit={handleSubmitZone} className="max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                                Nombre de la Zona
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-black font-bold"
-                                value={formData.nombre}
-                                onChange={(e) => setData('nombre', e.target.value)}
-                                placeholder='Ej: "Frontal", "Espalda"'
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                                Tipo de Zona
-                            </label>
-                            <select
-                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-black font-bold text-sm"
-                                value={formData.tipo}
-                                onChange={(e) => setData('tipo', e.target.value)}
-                            >
-                                <option value="impresion">Impresión (Estándar)</option>
-                                <option value="bloqueada">Bloqueada (Solo Admin)</option>
-                                <option value="baja_visibilidad">Baja Visibilidad (Aviso)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                            Imagen Base del Producto (esta vista)
-                        </label>
-                        
-                        {/* Selector de imágenes existentes del producto */}
-                        {producto.imagenes?.length > 0 && (
-                            <div className="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                <span className="text-[9px] text-gray-400 font-black uppercase block mb-2 tracking-widest">
-                                    Seleccionar de la galería del producto:
-                                </span>
-                                <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                                    {/* Incluir también la imagen principal si no está en la colección */}
-                                    {[
-                                        ...(producto.imagen_principal ? [{ id: 'main', url: producto.imagen_principal }] : []),
-                                        ...producto.imagenes
-                                    ].map((img, idx) => (
-                                        <button
-                                            key={img.id || idx}
-                                            type="button"
-                                            onClick={() => selectImageFromGallery(img.url)}
-                                            className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${imagePreview === img.url ? 'border-purple-600 ring-2 ring-purple-100' : 'border-gray-200 opacity-60 hover:opacity-100'}`}
-                                        >
-                                            <img src={img.url} className="w-full h-full object-contain bg-white" alt="Miniatura" />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <span className="text-[9px] text-gray-400 font-black uppercase block tracking-widest">
-                                O subir un archivo nuevo:
-                            </span>
-                            <input
-                                type="file" accept="image/*"
-                                onChange={handleFileChange}
-                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Inputs de canvas ocultos ya que son automáticos */}
-                    <input type="hidden" value={formData.canvas_width} />
-                    <input type="hidden" value={formData.canvas_height} />
-
-                    {/* Editor visual: arrastrar rectángulo */}
-                    {imagePreview && (
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                                Definir Área Imprimible (arrastra sobre la imagen)
-                            </label>
-                            <ZoneDrawer
-                                key={imagePreview}
-                                imageSrc={imagePreview}
-                                initialArea={zoneArea}
-                                canvasWidth={formData.canvas_width}
-                                canvasHeight={formData.canvas_height}
-                                zoneType={formData.tipo}
-                                onAreaChange={handleAreaChange}
-                            />
-                        </div>
-                    )}
-
-                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                        <button type="button" onClick={() => setIsModalOpen(false)}
-                            className="px-5 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-gray-50 rounded-xl"
-                        >
-                            Cancelar
-                        </button>
-                        <button type="submit" disabled={processing}
-                            className="px-8 py-2.5 bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-purple-700 disabled:opacity-50"
-                        >
-                            {processing ? "Guardando..." : modalMode === "create" ? "Crear Zona" : "Guardar Cambios"}
-                        </button>
-                    </div>
-                </form>
-            </AdminModal>
         </PanelLayout>
     );
 }

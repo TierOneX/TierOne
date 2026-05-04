@@ -161,4 +161,73 @@ class ZonaPersonalizacionController extends Controller
 
         return redirect()->back()->with('success', 'Precios actualizados correctamente');
     }
+
+    /**
+     * Sincroniza múltiples zonas para una misma imagen base.
+     * POST /panel-admin-ecommerce/products/{producto}/zonas/sync
+     */
+    public function bulkSync(Request $request, Producto $producto)
+    {
+        $validated = $request->validate([
+            'imagen_base' => 'required|string',
+            'zonas'       => 'present|array',
+            'zonas.*.id'           => 'nullable|exists:zonas_personalizacion,id',
+            'zonas.*.nombre'       => 'required|string|max:100',
+            'zonas.*.tipo'         => 'required|in:impresion,bloqueada,baja_visibilidad',
+            'zonas.*.area_x'       => 'required|integer|min:0',
+            'zonas.*.area_y'       => 'required|integer|min:0',
+            'zonas.*.area_width'   => 'required|integer|min:20',
+            'zonas.*.area_height'  => 'required|integer|min:20',
+            'zonas.*.canvas_width' => 'required|integer|min:100',
+            'zonas.*.canvas_height'=> 'required|integer|min:100',
+        ]);
+
+        $imgBase = $validated['imagen_base'];
+        
+        // Normalizar la imagen_base para la búsqueda (quitar /storage/ si existe para comparar)
+        $searchImgBase = str_replace('/storage/', '', $imgBase);
+        $searchImgBaseFull = str_starts_with($imgBase, '/storage/') ? $imgBase : '/storage/' . $imgBase;
+
+        $incomingIds = collect($validated['zonas'])->pluck('id')->filter()->toArray();
+
+        // 1. Eliminar zonas de esta imagen que no vienen en la nueva lista
+        // Buscamos tanto con /storage/ como sin él por si hay inconsistencias
+        ZonaPersonalizacion::where('id_producto', $producto->id)
+            ->where(function($q) use ($searchImgBase, $searchImgBaseFull) {
+                $q->where('imagen_base', $searchImgBase)
+                  ->orWhere('imagen_base', $searchImgBaseFull);
+            })
+            ->whereNotIn('id', $incomingIds)
+            ->delete();
+
+        // 2. Crear o Actualizar las que vienen
+        foreach ($validated['zonas'] as $idx => $zData) {
+            $zData['id_producto'] = $producto->id;
+            $zData['imagen_base'] = $imgBase;
+            
+            // Generar slug único para este producto
+            $baseSlug = Str::slug($zData['nombre']);
+            $slug = $baseSlug;
+            $count = 1;
+            while (ZonaPersonalizacion::where('id_producto', $producto->id)
+                ->where('slug', $slug)
+                ->where('id', '!=', $zData['id'] ?? 0)
+                ->exists()) {
+                $slug = $baseSlug . '-' . $count++;
+            }
+            
+            $zData['slug'] = $slug;
+            $zData['orden'] = $idx;
+            $zData['activa'] = true;
+
+            if (!empty($zData['id'])) {
+                ZonaPersonalizacion::where('id', $zData['id'])->update($zData);
+            } else {
+                unset($zData['id']);
+                ZonaPersonalizacion::create($zData);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Vista sincronizada correctamente');
+    }
 }
