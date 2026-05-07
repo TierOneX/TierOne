@@ -136,13 +136,15 @@ En la lista de items del carrito, si un item tiene `customization`, mostrar:
 )}
 ```
 
-2. **Preview del diseño** (miniatura del PNG renderizado):
+2. **Preview del diseño** (miniatura del PNG renderizado con el producto completo):
 ```jsx
-{item.customization?.renders && (
-    <div className="mt-2 flex gap-2">
-        {Object.entries(item.customization.renders).map(([zonaId, pngBase64]) => (
-            <img key={zonaId} src={pngBase64} alt="Diseño" className="w-16 h-16 rounded border border-gray-200 object-contain" />
-        ))}
+{item.customization?.render_principal && (
+    <div className="mt-2">
+        <img 
+            src={item.customization.render_principal} 
+            alt="Tu diseño" 
+            className="w-24 h-24 rounded-xl border border-white/10 object-contain bg-[#111] shadow-lg" 
+        />
     </div>
 )}
 ```

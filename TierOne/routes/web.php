@@ -79,6 +79,15 @@ Route::get('/cart', function () {
 })->name('cart');
 
 // =========================================================================
+// CUSTOMIZATION ROUTES (USUARIO)
+// =========================================================================
+
+Route::get('/shop/{slug}/personalizar', [App\Http\Controllers\Web\CustomizationController::class, 'editor'])->name('product.customize');
+Route::post('/customization/upload-image', [App\Http\Controllers\Web\CustomizationController::class, 'uploadImage'])->name('customization.upload');
+Route::post('/customization/save-render', [App\Http\Controllers\Web\CustomizationController::class, 'saveRender'])->name('customization.saveRender');
+Route::post('/customization/calcular-precio', [App\Http\Controllers\Web\CustomizationController::class, 'calcularPrecio'])->name('customization.calcularPrecio');
+
+// =========================================================================
 // ADMIN PANEL ROUTES
 // =========================================================================
 
@@ -111,6 +120,14 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     // Reviews
     Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Zonas de personalización
+    Route::get('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'index'])->name('products.zonas');
+    Route::post('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'store'])->name('products.zonas.store');
+    Route::post('/products/{producto}/zonas/sync', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'bulkSync'])->name('products.zonas.sync');
+    Route::put('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'update'])->name('zonas.update');
+    Route::delete('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'destroy'])->name('zonas.destroy');
+    Route::put('/products/{producto}/precios-personalizacion', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'updatePrecios'])->name('products.precios');
 });
 
 // =========================================================================

@@ -9,6 +9,7 @@ use App\Models\Pago;
 use App\Models\Producto;
 use App\Models\VarianteProducto;
 use App\Models\Orden;
+use App\Services\CustomizationService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,8 +26,9 @@ class StripeController extends Controller
 
     private StripeClient $stripe;
 
-    public function __construct()
-    {
+    public function __construct(
+        protected CustomizationService $customizationService
+    ) {
         $this->stripe = new StripeClient(config('stripe.secret'));
     }
 
@@ -53,6 +55,7 @@ class StripeController extends Controller
                 'items.*.id' => 'required|exists:productos,id',
                 'items.*.cantidad' => 'required|integer|min:1',
                 'items.*.id_variante' => 'nullable|exists:variantes_productos,id',
+                'items.*.personalizacion_data' => 'nullable|array',
                 'id_direccion_envio' => 'nullable|exists:direcciones_envio,id',
             ]);
 
@@ -73,7 +76,14 @@ class StripeController extends Controller
                     }
                 }
 
-                $lineSubtotal = round($precio * $itemReq['cantidad'], 2);
+                $recargo = 0;
+                if (!empty($itemReq['personalizacion_data'])) {
+                    // Validar recargo en el backend para seguridad
+                    $resRecargo = $this->customizationService->calcularRecargo($itemReq['personalizacion_data']['zonas'] ?? [], $producto->id);
+                    $recargo = $resRecargo['total'];
+                }
+
+                $lineSubtotal = round(($precio + $recargo) * $itemReq['cantidad'], 2);
                 $subtotal += $lineSubtotal;
 
                 $itemsData[] = [
@@ -83,6 +93,7 @@ class StripeController extends Controller
                     'cantidad' => $itemReq['cantidad'],
                     'precio_unitario' => $precio,
                     'subtotal' => $lineSubtotal,
+                    'personalizacion_data' => $itemReq['personalizacion_data'] ?? null,
                 ];
             }
 
@@ -127,6 +138,10 @@ class StripeController extends Controller
                         'cantidad' => $item['cantidad'],
                         'precio_unitario' => $item['precio_unitario'],
                         'subtotal' => $item['subtotal'],
+                        'personalizacion_data' => $item['personalizacion_data'] ?? null,
+                        'personalizacion_imagen' => isset($item['personalizacion_data']['render_principal']) 
+                            ? $this->customizationService->saveRenderedDesign($item['personalizacion_data']['render_principal'], $item['id_producto'])
+                            : null,
                     ]);
                 }
 

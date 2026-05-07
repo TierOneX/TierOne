@@ -14,6 +14,8 @@ import {
     Package,
     Search,
     Filter,
+    Download,
+    FileJson
 } from "lucide-react";
 
 const estadoBadge = (estado) => {
@@ -285,31 +287,77 @@ export default function Orders({
                                     orden.items.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex justify-between items-center text-sm bg-white p-3 rounded-xl border border-gray-100 shadow-sm"
+                                            className="flex flex-col bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-3 last:mb-0"
                                         >
-                                            <div className="flex gap-4 items-center">
-                                                <span className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-black text-red-600 text-[10px]">
-                                                    x{item.cantidad}
-                                                </span>
-                                                <span className="text-gray-900 font-bold">
-                                                    {item.producto}
-                                                </span>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <div className="flex gap-4 items-center">
+                                                    <span className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-black text-red-600 text-[10px]">
+                                                        x{item.cantidad}
+                                                    </span>
+                                                    <span className="text-gray-900 font-bold">
+                                                        {item.producto}
+                                                    </span>
+                                                </div>
+                                                <div className="flex gap-8 items-center">
+                                                    <span className="text-gray-400 text-[10px] font-black uppercase">
+                                                        €{Number(item.precio).toFixed(2)}/u
+                                                    </span>
+                                                    <span className="font-black text-gray-900">
+                                                        €{Number(item.subtotal).toFixed(2)}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-8 items-center">
-                                                <span className="text-gray-400 text-[10px] font-black uppercase">
-                                                    €
-                                                    {Number(
-                                                        item.precio,
-                                                    ).toFixed(2)}
-                                                    /u
-                                                </span>
-                                                <span className="font-black text-gray-900">
-                                                    €
-                                                    {Number(
-                                                        item.subtotal,
-                                                    ).toFixed(2)}
-                                                </span>
-                                            </div>
+
+                                            {/* Detalles de personalización si existen */}
+                                            {item.personalizacion_data && (
+                                                <div className="w-full mt-3 p-3 bg-purple-50 rounded-xl border border-purple-100 flex flex-col gap-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[9px] bg-purple-600 text-white px-2 py-0.5 rounded font-black uppercase tracking-widest">
+                                                                PERSONALIZADO
+                                                            </span>
+                                                            <span className="text-[10px] text-purple-600 font-bold">
+                                                                {item.personalizacion_data.precio_elementos?.textos || 0} texto(s),
+                                                                {item.personalizacion_data.precio_elementos?.imagenes || 0} imagen(es)
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            {item.personalizacion_imagen && (
+                                                                <a
+                                                                    href={item.personalizacion_imagen}
+                                                                    download={`diseno_item_${item.id}.png`}
+                                                                    className="px-3 py-1.5 bg-purple-600 text-white text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-purple-700 flex items-center gap-1.5"
+                                                                >
+                                                                    <Download size={12} /> PNG
+                                                                </a>
+                                                            )}
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const json = JSON.stringify(item.personalizacion_data, null, 2);
+                                                                    const blob = new Blob([json], { type: 'application/json' });
+                                                                    const url = URL.createObjectURL(blob);
+                                                                    const a = document.createElement('a');
+                                                                    a.href = url;
+                                                                    a.download = `diseno_item_${item.id}.json`;
+                                                                    a.click();
+                                                                    URL.revokeObjectURL(url);
+                                                                }}
+                                                                className="px-3 py-1.5 bg-white text-gray-700 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-gray-50 flex items-center gap-1.5 border border-gray-200"
+                                                            >
+                                                                <FileJson size={12} /> JSON
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    {item.personalizacion_imagen && (
+                                                        <img
+                                                            src={item.personalizacion_imagen}
+                                                            alt="Preview diseño"
+                                                            className="w-24 h-24 rounded border border-purple-200 object-contain bg-white"
+                                                        />
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 ) : (
@@ -695,20 +743,29 @@ export default function Orders({
                                             (item, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100"
+                                                    className="flex flex-col w-full p-3 bg-gray-50 rounded-xl border border-gray-100 mb-2 last:mb-0"
                                                 >
-                                                    <span className="text-sm font-bold text-gray-700">
-                                                        {item.producto}{" "}
-                                                        <span className="text-gray-400 font-black text-[10px] ml-1">
-                                                            x{item.cantidad}
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm font-bold text-gray-700">
+                                                            {item.producto}{" "}
+                                                            <span className="text-gray-400 font-black text-[10px] ml-1">
+                                                                x{item.cantidad}
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                    <span className="font-black text-black">
-                                                        €
-                                                        {Number(
-                                                            item.subtotal,
-                                                        ).toFixed(2)}
-                                                    </span>
+                                                        <span className="font-black text-black">
+                                                            €{Number(item.subtotal).toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                    {item.personalizacion_data && (
+                                                        <div className="mt-2 flex items-center gap-2">
+                                                            <span className="text-[8px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded font-black uppercase">
+                                                                Personalizado
+                                                            </span>
+                                                            {item.personalizacion_imagen && (
+                                                                <img src={item.personalizacion_imagen} alt="Miniatura" className="w-8 h-8 rounded border border-gray-200 object-contain" />
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ),
                                         )}

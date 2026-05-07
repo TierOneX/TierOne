@@ -95,9 +95,38 @@ Y en el `index`, añadir `personalizable` al mapeo:
 
 **Archivo**: `TierOne/TierOne/resources/js/Pages/PanelAdminEcommerce/ProductZones.jsx`
 
-Esta página tiene dos secciones principales:
-1. **Editor Visual de Zonas** — subir imagen, arrastrar rectángulo para definir el área imprimible
-2. **Configuración de Precios** — formulario para precios por tipo de elemento
+Esta página tiene tres secciones principales:
+1. **Grid de Zonas** — tarjetas que muestran la imagen del producto con el rectángulo de la zona superpuesto, badge de tipo y estado
+2. **Editor Visual de Zonas (Modal)** — seleccionar imagen del producto, definir el área con handles redimensionables, elegir tipo de zona
+3. **Configuración de Precios** — formulario para precios por tipo de elemento
+
+### Tipos de Zona
+
+Las zonas se clasifican por tipo con colores diferenciados:
+
+| Tipo | Color | Comportamiento |
+|------|-------|---------------|
+| `impresion` | Púrpura | El cliente puede personalizar esta zona |
+| `bloqueada` | Rojo | Zona con elemento fijo — **solo visible para admin**, excluida del editor del cliente |
+| `baja_visibilidad` | Ámbar | El cliente puede personalizar, pero se muestra un aviso visual |
+
+### Editor Visual (ZoneDrawer) — Interacciones
+
+El componente `ZoneDrawer` permite definir el área de la zona sobre la imagen del producto:
+
+- **Mover**: Arrastrar el cuerpo del rectángulo
+- **Redimensionar**: Arrastrar uno de los **8 handles** (4 esquinas + 4 puntos medios de los lados)
+- El clic fuera del rectángulo **no hace nada** (no se redibuja)
+- Tamaño mínimo: 50×50px
+- Color del rectángulo según el tipo de zona seleccionado
+
+### Canvas Auto-calculado
+
+Los campos `canvas_width` y `canvas_height` se calculan automáticamente desde las dimensiones de la imagen seleccionada. No se muestran en el formulario — se obtienen con `Image.naturalWidth` y `Image.naturalHeight` al seleccionar/subir la imagen.
+
+### Imagen Base Precargada
+
+Al editar una zona existente, la imagen base guardada se muestra automáticamente sin necesidad de resubirla. Si el admin no cambia la imagen, el backend no la modifica (validación `sometimes`).
 
 ```jsx
 import React, { useState, useRef, useCallback, useEffect } from "react";
@@ -110,10 +139,21 @@ import {
 } from "lucide-react";
 
 /**
- * Componente para dibujar un rectángulo arrastrando sobre una imagen.
- * El usuario sube una imagen del producto, y arrastra para definir el área imprimible.
+ * Componente para definir el área de una zona sobre la imagen del producto.
+ * 
+ * Interacciones:
+ * - Arrastrar el cuerpo del rectángulo → mover la zona
+ * - Arrastrar un handle (esquina/lado) → redimensionar la zona
+ * - Clic fuera → no hace nada (no se redibuja)
+ * 
+ * Props:
+ * - imageSrc: URL de la imagen base del producto
+ * - initialArea: {x, y, width, height} posición inicial de la zona
+ * - canvasWidth/canvasHeight: dimensiones virtuales (auto-calculadas desde la imagen)
+ * - zoneType: 'impresion' | 'bloqueada' | 'baja_visibilidad' (determina el color)
+ * - onAreaChange: callback cuando cambia el área
  */
-function ZoneDrawer({ imageSrc, initialArea, canvasWidth, canvasHeight, onAreaChange }) {
+function ZoneDrawer({ imageSrc, initialArea, canvasWidth, canvasHeight, zoneType = 'impresion', onAreaChange }) {
     const containerRef = useRef(null);
     const [drawing, setDrawing] = useState(false);
     const [startPoint, setStartPoint] = useState(null);
@@ -262,13 +302,14 @@ export default function ProductZones({
 
     const { data: formData, setData, post, put, processing, errors, reset } = useForm({
         nombre: '',
+        tipo: 'impresion',   // 'impresion' | 'bloqueada' | 'baja_visibilidad'
         imagen_base: null,
         area_x: 100,
         area_y: 80,
         area_width: 300,
         area_height: 350,
-        canvas_width: 600,
-        canvas_height: 700,
+        canvas_width: 600,   // auto-calculado desde la imagen
+        canvas_height: 700,  // auto-calculado desde la imagen
     });
 
     const { data: preciosData, setData: setPreciosData, put: putPrecios, processing: processingPrecios } = useForm({
@@ -562,6 +603,13 @@ export default function ProductZones({
 
 1. Navegar a `/panel-admin-ecommerce/products` → verificar badge y checkbox "Personalizable"
 2. Marcar un producto como personalizable → botón "Configurar Zonas" aparece
-3. Entrar a la gestión de zonas → crear zona con imagen y rectángulo arrastrable
-4. Configurar precios → guardar y verificar que persisten
-5. `npm run build` compila sin errores
+3. Entrar a la gestión de zonas → crear zona:
+   - Seleccionar imagen de la galería → el canvas se auto-calcula
+   - Redimensionar el rectángulo con los 8 handles
+   - Seleccionar tipo de zona (impresion/bloqueada/baja_visibilidad)
+4. Verificar **vista previa**: las tarjetas del grid muestran el rectángulo de la zona superpuesto con color según tipo
+5. Verificar **editar zona**: la imagen base ya aparece sin necesidad de resubirla
+6. Verificar **tipos**: badge de tipo con color correcto en cada tarjeta
+7. Verificar **superposición**: se pueden crear múltiples zonas sobre la misma imagen
+8. Configurar precios → guardar y verificar que persisten
+9. `npm run build` compila sin errores

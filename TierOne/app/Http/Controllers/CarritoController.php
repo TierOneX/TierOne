@@ -62,11 +62,15 @@ class CarritoController extends Controller
             $precio = $producto->precio_venta;
             // Si hubiera variante, habría que chequear si tiene sobrecoste o precio distinto
 
-            // 3. Buscar si el item ya existe en el carrito
-            $item = ItemCarrito::where('id_carrito', $carrito->id)
-                ->where('id_producto', $validated['id_producto'])
-                ->where('id_variante', $validated['id_variante'])
-                ->first();
+            // 3. Buscar si el item ya existe en el carrito (solo si NO es personalizado)
+            $item = null;
+            if (!isset($validated['personalizacion_data'])) {
+                $item = ItemCarrito::where('id_carrito', $carrito->id)
+                    ->where('id_producto', $validated['id_producto'])
+                    ->where('id_variante', $validated['id_variante'])
+                    ->whereNull('personalizacion_data')
+                    ->first();
+            }
 
             if ($item) {
                 $item->cantidad += $validated['cantidad'];
@@ -80,6 +84,7 @@ class CarritoController extends Controller
                     'cantidad' => $validated['cantidad'],
                     'precio_unitario' => $precio,
                     'subtotal' => $precio * $validated['cantidad'],
+                    'personalizacion_data' => $validated['personalizacion_data'] ?? null,
                     'fecha_agregado' => now()
                 ]);
             }
@@ -148,7 +153,15 @@ class CarritoController extends Controller
      */
     private function recalcularTotal(Carrito $carrito)
     {
-        $total = $carrito->items()->sum('subtotal');
+        $total = 0;
+        foreach ($carrito->items as $item) {
+            $recargo = 0;
+            if ($item->personalizacion_data) {
+                $data = $item->personalizacion_data;
+                $recargo = $data['precio_elementos']['total_recargo'] ?? 0;
+            }
+            $total += ($item->precio_unitario + $recargo) * $item->cantidad;
+        }
         $carrito->subtotal = $total;
         $carrito->save();
     }

@@ -19,21 +19,25 @@ npm install fabric
 
 **Archivo**: `TierOne/TierOne/resources/js/Pages/ProductCustomizer.jsx`
 
-Esta página recibe del backend (vía Inertia): `producto`, `zonas` (array de ZonaPersonalizacion), `precios` (`{texto: float, imagen: float}`).
+Esta página recibe del backend (vía Inertia): `producto`, `zonas` (array de ZonaPersonalizacion **filtradas**: solo `impresion` y `baja_visibilidad`), `precios` (`{texto: float, imagen: float}`).
 
 **Layout del editor**:
 - **Izquierda**: Panel de herramientas (añadir texto, subir imagen) + panel de capas
-- **Centro**: Canvas Fabric.js mostrando la imagen base del producto con el área imprimible delimitada
-- **Derecha/Inferior**: Selector de zonas (tabs: Frontal, Espalda...) + resumen de precio + botón "Añadir al carrito"
+- **Centro**: Canvas Fabric.js transparente sobre una imagen de fondo real (`Arquitectura Bunker`)
+- **Derecha/Inferior**: Selector de zonas + resumen de precio + botón "Añadir al carrito" (con confirmación premium)
+
+**Arquitectura Crítica (Sincronización de Coordenadas)**:
+Para evitar desplazamientos entre Admin y Cliente, se utiliza un sistema de **Coordenadas Absolutas** sobre la imagen natural. El cliente calcula la escala visual usando `canvas.width / zona.canvas_width`.
 
 **Funcionalidades clave**:
-1. El canvas muestra la imagen base de la zona seleccionada como fondo (no seleccionable)
-2. El área imprimible se muestra con un rectángulo de borde punteado (clipPath de Fabric.js para que los elementos no salgan del área)
-3. Al añadir texto: se crea un `fabric.IText` dentro del área imprimible, editable en doble clic
-4. Al añadir imagen: se abre un file picker, se sube al backend vía POST `/customization/upload-image`, y se crea un `fabric.Image` en el canvas
-5. Los elementos son arrastrables, redimensionables y rotables dentro del área (usar clipPath para restringir)
-6. Al cambiar de zona (tab), se guarda el estado del canvas actual y se carga el de la nueva zona
-7. El precio se calcula en tiempo real: cuenta textos + imágenes × precio unitario
+1. La imagen base se muestra en una etiqueta `<img>` estándar detrás del canvas (evita errores de offset de Fabric).
+2. El canvas de Fabric es 100% transparente y maneja los objetos de usuario.
+3. El área imprimible se delimita con un `clipPath` con `originX: 'left', originY: 'top'` (vital para Fabric v6).
+
+**Manejo de tipos de zona en el editor del cliente**:
+- Las zonas de tipo `bloqueada` **no llegan al frontend** — se filtran en `CustomizationService.getProductCustomizationData()` antes de enviarlas
+- Las zonas de tipo `baja_visibilidad` se muestran con un overlay ámbar semi-transparente y un icono de warning, pero el cliente puede añadir elementos
+- Las zonas de tipo `impresion` funcionan normalmente
 
 **Estructura del componente**:
 
@@ -228,186 +232,79 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
 
 **Archivo**: `TierOne/TierOne/resources/js/Components/Customizer/DesignCanvas.jsx`
 
-Este es el componente más complejo. Usa Fabric.js para:
-- Mostrar imagen base del producto como fondo (no seleccionable)
-- Delimitar el área imprimible con un clipPath (los elementos no pueden salir)
-- Gestionar capas (textos e imágenes del usuario)
-- Exponer métodos vía `forwardRef` + `useImperativeHandle`: `addText`, `addImage`, `deleteLayer`, `selectLayer`, `exportData`, `exportPNG`
+Este componente implementa la **Arquitectura Bunker** para garantizar precisión de píxel:
+- **Fondo Externo**: La imagen del producto no está "dentro" de Fabric.
+- **Escala Proporcional**: Se calcula el factor `s = canvas.width / zona.canvas_width`.
+- **ClipPath Absoluto**: Los recortes usan `absolutePositioned: true`.
 
-**Implementación clave**:
+**Implementación de Referencia**:
 
 ```jsx
-import { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
 import * as fabric from 'fabric';
 
-const DesignCanvas = forwardRef(({ zona, savedData, onLayersUpdate }, ref) => {
+const DesignCanvas = forwardRef(({ viewImage, activeZone, allViewZones, initialZonesData, onLayersUpdate }, ref) => {
     const canvasElRef = useRef(null);
     const fabricRef = useRef(null);
-    const [layers, setLayers] = useState([]);
+    const imgRef = useRef(null);
+    const scaleRef = useRef(1); // Escala visual del contenedor
+    const imgDimsRef = useRef({ w: 0, h: 0, bgObj: null });
 
-    // Inicializar Fabric.js canvas
-    useEffect(() => {
-        if (!zona || !canvasElRef.current) return;
+    // Cálculo de escala por zona (Crucial para sincronización)
+    const getZoneScale = useCallback((zone) => {
+        const canvas = fabricRef.current;
+        if (!canvas || !zone) return scaleRef.current;
+        const refW = zone.canvas_width || imgDimsRef.current.w || 1000;
+        return canvas.width / refW;
+    }, []);
 
-        const canvas = new fabric.Canvas(canvasElRef.current, {
-            width: zona.canvas_width,
-            height: zona.canvas_height,
-            backgroundColor: '#1a1a1a',
-            selection: true,
-        });
-        fabricRef.current = canvas;
+    // ... inicialización de canvas transparente y carga de imagen real en imgRef ...
 
-        // Cargar imagen base como fondo
-        fabric.FabricImage.fromURL(zona.imagen_base).then((img) => {
-            img.scaleToWidth(zona.canvas_width);
-            img.set({ selectable: false, evented: false });
-            canvas.setBackgroundImage(img);
-            canvas.renderAll();
-        });
-
-        // ClipPath: restringir objetos al área imprimible
-        const clipRect = new fabric.Rect({
-            left: zona.area_x,
-            top: zona.area_y,
-            width: zona.area_width,
-            height: zona.area_height,
-            absolutePositioned: true,
-        });
-
-        // Dibujar borde del área imprimible (visual, no funcional)
-        const areaBorder = new fabric.Rect({
-            left: zona.area_x,
-            top: zona.area_y,
-            width: zona.area_width,
-            height: zona.area_height,
-            fill: 'transparent',
-            stroke: 'rgba(168, 85, 247, 0.4)',
-            strokeDashArray: [8, 4],
-            strokeWidth: 2,
-            selectable: false,
-            evented: false,
-        });
-        canvas.add(areaBorder);
-
-        // Restaurar datos guardados si existen
-        if (savedData?.fabricJSON) {
-            canvas.loadFromJSON(savedData.fabricJSON).then(() => {
-                canvas.renderAll();
-            });
-        }
-
-        // Listener: al modificar objetos, actualizar layers
-        const updateLayers = () => {
-            const objs = canvas.getObjects().filter(o => o.selectable);
-            const newLayers = objs.map(o => ({
-                tipo: o._customType || 'texto',
-                contenido: o._customType === 'texto' ? o.text : o._customSrc,
-                x: Math.round(o.left),
-                y: Math.round(o.top),
-                width: Math.round(o.getScaledWidth()),
-                height: Math.round(o.getScaledHeight()),
-                rotation: Math.round(o.angle || 0),
-                fontSize: o.fontSize,
-                fontFamily: o.fontFamily,
-                color: o.fill,
-            }));
-            setLayers(newLayers);
-            onLayersUpdate(newLayers);
-        };
-
-        canvas.on('object:modified', updateLayers);
-        canvas.on('object:added', updateLayers);
-        canvas.on('object:removed', updateLayers);
-
-        // Restricción: no dejar salir objetos del área
-        canvas.on('object:moving', (e) => {
-            const obj = e.target;
-            if (!obj.selectable) return;
-            const bound = obj.getBoundingRect();
-            const areaRight = zona.area_x + zona.area_width;
-            const areaBottom = zona.area_y + zona.area_height;
-
-            if (bound.left < zona.area_x) obj.left = zona.area_x + (obj.left - bound.left);
-            if (bound.top < zona.area_y) obj.top = zona.area_y + (obj.top - bound.top);
-            if (bound.left + bound.width > areaRight) obj.left = areaRight - bound.width + (obj.left - bound.left);
-            if (bound.top + bound.height > areaBottom) obj.top = areaBottom - bound.height + (obj.top - bound.top);
-        });
-
-        return () => { canvas.dispose(); };
-    }, [zona?.id]);
-
-    // Métodos expuestos al padre
+    // Métodos expuestos
     useImperativeHandle(ref, () => ({
         addText: ({ content, fontSize, fontFamily, color }) => {
             const canvas = fabricRef.current;
-            if (!canvas || !zona) return;
+            const zone = activeZone;
+            const s = getZoneScale(zone);
+            
             const text = new fabric.IText(content || 'Tu texto', {
-                left: zona.area_x + 20,
-                top: zona.area_y + 20,
-                fontSize: fontSize || 28,
-                fontFamily: fontFamily || 'Arial',
-                fill: color || '#ffffff',
-                editable: true,
+                left: zone.area_x * s + 20,
+                top: zone.area_y * s + 20,
+                fontSize: (fontSize || 28) * s,
+                originX: 'left', originY: 'top',
+                clipPath: new fabric.Rect({
+                    left: zone.area_x * s,
+                    top: zone.area_y * s,
+                    width: zone.area_width * s,
+                    height: zone.area_height * s,
+                    strokeWidth: 0,
+                    originX: 'left', originY: 'top',
+                    absolutePositioned: true,
+                }),
             });
-            text._customType = 'texto';
             canvas.add(text);
-            canvas.setActiveObject(text);
-            canvas.renderAll();
         },
-
-        addImage: (url) => {
+        
+        exportViewPNG: () => {
             const canvas = fabricRef.current;
-            if (!canvas || !zona) return;
-            fabric.FabricImage.fromURL(url, { crossOrigin: 'anonymous' }).then((img) => {
-                // Escalar para que quepa en el área
-                const maxW = zona.area_width * 0.6;
-                const maxH = zona.area_height * 0.6;
-                const scale = Math.min(maxW / img.width, maxH / img.height, 1);
-                img.set({
-                    left: zona.area_x + 20,
-                    top: zona.area_y + 20,
-                    scaleX: scale,
-                    scaleY: scale,
-                });
-                img._customType = 'imagen';
-                img._customSrc = url;
-                canvas.add(img);
-                canvas.setActiveObject(img);
-                canvas.renderAll();
+            if (!canvas || !imgDimsRef.current.bgObj) return null;
+            
+            // Proceso de merge temporal para exportación
+            canvas.backgroundImage = imgDimsRef.current.bgObj;
+            const data = canvas.toDataURL({ 
+                format: 'png', 
+                multiplier: 1 / scaleRef.current 
             });
+            canvas.backgroundImage = null;
+            canvas.renderAll();
+            return data;
         },
-
-        deleteLayer: (index) => {
-            const canvas = fabricRef.current;
-            const objs = canvas.getObjects().filter(o => o.selectable);
-            if (objs[index]) {
-                canvas.remove(objs[index]);
-                canvas.renderAll();
-            }
-        },
-
-        selectLayer: (index) => {
-            const canvas = fabricRef.current;
-            const objs = canvas.getObjects().filter(o => o.selectable);
-            if (objs[index]) {
-                canvas.setActiveObject(objs[index]);
-                canvas.renderAll();
-            }
-        },
-
-        exportData: () => ({
-            layers,
-            fabricJSON: fabricRef.current?.toJSON(),
-        }),
-
-        exportPNG: () => fabricRef.current?.toDataURL({ format: 'png', multiplier: 2 }),
     }));
 
     return (
-        <div className="flex justify-center">
-            <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-500/5">
-                <canvas ref={canvasElRef} />
-            </div>
+        <div className="relative">
+            <img ref={imgRef} src={normalizedSrc} className="absolute inset-0" style={{objectFit: 'fill'}} />
+            <canvas ref={canvasElRef} className="absolute inset-0" />
         </div>
     );
 });
@@ -484,3 +381,6 @@ Añadir debajo del componente `AddToCartBar`, condicionalmente:
 5. Se puede subir imagen → se sube al backend, aparece en el canvas
 6. El precio se actualiza en tiempo real
 7. Los tabs de zonas funcionan si hay más de una zona
+8. **Zonas bloqueadas**: verificar que NO aparecen en el editor del cliente
+9. **Zonas baja visibilidad**: verificar que aparecen con overlay ámbar y warning
+10. **Superposición**: si hay una zona bloqueada dentro de una de impresión, solo se ve la de impresión en el cliente
