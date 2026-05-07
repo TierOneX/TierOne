@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as fabric from 'fabric';
-import { 
-    Trash2, MousePointer2, Square, 
+import { calculateScale, toAbsCoords } from '@/Utils/coordinateUtils';
+import { imgUrl } from '@/Utils/imageUtils';
+import {
+    Trash2, MousePointer2, Square,
     Lock, AlertTriangle, Type,
-    ChevronUp, ChevronDown
 } from 'lucide-react';
 
 const ZONE_COLORS = {
@@ -13,149 +14,191 @@ const ZONE_COLORS = {
 };
 
 export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }) {
-    const containerRef = useRef(null);
-    const canvasRef = useRef(null);
-    const fabricCanvasRef = useRef(null);
-    const [selectedId, setSelectedId] = useState(null);
-    const [imgDimensions, setImgDimensions] = useState({ w: 0, h: 0 });
-    const [canvasScale, setCanvasScale] = useState(1);
+    const outerRef    = useRef(null);   // mide ancho disponible
+    const stageRef    = useRef(null);   // div que contiene imagen + canvas alineados
+    const imgRef      = useRef(null);   // <img> base
+    const canvasRef   = useRef(null);   // <canvas> nativo
+    const fabricRef   = useRef(null);
+    const scaleRef    = useRef(1);
+    const imgDimsRef  = useRef({ w: 0, h: 0 });
+    const onChangeRef = useRef(onZonesChange);
 
-    // Normalizador de URL (mejorado)
-    const normalizedUrl = (src) => {
-        if (!src) return null;
-        if (src.startsWith('data:')) return src;
-        let path = src.startsWith('http') || src.startsWith('/') ? src : `/${src}`;
-        path = path.replace(/\/+/g, '/').replace(':/', '://');
-        if (!path.startsWith('http') && !path.startsWith('/storage') && !path.startsWith('/assets')) {
-            path = '/storage' + (path.startsWith('/') ? '' : '/') + path;
-        }
-        return path;
-    };
+    const [selectedId,  setSelectedId]  = useState(null);
+    const [imgNatural,  setImgNatural]  = useState({ w: 0, h: 0 });
+    const [stageSize,   setStageSize]   = useState({ w: 0, h: 0 });
 
-    const imageUrl = normalizedUrl(imageSrc);
+    useEffect(() => { onChangeRef.current = onZonesChange; }, [onZonesChange]);
 
-    // 1. Inicializar Canvas
+
+
+    const imageUrl = imgUrl(imageSrc);
+
+    const syncData = useCallback(() => {
+        const canvas = fabricRef.current;
+        if (!canvas) return;
+        const scale = scaleRef.current;
+        const dims  = imgDimsRef.current;
+
+        const updatedZones = canvas.getObjects()
+            .filter(o => o._id)
+            .map(o => {
+                const abs = toAbsCoords({
+                    x:      o.left,
+                    y:      o.top,
+                    width:  o.width  * o.scaleX,
+                    height: o.height * o.scaleY,
+                }, scale);
+                return {
+                    id:            (typeof o._id === 'string' && o._id.startsWith('temp_')) ? null : o._id,
+                    temp_id:       o._id,
+                    nombre:        o._nombre || 'Nueva Zona',
+                    tipo:          o._tipo   || 'impresion',
+                    area_x:        abs.x,
+                    area_y:        abs.y,
+                    area_width:    abs.width,
+                    area_height:   abs.height,
+                    canvas_width:  dims.w,
+                    canvas_height: dims.h,
+                };
+            });
+
+        onChangeRef.current(updatedZones);
+    }, []);
+
     useEffect(() => {
-        const canvas = new fabric.Canvas(canvasRef.current, {
-            backgroundColor: 'transparent',
-            selection: true,
-            preserveObjectStacking: true
-        });
-        fabricCanvasRef.current = canvas;
+        if (!imageUrl || !canvasRef.current || !outerRef.current) return;
 
-        // Manejo de eventos
-        const syncData = () => {
-            const objs = canvas.getObjects().filter(o => o._id);
-            const updatedZones = objs.map(o => ({
-                id: o._id.startsWith('temp_') ? null : o._id,
-                temp_id: o._id,
-                nombre: o._nombre || 'Nueva Zona',
-                tipo: o._tipo || 'impresion',
-                area_x: Math.round(o.left / canvasScale),
-                area_y: Math.round(o.top / canvasScale),
-                area_width: Math.round(o.width * o.scaleX / canvasScale),
-                area_height: Math.round(o.height * o.scaleY / canvasScale),
-                canvas_width: imgDimensions.w,
-                canvas_height: imgDimensions.h
-            }));
-            onZonesChange(updatedZones);
-        };
+        // ── Calcular escala a partir del contenedor exterior ─────────────────
+        const containerWidth = outerRef.current.offsetWidth || 800;
+        const maxWidth  = Math.min(containerWidth, 900);
+        const maxHeight = 600;
 
-        canvas.on('object:modified', syncData);
-        canvas.on('object:added', syncData);
-        canvas.on('object:removed', syncData);
-        canvas.on('selection:created', (e) => setSelectedId(e.selected[0]?._id));
-        canvas.on('selection:updated', (e) => setSelectedId(e.selected[0]?._id));
-        canvas.on('selection:cleared', () => setSelectedId(null));
-
-        return () => {
-            canvas.dispose();
-        };
-    }, [imgDimensions, canvasScale]);
-
-    // 2. Cargar Imagen Base y Ajustar Canvas
-    useEffect(() => {
-        if (!imageUrl) return;
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-            const containerWidth = containerRef.current?.offsetWidth || 800;
-            const maxWidth = Math.min(containerWidth, 1000);
-            const maxHeight = 600;
-            
-            const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
-            setImgDimensions({ w: img.width, h: img.height });
-            setCanvasScale(scale);
-            
-            if (fabricCanvasRef.current) {
-                fabricCanvasRef.current.setDimensions({
-                    width: img.width * scale,
-                    height: img.height * scale
-                });
-                
-                // Cargar zonas iniciales una vez tenemos la escala
-                loadZones(zones, scale, img.width, img.height);
+            // Usar las dimensiones del canvas de las zonas si existen, sino las de la imagen
+            const canvasDims = zones.length > 0 && zones[0].canvas_width && zones[0].canvas_height 
+                ? { w: zones[0].canvas_width, h: zones[0].canvas_height }
+                : { w: img.width, h: img.height };
+
+            console.log('FabricZoneEditor: Using canvas dimensions', 'w:', canvasDims.w, 'h:', canvasDims.h, 'vs image dimensions w:', img.width, 'h:', img.height);
+
+            const { scale, displayWidth, displayHeight } = calculateScale(
+                canvasDims.w, canvasDims.h, maxWidth, maxHeight
+            );
+
+            scaleRef.current   = scale;
+            imgDimsRef.current = canvasDims; // Usar las dimensiones del canvas
+            setImgNatural({ w: canvasDims.w, h: canvasDims.h });
+            setStageSize({ w: displayWidth, h: displayHeight });
+
+            console.log('FabricZoneEditor: Image loaded', imageUrl, 'imgDims w:', img.width, 'h:', img.height, 'canvasDims w:', canvasDims.w, 'h:', canvasDims.h, 'scale:', scale, 'displaySize w:', displayWidth, 'h:', displayHeight);
+
+            // ── Imagen base: tamaño exacto ───────────────────────────────────
+            if (imgRef.current) {
+                imgRef.current.style.width  = `${displayWidth}px`;
+                imgRef.current.style.height = `${displayHeight}px`;
+                imgRef.current.style.display = 'block';
             }
+
+            // ── Inicializar Fabric ───────────────────────────────────────────
+            // Destruir instancia previa si existe
+            if (fabricRef.current) {
+                fabricRef.current.dispose();
+                fabricRef.current = null;
+            }
+
+            const canvas = new fabric.Canvas(canvasRef.current, {
+                backgroundColor:       'transparent',
+                selection:              true,
+                preserveObjectStacking: true,
+                width:                  displayWidth,
+                height:                 displayHeight,
+            });
+            fabricRef.current = canvas;
+
+            // ── Posicionar el canvas-container directamente sobre la imagen ──
+            // Fabric envuelve el <canvas> en un <div class="canvas-container">
+            // con position:relative. Debemos asegurarnos de que ese wrapper
+            // esté exactamente sobre la imagen.
+            const wrapper = canvas.wrapperEl || canvas.lowerCanvasEl?.parentElement;
+            if (wrapper && stageRef.current) {
+                wrapper.style.position = 'absolute';
+                wrapper.style.top      = '0';
+                wrapper.style.left     = '0';
+                wrapper.style.width    = `${displayWidth}px`;
+                wrapper.style.height   = `${displayHeight}px`;
+            }
+
+            canvas.on('object:modified', syncData);
+            canvas.on('object:removed',  syncData);
+            canvas.on('selection:created', e => setSelectedId(e.selected[0]?._id));
+            canvas.on('selection:updated', e => setSelectedId(e.selected[0]?._id));
+            canvas.on('selection:cleared',  () => setSelectedId(null));
+
+            // ── Cargar zonas ─────────────────────────────────────────────────
+            zones.forEach(z => {
+                const cfg = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
+                console.log('FabricZoneEditor: Loading zone', z.nombre, 'area:', z.area_x, z.area_y, z.area_width, z.area_height, 'canvas:', z.canvas_width, z.canvas_height, 'scale:', scale, 'pos:', z.area_x * scale, z.area_y * scale, z.area_width * scale, z.area_height * scale);
+                canvas.add(new fabric.Rect({
+                    left:   z.area_x      * scale,
+                    top:    z.area_y      * scale,
+                    width:  z.area_width  * scale,
+                    height: z.area_height * scale,
+                    fill:             cfg.fill,
+                    stroke:           cfg.stroke,
+                    strokeWidth:      2,
+                    cornerColor:      '#fff',
+                    cornerStrokeColor: cfg.stroke,
+                    cornerSize:        8,
+                    transparentCorners: false,
+                    _id:     z.id || `temp_${Math.random().toString(36).substr(2, 9)}`,
+                    _tipo:   z.tipo,
+                    _nombre: z.nombre,
+                }));
+            });
+            canvas.renderAll();
+
+            // calcOffset post-render
+            requestAnimationFrame(() => {
+                if (fabricRef.current) fabricRef.current.calcOffset();
+            });
         };
         img.src = imageUrl;
+
+        return () => {
+            if (fabricRef.current) {
+                fabricRef.current.dispose();
+                fabricRef.current = null;
+            }
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [imageUrl]);
 
-    const loadZones = (initialZones, scale, canvasW, canvasH) => {
-        const canvas = fabricCanvasRef.current;
-        if (!canvas) return;
-        
-        canvas.getObjects().forEach(obj => canvas.remove(obj));
-        
-        initialZones.forEach(z => {
-            const config = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
-            const rect = new fabric.Rect({
-                left: z.area_x * scale,
-                top: z.area_y * scale,
-                width: z.area_width * scale,
-                height: z.area_height * scale,
-                fill: config.fill,
-                stroke: config.stroke,
-                strokeWidth: 2,
-                cornerColor: '#fff',
-                cornerStrokeColor: config.stroke,
-                cornerSize: 8,
-                transparentCorners: false,
-                _id: z.id || `temp_${Math.random().toString(36).substr(2, 9)}`,
-                _tipo: z.tipo,
-                _nombre: z.nombre
-            });
-            canvas.add(rect);
-        });
-        canvas.renderAll();
-    };
-
     const addZone = (type) => {
-        const canvas = fabricCanvasRef.current;
+        const canvas = fabricRef.current;
         if (!canvas) return;
-        
-        const config = ZONE_COLORS[type];
+        const cfg = ZONE_COLORS[type];
         const rect = new fabric.Rect({
-            left: 50,
-            top: 50,
-            width: 150,
-            height: 150,
-            fill: config.fill,
-            stroke: config.stroke,
-            strokeWidth: 2,
-            cornerColor: '#fff',
-            cornerSize: 8,
+            left:   50, top: 50,
+            width:  150, height: 150,
+            fill:             cfg.fill,
+            stroke:           cfg.stroke,
+            strokeWidth:      2,
+            cornerColor:      '#fff',
+            cornerSize:        8,
             transparentCorners: false,
-            _id: `temp_${Date.now()}`,
-            _tipo: type,
-            _nombre: `Zona ${config.label}`
+            _id:     `temp_${Date.now()}`,
+            _tipo:   type,
+            _nombre: `Zona ${cfg.label}`,
         });
-        
         canvas.add(rect);
         canvas.setActiveObject(rect);
+        syncData();
     };
 
     const deleteSelected = () => {
-        const canvas = fabricCanvasRef.current;
+        const canvas = fabricRef.current;
         const active = canvas?.getActiveObject();
         if (active) {
             canvas.remove(active);
@@ -165,90 +208,101 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
     };
 
     const changeType = (newType) => {
-        const canvas = fabricCanvasRef.current;
+        const canvas = fabricRef.current;
         const active = canvas?.getActiveObject();
         if (active) {
-            const config = ZONE_COLORS[newType];
-            active.set({
-                fill: config.fill,
-                stroke: config.stroke,
-                _tipo: newType,
-                _nombre: `Zona ${config.label}`
-            });
+            const cfg = ZONE_COLORS[newType];
+            active.set({ fill: cfg.fill, stroke: cfg.stroke, _tipo: newType, _nombre: `Zona ${cfg.label}` });
             canvas.renderAll();
-            // Disparar sincronización manual
             canvas.fire('object:modified');
         }
     };
 
     return (
-        <div className="flex flex-col gap-6" ref={containerRef}>
-            {/* Barra de Herramientas Superior */}
+        <div className="flex flex-col gap-6" ref={outerRef}>
+            {/* Barra de Herramientas */}
             <div className="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
-                <button 
-                    onClick={() => addZone('impresion')}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg hover:bg-purple-600/30 transition-all text-[10px] font-black uppercase tracking-widest"
-                >
+                <button onClick={() => addZone('impresion')}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg hover:bg-purple-600/30 transition-all text-[10px] font-black uppercase tracking-widest">
                     <Type size={14} /> + Área Impresión
                 </button>
-                <button 
-                    onClick={() => addZone('bloqueada')}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-600/30 transition-all text-[10px] font-black uppercase tracking-widest"
-                >
+                <button onClick={() => addZone('bloqueada')}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-600/30 transition-all text-[10px] font-black uppercase tracking-widest">
                     <Lock size={14} /> + Área Bloqueada
                 </button>
-                <button 
-                    onClick={() => addZone('baja_visibilidad')}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-600/20 text-amber-400 border border-amber-500/30 rounded-lg hover:bg-amber-600/30 transition-all text-[10px] font-black uppercase tracking-widest"
-                >
+                <button onClick={() => addZone('baja_visibilidad')}
+                    className="flex items-center gap-2 px-4 py-2 bg-amber-600/20 text-amber-400 border border-amber-500/30 rounded-lg hover:bg-amber-600/30 transition-all text-[10px] font-black uppercase tracking-widest">
                     <AlertTriangle size={14} /> + Advertencia
                 </button>
-
                 <div className="w-px h-8 bg-gray-700 mx-2 self-center" />
-
-                <button 
-                    onClick={deleteSelected}
-                    disabled={!selectedId}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-[10px] font-black uppercase tracking-widest ${selectedId ? 'bg-gray-700 text-white hover:bg-red-600/50' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}
-                >
+                <button onClick={deleteSelected} disabled={!selectedId}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-[10px] font-black uppercase tracking-widest
+                        ${selectedId ? 'bg-gray-700 text-white hover:bg-red-600/50' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}>
                     <Trash2 size={14} /> Eliminar Seleccionada
                 </button>
             </div>
 
-            {/* Contenedor del Editor */}
-            <div className="relative flex justify-center bg-gray-950 rounded-2xl border border-gray-800 overflow-hidden shadow-inner min-h-[500px]">
-                {/* Imagen Base (Capa Inferior) */}
-                {imageUrl && (
-                    <img 
-                        src={imageUrl} 
-                        className="absolute pointer-events-none select-none" 
-                        style={{ 
-                            width: imgDimensions.w * canvasScale, 
-                            height: imgDimensions.h * canvasScale,
-                            top: 0,
-                            left: '50%',
-                            transform: 'translateX(-50%)'
-                        }}
-                        alt="Base"
-                    />
-                )}
-                
-                {/* Canvas Fabric (Capa Superior) */}
-                <div className="relative z-10" style={{ width: imgDimensions.w * canvasScale, height: imgDimensions.h * canvasScale }}>
-                    <canvas ref={canvasRef} />
-                </div>
+            {/*
+             * Stage: position:relative con tamaño fijo = displaySize.
+             * La imagen y el canvas-container de Fabric se solapan exactamente.
+             * margin:auto centra el stage sin introducir offsets en el canvas.
+             */}
+            <div
+                className="w-full flex justify-center bg-[#0a0a0a] p-4 rounded-2xl border border-gray-800"
+                ref={outerRef}
+            >
+                <div
+                    className="relative rounded-2xl overflow-hidden shadow-2xl bg-[#111]"
+                    ref={stageRef}
+                    style={stageSize.w > 0 ? {
+                        width: stageSize.w,
+                        height: stageSize.h,
+                    } : {
+                        width: '100%',
+                        minHeight: 500
+                    }}
+                >
+                    {/* Imagen base — tamaño controlado por JS en img.onload */}
+                    {imageUrl && (
+                        <img
+                            ref={imgRef}
+                            src={imageUrl}
+                            alt="Base"
+                            style={{
+                                display:        'block',
+                                position:       'absolute',
+                                top:            0,
+                                left:           0,
+                                width:          stageSize.w,
+                                height:         stageSize.h,
+                                objectFit:      'contain',
+                                pointerEvents:  'none',
+                                userSelect:     'none',
+                            }}
+                        />
+                    )}
 
-                {/* Acciones Rápidas Flotantes (Solo si hay selección) */}
-                {selectedId && (
-                    <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 animate-in slide-in-from-right duration-200">
-                        <div className="bg-gray-900/90 backdrop-blur-md p-3 rounded-xl border border-gray-700 shadow-2xl flex flex-col gap-2">
-                            <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Convertir a:</p>
-                            <button onClick={() => changeType('impresion')} className="w-8 h-8 rounded-lg bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center hover:bg-purple-600 transition-colors" title="Impresión"><Type size={14}/></button>
-                            <button onClick={() => changeType('bloqueada')} className="w-8 h-8 rounded-lg bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center hover:bg-red-600 transition-colors" title="Bloqueada"><Lock size={14}/></button>
-                            <button onClick={() => changeType('baja_visibilidad')} className="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center hover:bg-amber-600 transition-colors" title="Advertencia"><AlertTriangle size={14}/></button>
+                    {/*
+                     * Canvas nativo — Fabric lo envolverá en canvas-container.
+                     * No ponemos className="absolute inset-0" aquí porque
+                     * ese CSS conflictuaría con los estilos inline de Fabric.
+                     * El posicionamiento se hace vía JS en img.onload.
+                     */}
+                    <canvas ref={canvasRef} />
+
+                    {/* Acciones Rápidas */}
+                    {selectedId && (
+                        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 20 }}
+                            className="animate-in slide-in-from-right duration-200">
+                            <div className="bg-gray-900/90 backdrop-blur-md p-3 rounded-xl border border-gray-700 shadow-2xl flex flex-col gap-2">
+                                <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Convertir a:</p>
+                                <button onClick={() => changeType('impresion')}        className="w-8 h-8 rounded-lg bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center hover:bg-purple-600 transition-colors" title="Impresión"><Type size={14}/></button>
+                                <button onClick={() => changeType('bloqueada')}        className="w-8 h-8 rounded-lg bg-red-600/20    text-red-400    border border-red-500/30    flex items-center justify-center hover:bg-red-600    transition-colors" title="Bloqueada"><Lock size={14}/></button>
+                                <button onClick={() => changeType('baja_visibilidad')} className="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center hover:bg-amber-600 transition-colors" title="Advertencia"><AlertTriangle size={14}/></button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             <div className="flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest px-2">
@@ -256,7 +310,7 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                     <span className="flex items-center gap-1"><MousePointer2 size={12}/> Click para seleccionar</span>
                     <span className="flex items-center gap-1"><Square size={12}/> Arrastra para mover/redimensionar</span>
                 </div>
-                <span>Resolución Original: {imgDimensions.w}x{imgDimensions.h}px</span>
+                <span>Resolución Original: {imgNatural.w}x{imgNatural.h}px</span>
             </div>
         </div>
     );

@@ -1,26 +1,21 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import { Head, useForm, router, Link } from "@inertiajs/react";
 import {
-    Plus, Trash2, Edit2, Eye, EyeOff, ArrowLeft,
-    Move, Save, DollarSign, Image as ImageIcon,
-    Layout
+    Plus, Trash2, Edit2, ArrowLeft,
+    Save, DollarSign, Image as ImageIcon,
 } from "lucide-react";
 import FabricZoneEditor from "@/Components/PanelAdminEcommerce/FabricZoneEditor";
+import { imgUrl } from "@/Utils/imageUtils";
 
 // Colores por tipo de zona
 const ZONE_COLORS = {
-    impresion:        { border: 'border-purple-400', bg: 'bg-purple-500/15', label: 'bg-purple-600', text: 'Impresión',        overlay: 'bg-black/40' },
-    bloqueada:        { border: 'border-red-400',    bg: 'bg-red-500/15',    label: 'bg-red-600',    text: 'Bloqueada',        overlay: 'bg-red-900/30' },
-    baja_visibilidad: { border: 'border-amber-400',  bg: 'bg-amber-500/15',  label: 'bg-amber-600',  text: 'Baja Visibilidad', overlay: 'bg-amber-900/25' },
+    impresion:        { border: 'border-purple-400', bg: 'bg-purple-500/15', label: 'bg-purple-600', text: 'Impresión' },
+    bloqueada:        { border: 'border-red-400',    bg: 'bg-red-500/15',    label: 'bg-red-600',    text: 'Bloqueada' },
+    baja_visibilidad: { border: 'border-amber-400',  bg: 'bg-amber-500/15',  label: 'bg-amber-600',  text: 'Baja Visibilidad' },
 };
 
-/** Normaliza rutas de imagen relativas a absolutas */
-const imgUrl = (src) => {
-    if (!src) return null;
-    if (src.startsWith('data:')) return src; // Blobs/Base64
-    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
-};
+
 
 export default function ProductZones({
     producto, zonas = [],
@@ -28,11 +23,21 @@ export default function ProductZones({
     precioTextoGlobal, precioImagenGlobal
 }) {
     const [editingView, setEditingView] = useState(null); // { imgBase: string, zones: [] } | null
+    const [imageDimensions, setImageDimensions] = useState({}); // { [imgUrl]: { w, h } }
 
     const { data: formData, setData, post, processing, reset } = useForm({
         imagen_base: null,
         zonas: [],
     });
+
+    const handleImageLoad = (imgBase, event) => {
+        const img = event.target;
+        console.log('ProductZones: Image loaded', imgUrl(imgBase), 'dimensions w:', img.naturalWidth, 'h:', img.naturalHeight);
+        setImageDimensions(prev => ({
+            ...prev,
+            [imgUrl(imgBase)]: { w: img.naturalWidth, h: img.naturalHeight }
+        }));
+    };
 
     const { data: preciosData, setData: setPreciosData, put: putPrecios, processing: processingPrecios } = useForm({
         precio_texto: precioTexto,
@@ -56,7 +61,7 @@ export default function ProductZones({
     const handleSubmitSync = (e) => {
         if (e) e.preventDefault();
         post(route('panel.ecommerce.products.zonas.sync', producto.id), {
-            onSuccess: () => { 
+            onSuccess: () => {
                 exitStudio();
             },
         });
@@ -72,6 +77,14 @@ export default function ProductZones({
         e.preventDefault();
         putPrecios(route('panel.ecommerce.products.precios', producto.id));
     };
+
+    // Agrupar zonas por imagen
+    const groupedViews = zonas.reduce((acc, z) => {
+        const normalizedImgUrl = imgUrl(z.imagen_base);
+        if (!acc[normalizedImgUrl]) acc[normalizedImgUrl] = [];
+        acc[normalizedImgUrl].push(z);
+        return acc;
+    }, {});
 
     return (
         <PanelLayout title={`Zonas — ${producto.nombre}`} activeItem="Productos">
@@ -108,7 +121,7 @@ export default function ProductZones({
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 mb-8 animate-in fade-in zoom-in duration-300">
                     <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
                         <div className="flex items-center gap-4">
-                            <button 
+                            <button
                                 onClick={exitStudio}
                                 className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg border border-gray-700 transition-colors"
                             >
@@ -203,28 +216,46 @@ export default function ProductZones({
             ) : (
                 /* MODO LISTADO: Grid de vistas agrupadas */
                 <div className="space-y-8 mb-8">
-                    {Object.entries(zonas.reduce((acc, z) => {
-                        const normalizedUrl = imgUrl(z.imagen_base);
-                        if (!acc[normalizedUrl]) acc[normalizedUrl] = [];
-                        acc[normalizedUrl].push(z);
-                        return acc;
-                    }, {})).map(([imgBase, groupZones], viewIdx) => (
+                    {Object.entries(groupedViews).map(([imgBase, groupZones], viewIdx) => (
                         <div key={imgBase} className="bg-gray-900/50 rounded-2xl border border-gray-800 p-6">
+                            {/* Cabecera de Vista — UN SOLO botón Editar Vista aquí */}
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-white font-black text-sm uppercase tracking-widest flex items-center gap-2">
                                     <ImageIcon size={16} className="text-purple-400" />
                                     Vista {viewIdx + 1}: {groupZones[0].nombre}
                                 </h3>
-                                <span className="text-[10px] text-gray-500 font-bold uppercase">
-                                    {groupZones.length} {groupZones.length === 1 ? 'Zona' : 'Zonas'} en esta imagen
-                                </span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] text-gray-500 font-bold uppercase">
+                                        {groupZones.length} {groupZones.length === 1 ? 'Zona' : 'Zonas'}
+                                    </span>
+                                    <button
+                                        onClick={() => enterStudio(imgBase, groupZones)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-md"
+                                    >
+                                        <Edit2 size={12} /> Editar Vista
+                                    </button>
+                                </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
-                                {/* Previsualización combinada */}
-                                <div className="bg-gray-950 rounded-xl overflow-hidden border border-gray-800 relative aspect-[6/7] max-h-[500px]">
-                                    <img src={imgUrl(imgBase)} alt="Vista" className="w-full h-full object-contain" />
-                                    
+                                {/* Previsualización: estructura simple con proporción fija */}
+                                <div 
+                                    className="relative w-full max-w-[450px] bg-[#111] rounded-xl overflow-hidden border border-gray-800"
+                                    style={{
+                                        paddingTop: imageDimensions[imgUrl(imgBase)]
+                                            ? `${(imageDimensions[imgUrl(imgBase)].h / imageDimensions[imgUrl(imgBase)].w) * 100}%`
+                                            : '150%'
+                                    }}
+                                >
+                                    {/* Imagen de fondo */}
+                                    <img
+                                        src={imgUrl(imgBase)}
+                                        alt="Vista"
+                                        onLoad={(e) => handleImageLoad(imgBase, e)}
+                                        className="absolute inset-0 w-full h-full object-contain"
+                                    />
+
+                                    {/* Overlays de zonas */}
                                     {groupZones.map((z) => {
                                         const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
                                         return (
@@ -232,13 +263,13 @@ export default function ProductZones({
                                                 key={z.id}
                                                 className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} group/zone`}
                                                 style={{
-                                                    left: `${(z.area_x / z.canvas_width) * 100}%`,
-                                                    top: `${(z.area_y / z.canvas_height) * 100}%`,
-                                                    width: `${(z.area_width / z.canvas_width) * 100}%`,
-                                                    height: `${(z.area_height / z.canvas_height) * 100}%`,
+                                                    left: z.canvas_width > 0 ? `${(z.area_x / z.canvas_width) * 100}%` : '0%',
+                                                    top: z.canvas_height > 0 ? `${(z.area_y / z.canvas_height) * 100}%` : '0%',
+                                                    width: z.canvas_width > 0 ? `${(z.area_width / z.canvas_width) * 100}%` : '0%',
+                                                    height: z.canvas_height > 0 ? `${(z.area_height / z.canvas_height) * 100}%` : '0%',
                                                 }}
                                             >
-                                                <div className={`absolute -top-6 left-0 ${tc.label} text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter opacity-80 group-hover/zone:opacity-100 transition-opacity`}>
+                                                <div className={`absolute -top-5 left-0 ${tc.label} text-white text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter`}>
                                                     {z.nombre}
                                                 </div>
                                             </div>
@@ -246,7 +277,7 @@ export default function ProductZones({
                                     })}
                                 </div>
 
-                                {/* Lista de zonas para esta vista */}
+                                {/* Lista de zonas — sin botones individuales de "Gestionar Vista" */}
                                 <div className="space-y-3">
                                     {groupZones.map((z) => {
                                         const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
@@ -263,11 +294,13 @@ export default function ProductZones({
                                                         {z.area_width}x{z.area_height}px @ {z.area_x},{z.area_y}
                                                     </p>
                                                 </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => enterStudio(imgBase, groupZones)} className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-purple-700 transition-colors">
-                                                        <Edit2 size={12} /> Gestionar Vista
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    onClick={() => handleDeleteZone(z.id)}
+                                                    className="p-2 text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                    title="Eliminar zona"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
                                             </div>
                                         );
                                     })}

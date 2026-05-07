@@ -2,11 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Trophy, Zap, Gamepad2 } from 'lucide-react';
 
-/** Normaliza rutas de imagen relativas a absolutas */
-const imgUrl = (src) => {
-    if (!src) return null;
-    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
-};
+import { imgUrl } from '@/Utils/imageUtils';
 import MainLayout from '@/Layouts/MainLayout';
 import ProductGallery from '@/Components/Product/ProductGallery';
 import ProductInfo from '@/Components/Product/ProductInfo';
@@ -58,7 +54,7 @@ export default function Product({ producto, relacionados = [] }) {
                             {producto.personalizable && (
                                 <Link
                                     href={route('product.customize', producto.slug)}
-                                    className="flex w-full py-4 rounded-lg font-black text-sm uppercase tracking-widest items-center justify-center gap-3 transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 active:scale-[0.98] mb-4"
+                                    className="flex w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest items-center justify-center gap-3 transition-all bg-[#e31837] text-white hover:bg-red-700 active:scale-[0.98] mb-4 shadow-lg shadow-red-500/20"
                                 >
                                     <span>✨</span> PERSONALIZAR ESTE PRODUCTO
                                 </Link>
