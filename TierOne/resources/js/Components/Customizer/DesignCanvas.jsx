@@ -5,6 +5,7 @@ import { imgUrl } from '@/Utils/imageUtils';
 
 /**
  * DesignCanvas — Editor Fabric.js para personalización de producto (cliente).
+ * Versión Blindada: Usa imagen de fondo real + canvas transparente (Estilo Admin).
  */
 const DesignCanvas = forwardRef(({
     viewImage,
@@ -17,12 +18,14 @@ const DesignCanvas = forwardRef(({
     const containerRef = useRef(null);
     const canvasElRef = useRef(null);
     const fabricRef = useRef(null);
-    const scaleRef = useRef(1);
+    const imgRef = useRef(null);
+    
+    const scaleRef    = useRef(1);
+    const imgDimsRef  = useRef({ w: 0, h: 0 });
     const prevZoneIdRef = useRef(null);
     const zoneObjectsRef = useRef({});
     const initDataLoadedRef = useRef({});
     
-    const [layers, setLayers] = useState([]);
     const [canvasReady, setCanvasReady] = useState(false);
     const [displaySize, setDisplaySize] = useState({ w: 0, h: 0 });
 
@@ -40,13 +43,23 @@ const DesignCanvas = forwardRef(({
 
     const normalizedSrc = imgUrl(viewImage);
 
-    // ── Serialization Helpers ────────────────────────
+    // ── Escala por zona con máxima precisión ────────────────────────
+    const getZoneScale = useCallback((zone) => {
+        const canvas = fabricRef.current;
+        if (!canvas || !zone) return scaleRef.current;
+        const refW = zone.canvas_width || imgDimsRef.current.w || 1000;
+        const s = canvas.width / refW;
+        return s;
+    }, []);
 
     const serializeUserObjects = useCallback(() => {
         const canvas = fabricRef.current;
-        if (!canvas) return { layers: [], userObjects: [] };
+        const zone = activeZoneRef.current;
+        if (!canvas || !zone) return { layers: [], userObjects: [] };
+        
         const userObjs = canvas.getObjects().filter(o => o._isUserObject);
-        const s = scaleRef.current;
+        const s = getZoneScale(zone);
+
         const serializedLayers = userObjs.map(o => ({
             tipo: o._customType || 'texto',
             contenido: o._customType === 'texto' ? o.text : o._customSrc,
@@ -59,11 +72,13 @@ const DesignCanvas = forwardRef(({
             fontFamily: o.fontFamily,
             color: o.fill,
         }));
+        
         const serializedObjects = userObjs.map(o =>
             o.toObject(['_customType', '_customSrc', '_isUserObject'])
         );
+        
         return { layers: serializedLayers, userObjects: serializedObjects };
-    }, []);
+    }, [getZoneScale]);
 
     const saveCurrentZone = useCallback(() => {
         const zoneId = prevZoneIdRef.current;
@@ -83,55 +98,56 @@ const DesignCanvas = forwardRef(({
 
     const drawZoneOverlays = useCallback((activeZoneId) => {
         const canvas = fabricRef.current;
-        const scale = scaleRef.current;
         const zones = allViewZonesRef.current;
         if (!canvas || !zones) return;
 
-        // Limpiar overlays previos
         canvas.getObjects().filter(o => o._isOverlay).forEach(o => canvas.remove(o));
 
         zones.forEach(z => {
             const isActive = z.id === activeZoneId;
             const isBaja = z.tipo === 'baja_visibilidad';
+            const s = getZoneScale(z);
 
             const rect = new fabric.Rect({
-                left: z.area_x * scale,
-                top: z.area_y * scale,
-                width: z.area_width * scale,
-                height: z.area_height * scale,
+                left: z.area_x * s,
+                top: z.area_y * s,
+                width: z.area_width * s,
+                height: z.area_height * s,
                 fill: isBaja ? 'rgba(245,158,11,0.05)' : 'transparent',
                 stroke: isActive ? 'rgba(168,85,247,0.8)' : 'rgba(168,85,247,0.2)',
                 strokeDashArray: [8, 4],
                 strokeWidth: isActive ? 2 : 1,
+                strokeUniform: true,
                 selectable: false,
                 evented: !isActive,
                 hoverCursor: !isActive ? 'pointer' : 'default',
+                originX: 'left',
+                originY: 'top'
             });
             rect._isOverlay = true;
             rect._zoneId = z.id;
             canvas.add(rect);
 
             if (isActive || isBaja) {
-                let labelText = z.nombre.toUpperCase();
-                if (isBaja) labelText = '⚠️ ' + labelText;
-
-                const label = new fabric.IText(labelText, {
-                    left: z.area_x * scale + 5,
-                    top: z.area_y * scale + 5,
-                    fontSize: Math.max(9, Math.round(10 * scale)),
+                const label = new fabric.IText(z.nombre.toUpperCase(), {
+                    left: z.area_x * s + 5,
+                    top: z.area_y * s + 5,
+                    fontSize: Math.max(9, Math.round(10 * s)),
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: '900',
                     fill: isBaja ? '#f59e0b' : '#a855f7',
                     backgroundColor: 'rgba(0,0,0,0.6)',
                     selectable: false,
                     evented: false,
+                    originX: 'left',
+                    originY: 'top'
                 });
                 label._isOverlay = true;
                 canvas.add(label);
             }
         });
         canvas.renderAll();
-    }, []);
+    }, [getZoneScale]);
 
     const loadZoneObjects = useCallback(async (zoneId) => {
         const canvas = fabricRef.current;
@@ -143,15 +159,13 @@ const DesignCanvas = forwardRef(({
             initDataLoadedRef.current[zoneId] = true;
         }
         
-        if (!data?.userObjects?.length) {
-            setLayers([]);
-            onLayersUpdateRef.current?.(zoneId, []);
-            return;
-        }
+        if (!data?.userObjects?.length) return;
 
         try {
             const zones = allViewZonesRef.current;
             const zone = zones?.find(z => z.id === zoneId);
+            const s = getZoneScale(zone);
+
             for (const objData of data.userObjects) {
                 let obj;
                 if (objData.type === 'i-text' || objData.type === 'IText') {
@@ -162,149 +176,120 @@ const DesignCanvas = forwardRef(({
                     const klass = fabric.classRegistry?.getClass(objData.type);
                     if (klass) obj = await klass.fromObject(objData);
                 }
-                if (obj) {
+                
+                if (obj && zone) {
                     obj._isUserObject = true;
                     obj._customType = objData._customType;
                     obj._customSrc = objData._customSrc;
-                    if (zone) {
-                        obj.clipPath = new fabric.Rect({
-                            left: zone.area_x * scaleRef.current,
-                            top: zone.area_y * scaleRef.current,
-                            width: zone.area_width * scaleRef.current,
-                            height: zone.area_height * scaleRef.current,
-                            absolutePositioned: true,
-                        });
-                    }
+                    
+                    obj.clipPath = new fabric.Rect({
+                        left: zone.area_x * s,
+                        top: zone.area_y * s,
+                        width: zone.area_width * s,
+                        height: zone.area_height * s,
+                        strokeWidth: 0,
+                        originX: 'left',
+                        originY: 'top',
+                        absolutePositioned: true,
+                    });
                     canvas.add(obj);
                 }
             }
             canvas.renderAll();
-            setLayers(data.layers || []);
-            onLayersUpdateRef.current?.(zoneId, data.layers || []);
         } catch (err) {
             console.error('Error loading zone objects:', err);
         }
-    }, []);
+    }, [getZoneScale]);
 
     // ── Init Effect ──────────────────────────────────
-
     useEffect(() => {
-        if (!normalizedSrc || !canvasElRef.current) {
-            console.log('DesignCanvas: Missing normalizedSrc or canvasElRef', { normalizedSrc, hasRef: !!canvasElRef.current });
-            return;
-        }
+        if (!normalizedSrc || !canvasElRef.current) return;
 
         let isMounted = true;
-        console.log('DesignCanvas: Starting initialization for', normalizedSrc);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
 
-        const imgEl = new Image();
-        imgEl.crossOrigin = 'anonymous';
-
-        imgEl.onload = async () => {
+        img.onload = () => {
             if (!isMounted) return;
             try {
-                console.log('DesignCanvas: Image loaded successfully', { w: imgEl.width, h: imgEl.height });
                 const containerWidth = containerRef.current?.offsetWidth || 700;
-                const maxW = Math.min(containerWidth, 700);
-                const maxH = 550;
+                const maxWidth = Math.min(containerWidth, 700);
+                const maxHeight = 550;
 
                 const { scale, displayWidth, displayHeight } = calculateScale(
-                    imgEl.width, imgEl.height, maxW, maxH
+                    img.width, img.height, maxWidth, maxHeight
                 );
 
-                if (isNaN(scale) || displayWidth <= 0 || displayHeight <= 0) {
-                    console.error('DesignCanvas: Invalid dimensions calculated', { scale, displayWidth, displayHeight });
-                    setCanvasReady(true);
-                    return;
-                }
-
                 scaleRef.current = scale;
+                imgDimsRef.current = { w: img.width, h: img.height };
                 setDisplaySize({ w: displayWidth, h: displayHeight });
 
-                console.log('DesignCanvas: Creating new Fabric canvas', { displayWidth, displayHeight });
+                if (fabricRef.current) {
+                    fabricRef.current.dispose();
+                }
+
                 const canvas = new fabric.Canvas(canvasElRef.current, {
                     width: displayWidth,
                     height: displayHeight,
-                    backgroundColor: '#111',
+                    backgroundColor: 'transparent', 
                     selection: true,
                     preserveObjectStacking: true,
                 });
                 fabricRef.current = canvas;
 
-                // Cargar imagen de fondo en Fabric
-                const background = await fabric.FabricImage.fromURL(normalizedSrc, { crossOrigin: 'anonymous' });
-                background.set({
-                    scaleX: scale,
-                    scaleY: scale,
-                    originX: 'left',
-                    originY: 'top',
-                    selectable: false,
-                    evented: false
+                // Cargar imagen de fondo para exportación futura
+                fabric.FabricImage.fromURL(normalizedSrc, { crossOrigin: 'anonymous' }).then(img => {
+                    img.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                        originX: 'left',
+                        originY: 'top',
+                        selectable: false,
+                        evented: false
+                    });
+                    imgDimsRef.current.bgObj = img;
                 });
-                canvas.backgroundImage = background;
-                canvas.renderAll();
-                
-                if (isMounted) setCanvasReady(true);
 
-                // Eventos
-                canvas.on('mouse:down', (e) => {
-                    if (e.target?._zoneId && onZoneActivateRef.current) {
-                        onZoneActivateRef.current(e.target._zoneId);
-                    }
-                });
+                if (imgRef.current) {
+                    imgRef.current.style.width = `${displayWidth}px`;
+                    imgRef.current.style.height = `${displayHeight}px`;
+                    imgRef.current.style.display = 'block';
+                }
+                
+                setCanvasReady(true);
 
                 const updateLayers = () => {
                     const c = fabricRef.current;
-                    if (!c) return;
-                    const userObjs = c.getObjects().filter(o => o._isUserObject);
-                    const s = scaleRef.current;
-                    const newLayers = userObjs.map(o => ({
-                        tipo: o._customType || 'texto',
-                        contenido: o._customType === 'texto' ? o.text : o._customSrc,
-                        x: Math.round(o.left / s),
-                        y: Math.round(o.top / s),
-                        width: Math.round(o.getScaledWidth() / s),
-                        height: Math.round(o.getScaledHeight() / s),
-                        rotation: Math.round(o.angle || 0),
-                        fontSize: o.fontSize,
-                        fontFamily: o.fontFamily,
-                        color: o.fill,
-                    }));
-                    setLayers(newLayers);
+                    const z = activeZoneRef.current;
+                    if (!c || !z) return;
+                    const data = serializeUserObjects();
                     if (prevZoneIdRef.current) {
-                        onLayersUpdateRef.current?.(prevZoneIdRef.current, newLayers);
+                        onLayersUpdateRef.current?.(prevZoneIdRef.current, data.layers);
                     }
                 };
+                
                 canvas.on('object:modified', updateLayers);
                 canvas.on('object:added', () => {
-                    // Evitar bucles durante la carga inicial
-                    if (canvasReady) setTimeout(updateLayers, 50);
+                    setTimeout(() => { if (fabricRef.current) updateLayers(); }, 50);
                 });
                 canvas.on('object:removed', updateLayers);
             } catch (err) {
                 console.error('DesignCanvas: Error during initialization', err);
             }
         };
-
-        imgEl.onerror = (e) => {
-            if (!isMounted) return;
-            console.error('DesignCanvas: Image failed to load', normalizedSrc, e);
-            setCanvasReady(true);
-        };
-
-        imgEl.src = normalizedSrc;
+        img.src = normalizedSrc;
 
         return () => {
             isMounted = false;
             if (fabricRef.current) {
                 fabricRef.current.dispose();
                 fabricRef.current = null;
+                setCanvasReady(false);
             }
         };
     }, [normalizedSrc]);
 
     // ── Zone Switch Effect ───────────────────────────
-
     useEffect(() => {
         if (!canvasReady || !activeZone || !fabricRef.current) return;
 
@@ -320,13 +305,13 @@ const DesignCanvas = forwardRef(({
     }, [canvasReady, activeZone?.id, saveCurrentZone, clearCanvas, drawZoneOverlays, loadZoneObjects]);
 
     // ── Imperative Handle ────────────────────────────
-
     useImperativeHandle(ref, () => ({
         addText: ({ content, fontSize, fontFamily, color }) => {
             const canvas = fabricRef.current;
             const zone = activeZoneRef.current;
-            const s = scaleRef.current;
             if (!canvas || !zone) return;
+            
+            const s = getZoneScale(zone);
             const text = new fabric.IText(content || 'Tu texto', {
                 left: zone.area_x * s + 20,
                 top: zone.area_y * s + 20,
@@ -334,11 +319,16 @@ const DesignCanvas = forwardRef(({
                 fontFamily: fontFamily || 'Arial',
                 fill: color || '#ffffff',
                 editable: true,
+                originX: 'left',
+                originY: 'top',
                 clipPath: new fabric.Rect({
                     left: zone.area_x * s,
                     top: zone.area_y * s,
                     width: zone.area_width * s,
                     height: zone.area_height * s,
+                    strokeWidth: 0,
+                    originX: 'left',
+                    originY: 'top',
                     absolutePositioned: true,
                 }),
             });
@@ -350,13 +340,11 @@ const DesignCanvas = forwardRef(({
         addImage: (url) => {
             const canvas = fabricRef.current;
             const zone = activeZoneRef.current;
-            const s = scaleRef.current;
             if (!canvas || !zone) return;
+            
+            const s = getZoneScale(zone);
             fabric.FabricImage.fromURL(url, { crossOrigin: 'anonymous' }).then((img) => {
-                if (!img) {
-                    console.error('DesignCanvas: Failed to create FabricImage from URL', url);
-                    return;
-                }
+                if (!img) return;
                 const maxW = zone.area_width * s * 0.8;
                 const imgScale = maxW / (img.width || 1);
                 img.set({
@@ -364,11 +352,16 @@ const DesignCanvas = forwardRef(({
                     top: zone.area_y * s + 10,
                     scaleX: imgScale,
                     scaleY: imgScale,
+                    originX: 'left',
+                    originY: 'top',
                     clipPath: new fabric.Rect({
                         left: zone.area_x * s,
                         top: zone.area_y * s,
                         width: zone.area_width * s,
                         height: zone.area_height * s,
+                        strokeWidth: 0,
+                        originX: 'left',
+                        originY: 'top',
                         absolutePositioned: true,
                     }),
                 });
@@ -382,33 +375,71 @@ const DesignCanvas = forwardRef(({
         exportAllData: () => { saveCurrentZone(); return { ...zoneObjectsRef.current }; },
         exportViewPNG: () => {
             const canvas = fabricRef.current;
-            if (!canvas) return null;
-            return canvas.toDataURL({ format: 'png', multiplier: 1 / scaleRef.current });
+            if (!canvas || !imgDimsRef.current.bgObj) return null;
+            
+            // Metemos el fondo temporalmente para la foto
+            canvas.backgroundImage = imgDimsRef.current.bgObj;
+            const data = canvas.toDataURL({ 
+                format: 'png', 
+                multiplier: 1 / scaleRef.current 
+            });
+            canvas.backgroundImage = null;
+            canvas.renderAll();
+            
+            return data;
+        },
+        selectLayer: (index) => {
+            const canvas = fabricRef.current;
+            if (!canvas) return;
+            const userObjs = canvas.getObjects().filter(o => o._isUserObject);
+            const target = userObjs[index];
+            if (target) {
+                canvas.setActiveObject(target);
+                canvas.renderAll();
+            }
+        },
+        deleteLayer: (index) => {
+            const canvas = fabricRef.current;
+            if (!canvas) return;
+            const userObjs = canvas.getObjects().filter(o => o._isUserObject);
+            const target = userObjs[index];
+            if (target) {
+                canvas.remove(target);
+                canvas.renderAll();
+            }
         }
     }));
 
-    try {
-        const hasValidSize = displaySize.w > 0 && displaySize.h > 0;
+    const hasValidSize = displaySize.w > 0 && displaySize.h > 0;
 
-        return (
-            <div ref={containerRef} className="w-full flex justify-center">
-                <div
-                    className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#111]"
-                    style={hasValidSize ? { width: displaySize.w, height: displaySize.h } : { width: '100%', minHeight: 400 }}
-                >
-                    <canvas ref={canvasElRef} className="absolute inset-0" />
-                    {!canvasReady && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                        </div>
-                    )}
-                </div>
+    return (
+        <div ref={containerRef} className="w-full flex justify-center">
+            <div
+                className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#111]"
+                style={hasValidSize ? { width: displaySize.w, height: displaySize.h } : { width: '100%', minHeight: 400 }}
+            >
+                <img 
+                    ref={imgRef}
+                    src={normalizedSrc} 
+                    alt="Background"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        display: 'none',
+                        objectFit: 'fill',
+                        pointerEvents: 'none'
+                    }}
+                />
+                <canvas ref={canvasElRef} className="absolute inset-0" />
+                {!canvasReady && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    </div>
+                )}
             </div>
-        );
-    } catch (renderError) {
-        console.error('DesignCanvas: Fatal Render Error', renderError);
-        return <div className="p-4 bg-red-900/20 text-red-500 rounded-xl">Error al cargar el lienzo de diseño</div>;
-    }
+        </div>
+    );
 });
 
 DesignCanvas.displayName = 'DesignCanvas';

@@ -8,22 +8,19 @@ import {
 import FabricZoneEditor from "@/Components/PanelAdminEcommerce/FabricZoneEditor";
 import { imgUrl } from "@/Utils/imageUtils";
 
-// Colores por tipo de zona
 const ZONE_COLORS = {
     impresion:        { border: 'border-purple-400', bg: 'bg-purple-500/15', label: 'bg-purple-600', text: 'Impresión' },
     bloqueada:        { border: 'border-red-400',    bg: 'bg-red-500/15',    label: 'bg-red-600',    text: 'Bloqueada' },
     baja_visibilidad: { border: 'border-amber-400',  bg: 'bg-amber-500/15',  label: 'bg-amber-600',  text: 'Baja Visibilidad' },
 };
 
-
-
 export default function ProductZones({
     producto, zonas = [],
     precioTexto, precioImagen,
     precioTextoGlobal, precioImagenGlobal
 }) {
-    const [editingView, setEditingView] = useState(null); // { imgBase: string, zones: [] } | null
-    const [imageDimensions, setImageDimensions] = useState({}); // { [imgUrl]: { w, h } }
+    const [editingView, setEditingView] = useState(null);
+    const [imageDimensions, setImageDimensions] = useState({});
 
     const { data: formData, setData, post, processing, reset } = useForm({
         imagen_base: null,
@@ -32,10 +29,11 @@ export default function ProductZones({
 
     const handleImageLoad = (imgBase, event) => {
         const img = event.target;
-        console.log('ProductZones: Image loaded', imgUrl(imgBase), 'dimensions w:', img.naturalWidth, 'h:', img.naturalHeight);
+        const key = imgUrl(imgBase);
+        console.log('ProductZones: Image loaded', key, 'dimensions w:', img.naturalWidth, 'h:', img.naturalHeight);
         setImageDimensions(prev => ({
             ...prev,
-            [imgUrl(imgBase)]: { w: img.naturalWidth, h: img.naturalHeight }
+            [key]: { w: img.naturalWidth, h: img.naturalHeight }
         }));
     };
 
@@ -52,6 +50,12 @@ export default function ProductZones({
             zonas: existingZones
         });
     };
+
+    React.useEffect(() => {
+        if (editingView?.imgBase) {
+            setData('imagen_base', editingView.imgBase);
+        }
+    }, [editingView?.imgBase]);
 
     const exitStudio = () => {
         setEditingView(null);
@@ -78,7 +82,6 @@ export default function ProductZones({
         putPrecios(route('panel.ecommerce.products.precios', producto.id));
     };
 
-    // Agrupar zonas por imagen
     const groupedViews = zonas.reduce((acc, z) => {
         const normalizedImgUrl = imgUrl(z.imagen_base);
         if (!acc[normalizedImgUrl]) acc[normalizedImgUrl] = [];
@@ -90,7 +93,6 @@ export default function ProductZones({
         <PanelLayout title={`Zonas — ${producto.nombre}`} activeItem="Productos">
             <Head title={`Zonas de Personalización - ${producto.nombre}`} />
 
-            {/* Header con botón volver */}
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-4">
                     <Link
@@ -117,7 +119,6 @@ export default function ProductZones({
             </div>
 
             {editingView ? (
-                /* MODO ESTUDIO: Editor Interactivo Inline */
                 <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 mb-8 animate-in fade-in zoom-in duration-300">
                     <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
                         <div className="flex items-center gap-4">
@@ -152,7 +153,6 @@ export default function ProductZones({
                     </div>
 
                     <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-12">
-                        {/* Editor Principal */}
                         <div className="space-y-6">
                             <FabricZoneEditor
                                 key={editingView.imgBase}
@@ -162,7 +162,6 @@ export default function ProductZones({
                             />
                         </div>
 
-                        {/* Controles Laterales */}
                         <div className="space-y-8">
                             <section>
                                 <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-800 pb-2">
@@ -214,11 +213,9 @@ export default function ProductZones({
                     </div>
                 </div>
             ) : (
-                /* MODO LISTADO: Grid de vistas agrupadas */
                 <div className="space-y-8 mb-8">
                     {Object.entries(groupedViews).map(([imgBase, groupZones], viewIdx) => (
                         <div key={imgBase} className="bg-gray-900/50 rounded-2xl border border-gray-800 p-6">
-                            {/* Cabecera de Vista — UN SOLO botón Editar Vista aquí */}
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-white font-black text-sm uppercase tracking-widest flex items-center gap-2">
                                     <ImageIcon size={16} className="text-purple-400" />
@@ -238,46 +235,47 @@ export default function ProductZones({
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
-                                {/* Previsualización: estructura simple con proporción fija */}
-                                <div 
-                                    className="relative w-full max-w-[450px] bg-[#111] rounded-xl overflow-hidden border border-gray-800"
-                                    style={{
-                                        paddingTop: imageDimensions[imgUrl(imgBase)]
-                                            ? `${(imageDimensions[imgUrl(imgBase)].h / imageDimensions[imgUrl(imgBase)].w) * 100}%`
-                                            : '150%'
-                                    }}
-                                >
-                                    {/* Imagen de fondo */}
-                                    <img
-                                        src={imgUrl(imgBase)}
-                                        alt="Vista"
-                                        onLoad={(e) => handleImageLoad(imgBase, e)}
-                                        className="absolute inset-0 w-full h-full object-contain"
-                                    />
+                                <div className="w-full flex justify-center bg-[#0a0a0a] rounded-xl border border-gray-800 p-4">
+                                    <div className="relative inline-block">
+                                        <img
+                                            src={imgUrl(imgBase)}
+                                            alt="Vista"
+                                            onLoad={(e) => handleImageLoad(imgBase, e)}
+                                            className="block max-h-[500px] w-auto rounded-lg shadow-2xl"
+                                        />
 
-                                    {/* Overlays de zonas */}
-                                    {groupZones.map((z) => {
-                                        const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
-                                        return (
-                                            <div
-                                                key={z.id}
-                                                className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} group/zone`}
-                                                style={{
-                                                    left: z.canvas_width > 0 ? `${(z.area_x / z.canvas_width) * 100}%` : '0%',
-                                                    top: z.canvas_height > 0 ? `${(z.area_y / z.canvas_height) * 100}%` : '0%',
-                                                    width: z.canvas_width > 0 ? `${(z.area_width / z.canvas_width) * 100}%` : '0%',
-                                                    height: z.canvas_height > 0 ? `${(z.area_height / z.canvas_height) * 100}%` : '0%',
-                                                }}
-                                            >
-                                                <div className={`absolute -top-5 left-0 ${tc.label} text-white text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter`}>
-                                                    {z.nombre}
+                                        {imageDimensions[imgUrl(imgBase)] && groupZones.map((z) => {
+                                            const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
+                                            const imgDims = imageDimensions[imgUrl(imgBase)];
+
+                                            const refW = z.canvas_width  || imgDims.w;
+                                            const refH = z.canvas_height || imgDims.h;
+
+                                            const left   = (z.area_x      / refW) * 100;
+                                            const top    = (z.area_y      / refH) * 100;
+                                            const width  = (z.area_width  / refW) * 100;
+                                            const height = (z.area_height / refH) * 100;
+
+                                            return (
+                                                <div
+                                                    key={z.id}
+                                                    className={`absolute border-2 border-dashed ${tc.border} ${tc.bg} group/zone`}
+                                                    style={{
+                                                        left:   `${left}%`,
+                                                        top:    `${top}%`,
+                                                        width:  `${width}%`,
+                                                        height: `${height}%`,
+                                                    }}
+                                                >
+                                                    <div className={`absolute -top-5 left-0 ${tc.label} text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter whitespace-nowrap`}>
+                                                        {z.nombre}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
 
-                                {/* Lista de zonas — sin botones individuales de "Gestionar Vista" */}
                                 <div className="space-y-3">
                                     {groupZones.map((z) => {
                                         const tc = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
@@ -319,7 +317,6 @@ export default function ProductZones({
                 </div>
             )}
 
-            {/* Sección de Precios */}
             <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mt-8">
                 <h3 className="text-white font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
                     <DollarSign size={16} className="text-green-400" />

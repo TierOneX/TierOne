@@ -14,10 +14,10 @@ const ZONE_COLORS = {
 };
 
 export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }) {
-    const outerRef    = useRef(null);   // mide ancho disponible
-    const stageRef    = useRef(null);   // div que contiene imagen + canvas alineados
-    const imgRef      = useRef(null);   // <img> base
-    const canvasRef   = useRef(null);   // <canvas> nativo
+    const outerRef    = useRef(null);
+    const stageRef    = useRef(null);
+    const imgRef      = useRef(null);
+    const canvasRef   = useRef(null);
     const fabricRef   = useRef(null);
     const scaleRef    = useRef(1);
     const imgDimsRef  = useRef({ w: 0, h: 0 });
@@ -29,10 +29,9 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
 
     useEffect(() => { onChangeRef.current = onZonesChange; }, [onZonesChange]);
 
-
-
     const imageUrl = imgUrl(imageSrc);
 
+    // ── BUG 1 FIX: syncData ──────────────────────────────────────────────────
     const syncData = useCallback(() => {
         const canvas = fabricRef.current;
         if (!canvas) return;
@@ -42,11 +41,14 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
         const updatedZones = canvas.getObjects()
             .filter(o => o._id)
             .map(o => {
+                // getBoundingRect() devuelve coordenadas de pantalla ya escaladas
+                // y es más fiable que o.left/top cuando el objeto fue transformado.
+                const br = o.getBoundingRect(true); // true = sin incluir strokeWidth
                 const abs = toAbsCoords({
-                    x:      o.left,
-                    y:      o.top,
-                    width:  o.width  * o.scaleX,
-                    height: o.height * o.scaleY,
+                    x:      br.left,
+                    y:      br.top,
+                    width:  br.width,
+                    height: br.height,
                 }, scale);
                 return {
                     id:            (typeof o._id === 'string' && o._id.startsWith('temp_')) ? null : o._id,
@@ -65,10 +67,18 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
         onChangeRef.current(updatedZones);
     }, []);
 
+    // ── BUG 2 FIX: useEffect depende de imageUrl Y de zones ─────────────────
+    const zonesRef = useRef(zones);
+    useEffect(() => { zonesRef.current = zones; }, [zones]);
+
+    // Clave que fuerza reinit solo cuando cambia imageUrl o las dims del canvas
+    const canvasDimsKey = zones.length > 0 && zones[0].canvas_width
+        ? `${zones[0].canvas_width}x${zones[0].canvas_height}`
+        : 'natural';
+
     useEffect(() => {
         if (!imageUrl || !canvasRef.current || !outerRef.current) return;
 
-        // ── Calcular escala a partir del contenedor exterior ─────────────────
         const containerWidth = outerRef.current.offsetWidth || 800;
         const maxWidth  = Math.min(containerWidth, 900);
         const maxHeight = 600;
@@ -76,51 +86,41 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-            // Usar las dimensiones del canvas de las zonas si existen, sino las de la imagen
-            const canvasDims = zones.length > 0 && zones[0].canvas_width && zones[0].canvas_height 
-                ? { w: zones[0].canvas_width, h: zones[0].canvas_height }
-                : { w: img.width, h: img.height };
+            const currentZones = zonesRef.current;
 
-            console.log('FabricZoneEditor: Using canvas dimensions', 'w:', canvasDims.w, 'h:', canvasDims.h, 'vs image dimensions w:', img.width, 'h:', img.height);
+            const canvasDims = currentZones.length > 0 && currentZones[0].canvas_width && currentZones[0].canvas_height
+                ? { w: currentZones[0].canvas_width, h: currentZones[0].canvas_height }
+                : { w: img.width, h: img.height };
 
             const { scale, displayWidth, displayHeight } = calculateScale(
                 canvasDims.w, canvasDims.h, maxWidth, maxHeight
             );
 
             scaleRef.current   = scale;
-            imgDimsRef.current = canvasDims; // Usar las dimensiones del canvas
+            imgDimsRef.current = canvasDims;
             setImgNatural({ w: canvasDims.w, h: canvasDims.h });
             setStageSize({ w: displayWidth, h: displayHeight });
 
-            console.log('FabricZoneEditor: Image loaded', imageUrl, 'imgDims w:', img.width, 'h:', img.height, 'canvasDims w:', canvasDims.w, 'h:', canvasDims.h, 'scale:', scale, 'displaySize w:', displayWidth, 'h:', displayHeight);
-
-            // ── Imagen base: tamaño exacto ───────────────────────────────────
             if (imgRef.current) {
                 imgRef.current.style.width  = `${displayWidth}px`;
                 imgRef.current.style.height = `${displayHeight}px`;
                 imgRef.current.style.display = 'block';
             }
 
-            // ── Inicializar Fabric ───────────────────────────────────────────
-            // Destruir instancia previa si existe
             if (fabricRef.current) {
                 fabricRef.current.dispose();
                 fabricRef.current = null;
             }
 
             const canvas = new fabric.Canvas(canvasRef.current, {
-                backgroundColor:       'transparent',
-                selection:              true,
-                preserveObjectStacking: true,
-                width:                  displayWidth,
-                height:                 displayHeight,
+                backgroundColor:        'transparent',
+                selection:               true,
+                preserveObjectStacking:  true,
+                width:                   displayWidth,
+                height:                  displayHeight,
             });
             fabricRef.current = canvas;
 
-            // ── Posicionar el canvas-container directamente sobre la imagen ──
-            // Fabric envuelve el <canvas> en un <div class="canvas-container">
-            // con position:relative. Debemos asegurarnos de que ese wrapper
-            // esté exactamente sobre la imagen.
             const wrapper = canvas.wrapperEl || canvas.lowerCanvasEl?.parentElement;
             if (wrapper && stageRef.current) {
                 wrapper.style.position = 'absolute';
@@ -136,19 +136,25 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
             canvas.on('selection:updated', e => setSelectedId(e.selected[0]?._id));
             canvas.on('selection:cleared',  () => setSelectedId(null));
 
-            // ── Cargar zonas ─────────────────────────────────────────────────
-            zones.forEach(z => {
+            // Cargar zonas existentes
+            currentZones.forEach(z => {
                 const cfg = ZONE_COLORS[z.tipo] || ZONE_COLORS.impresion;
-                console.log('FabricZoneEditor: Loading zone', z.nombre, 'area:', z.area_x, z.area_y, z.area_width, z.area_height, 'canvas:', z.canvas_width, z.canvas_height, 'scale:', scale, 'pos:', z.area_x * scale, z.area_y * scale, z.area_width * scale, z.area_height * scale);
+                const zoneScale = (z.canvas_width && z.canvas_height)
+                    ? calculateScale(z.canvas_width, z.canvas_height, maxWidth, maxHeight).scale
+                    : scale;
+
                 canvas.add(new fabric.Rect({
-                    left:   z.area_x      * scale,
-                    top:    z.area_y      * scale,
-                    width:  z.area_width  * scale,
-                    height: z.area_height * scale,
-                    fill:             cfg.fill,
-                    stroke:           cfg.stroke,
-                    strokeWidth:      2,
-                    cornerColor:      '#fff',
+                    left:   z.area_x      * zoneScale,
+                    top:    z.area_y      * zoneScale,
+                    width:  z.area_width  * zoneScale,
+                    height: z.area_height * zoneScale,
+                    scaleX: 1,
+                    scaleY: 1,
+                    fill:              cfg.fill,
+                    stroke:            cfg.stroke,
+                    strokeWidth:       2,
+                    strokeUniform:     true,
+                    cornerColor:       '#fff',
                     cornerStrokeColor: cfg.stroke,
                     cornerSize:        8,
                     transparentCorners: false,
@@ -159,7 +165,6 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
             });
             canvas.renderAll();
 
-            // calcOffset post-render
             requestAnimationFrame(() => {
                 if (fabricRef.current) fabricRef.current.calcOffset();
             });
@@ -172,8 +177,7 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                 fabricRef.current = null;
             }
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [imageUrl]);
+    }, [imageUrl, canvasDimsKey]);
 
     const addZone = (type) => {
         const canvas = fabricRef.current;
@@ -182,9 +186,12 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
         const rect = new fabric.Rect({
             left:   50, top: 50,
             width:  150, height: 150,
+            scaleX: 1,
+            scaleY: 1,
             fill:             cfg.fill,
             stroke:           cfg.stroke,
             strokeWidth:      2,
+            strokeUniform:    true,
             cornerColor:      '#fff',
             cornerSize:        8,
             transparentCorners: false,
@@ -204,6 +211,7 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
             canvas.remove(active);
             canvas.discardActiveObject();
             canvas.renderAll();
+            syncData();
         }
     };
 
@@ -214,13 +222,12 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
             const cfg = ZONE_COLORS[newType];
             active.set({ fill: cfg.fill, stroke: cfg.stroke, _tipo: newType, _nombre: `Zona ${cfg.label}` });
             canvas.renderAll();
-            canvas.fire('object:modified');
+            syncData();
         }
     };
 
     return (
         <div className="flex flex-col gap-6" ref={outerRef}>
-            {/* Barra de Herramientas */}
             <div className="flex flex-wrap gap-2 p-3 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
                 <button onClick={() => addZone('impresion')}
                     className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-500/30 rounded-lg hover:bg-purple-600/30 transition-all text-[10px] font-black uppercase tracking-widest">
@@ -242,15 +249,7 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                 </button>
             </div>
 
-            {/*
-             * Stage: position:relative con tamaño fijo = displaySize.
-             * La imagen y el canvas-container de Fabric se solapan exactamente.
-             * margin:auto centra el stage sin introducir offsets en el canvas.
-             */}
-            <div
-                className="w-full flex justify-center bg-[#0a0a0a] p-4 rounded-2xl border border-gray-800"
-                ref={outerRef}
-            >
+            <div className="w-full flex justify-center bg-[#0a0a0a] p-4 rounded-2xl border border-gray-800">
                 <div
                     className="relative rounded-2xl overflow-hidden shadow-2xl bg-[#111]"
                     ref={stageRef}
@@ -262,7 +261,6 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                         minHeight: 500
                     }}
                 >
-                    {/* Imagen base — tamaño controlado por JS en img.onload */}
                     {imageUrl && (
                         <img
                             ref={imgRef}
@@ -275,22 +273,15 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                                 left:           0,
                                 width:          stageSize.w,
                                 height:         stageSize.h,
-                                objectFit:      'contain',
+                                objectFit:      'fill',
                                 pointerEvents:  'none',
                                 userSelect:     'none',
                             }}
                         />
                     )}
 
-                    {/*
-                     * Canvas nativo — Fabric lo envolverá en canvas-container.
-                     * No ponemos className="absolute inset-0" aquí porque
-                     * ese CSS conflictuaría con los estilos inline de Fabric.
-                     * El posicionamiento se hace vía JS en img.onload.
-                     */}
                     <canvas ref={canvasRef} />
 
-                    {/* Acciones Rápidas */}
                     {selectedId && (
                         <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 20 }}
                             className="animate-in slide-in-from-right duration-200">

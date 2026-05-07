@@ -9,6 +9,7 @@ import LayerPanel from '@/Components/Customizer/LayerPanel';
 import ZoneSelector from '@/Components/Customizer/ZoneSelector';
 import PriceSummary from '@/Components/Customizer/PriceSummary';
 import { ShoppingCart, ArrowLeft } from 'lucide-react';
+import ConfirmationModal from '@/Components/Customizer/ConfirmationModal';
 
 import { imgUrl } from '@/Utils/imageUtils';
 
@@ -41,6 +42,7 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     const [activeZoneId, setActiveZoneId] = useState(null);
     const [zonesData, setZonesData] = useState({});   // { [zoneId]: { layers, userObjects } }
     const [allZonesLayers, setAllZonesLayers] = useState({}); // { [zoneId]: layers[] } para precio
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const canvasRef = useRef(null);
 
     const activeView = (views && views.length > 0) ? views[activeViewIndex] : null;
@@ -113,7 +115,13 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
         setActiveZoneId(zoneId);
     };
 
-    const handleAddToCart = async () => {
+    const handleAddToCart = () => {
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmAddToCart = async () => {
+        setIsConfirmModalOpen(false);
+
         // Guardar estado actual
         if (canvasRef.current) {
             const allData = canvasRef.current.exportAllData();
@@ -229,6 +237,12 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                     </div>
                 </div>
             </section>
+
+            <ConfirmationModal 
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmAddToCart}
+            />
         </MainLayout>
     );
 }
