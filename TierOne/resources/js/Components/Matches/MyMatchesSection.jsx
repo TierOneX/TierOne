@@ -1,4 +1,4 @@
-﻿import { router } from '@inertiajs/react';
+﻿import { Link, router } from '@inertiajs/react';
 
 const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
@@ -43,6 +43,12 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
                         <p className="text-sm font-bold uppercase tracking-[0.25em] text-gray-500">
                             Inicia sesion para ver tus partidas
                         </p>
+                        <Link
+                            href="/login"
+                            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500"
+                        >
+                            Iniciar sesion
+                        </Link>
                     </div>
                 ) : matches.length === 0 ? (
                     <div className="rounded-[28px] border border-dashed border-white/10 bg-[#111111] px-6 py-16 text-center">

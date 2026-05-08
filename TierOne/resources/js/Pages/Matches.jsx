@@ -2,7 +2,6 @@
 import { useMemo, useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import MatchesHero from '@/Components/Matches/MatchesHero';
-import MatchesSearchBar from '@/Components/Matches/MatchesSearchBar';
 import MatchesGameGrid from '@/Components/Matches/MatchesGameGrid';
 import MatchesDrawer from '@/Components/Matches/MatchesDrawer';
 import MyMatchesSection from '@/Components/Matches/MyMatchesSection';
@@ -12,6 +11,7 @@ export default function Matches({ juegos = [], categorias = [] }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('TODOS');
     const [selectedGameId, setSelectedGameId] = useState(null);
+    const [drawerTab, setDrawerTab] = useState('list');
 
     const filteredGames = useMemo(() => {
         return juegos.filter((game) => {
@@ -63,6 +63,16 @@ export default function Matches({ juegos = [], categorias = [] }) {
         );
     }, [auth?.user, juegos]);
 
+    const isDrawerActionFlash = [
+        'Partida creada correctamente.',
+        'Te has unido a la partida correctamente.',
+    ].includes(flash?.success);
+
+    const openGameDrawer = (gameOrId, tab = 'list') => {
+        setSelectedGameId(typeof gameOrId === 'object' ? gameOrId.id : gameOrId);
+        setDrawerTab(tab);
+    };
+
     return (
         <MainLayout>
             <Head title="Partidas" />
@@ -73,7 +83,7 @@ export default function Matches({ juegos = [], categorias = [] }) {
                 />
             </Head>
 
-            {flash?.success && !selectedGame && (
+            {flash?.success && !selectedGame && !isDrawerActionFlash && (
                 <div className="px-4 pt-6 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-[1400px] rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
                         {flash.success}
@@ -94,30 +104,31 @@ export default function Matches({ juegos = [], categorias = [] }) {
                 activeCategory={activeCategory}
                 onCategoryChange={setActiveCategory}
                 categories={categorias}
-            />
-
-            <MatchesSearchBar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
                 totalGames={filteredGames.length}
+                onSelectGame={(game) => openGameDrawer(game, 'list')}
             />
 
             <MatchesGameGrid
                 games={filteredGames}
                 selectedGameId={selectedGameId}
-                onSelectGame={(game) => setSelectedGameId(game.id)}
+                onSelectGame={(game) => openGameDrawer(game, 'list')}
+                onJoinGame={(game) => openGameDrawer(game, 'list')}
+                onCreateGame={(game) => openGameDrawer(game, 'create')}
             />
 
             <MyMatchesSection
                 matches={myMatches}
                 isAuthenticated={Boolean(auth?.user)}
-                onOpenGame={(gameId) => setSelectedGameId(gameId)}
+                onOpenGame={(gameId) => openGameDrawer(gameId, 'list')}
             />
 
             <MatchesDrawer
                 isOpen={Boolean(selectedGame)}
                 game={selectedGame}
                 games={juegos}
+                initialTab={drawerTab}
                 onClose={() => setSelectedGameId(null)}
             />
         </MainLayout>
