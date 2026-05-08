@@ -246,7 +246,7 @@
                 {{ number_format($item->precio_unitario, 2, ',', '.') }} €
             </td>
             <td class="text-right text-white bold" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                {{ number_format($item->cantidad * $item->precio_unitario, 2, ',', '.') }} €
+                {{ number_format($item->subtotal, 2, ',', '.') }} €
             </td>
         </tr>
         @endforeach
