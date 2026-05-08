@@ -27,7 +27,7 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
     };
 
     return (
-        <section className="bg-[#090909] px-4 pb-16 sm:px-6 lg:px-8">
+        <section className="bg-[radial-gradient(circle_at_top_right,_rgba(227,24,55,0.28),_transparent_48%),radial-gradient(circle_at_18%_78%,_rgba(227,24,55,0.14),_transparent_44%),linear-gradient(180deg,_#141414_0%,_#090909_100%)] px-4 pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1400px]">
                 <div className="mb-8 flex items-end justify-between gap-4">
                     <div>

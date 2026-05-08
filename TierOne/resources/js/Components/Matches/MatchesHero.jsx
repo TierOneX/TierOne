@@ -14,11 +14,13 @@ export default function MatchesHero({
     onSearchChange,
     totalGames,
     onSelectGame,
+    onJoinGame,
+    onCreateGame,
 }) {
     const availableCategories = ['TODOS', ...categories];
 
     return (
-        <section className="relative overflow-hidden border-b border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(227,24,55,0.22),_transparent_32%),linear-gradient(180deg,_#111111_0%,_#090909_100%)] px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden border-b border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(227,24,55,0.36),_transparent_52%),radial-gradient(circle_at_78%_22%,_rgba(227,24,55,0.18),_transparent_46%),linear-gradient(180deg,_#151515_0%,_#090909_100%)] px-4 pb-10 pt-10 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1400px]">
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
@@ -54,10 +56,8 @@ export default function MatchesHero({
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                     {popularGames.map((game, index) => (
-                        <button
+                        <article
                             key={game.id}
-                            type="button"
-                            onClick={() => onSelectGame(game)}
                             className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#101010] ${index === 0 ? 'xl:col-span-2 xl:row-span-2 min-h-[360px]' : 'min-h-[220px]'} `}
                         >
                             <img
@@ -66,7 +66,18 @@ export default function MatchesHero({
                                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
-                            <div className="relative flex h-full flex-col justify-end p-6">
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => onSelectGame(game)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter' || event.key === ' ') {
+                                        event.preventDefault();
+                                        onSelectGame(game);
+                                    }
+                                }}
+                                className="relative flex h-full cursor-pointer flex-col justify-end p-6"
+                            >
                                 <div className="mb-4 flex items-center justify-between gap-3">
                                     <span className="rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-red-400">
                                         {game.categoria}
@@ -81,8 +92,30 @@ export default function MatchesHero({
                                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-300">
                                     {game.descripcion}
                                 </p>
+                                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                    <button
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onJoinGame(game);
+                                        }}
+                                        className="min-h-11 rounded-xl border border-white/20 bg-black/35 px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-red-500/10"
+                                    >
+                                        Unirse a partida
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onCreateGame(game);
+                                        }}
+                                        className="min-h-11 rounded-xl bg-red-600 px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
+                                    >
+                                        Crear partida
+                                    </button>
+                                </div>
                             </div>
-                        </button>
+                        </article>
                     ))}
                 </div>
             </div>

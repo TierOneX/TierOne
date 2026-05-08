@@ -5,7 +5,7 @@
 
 export default function TournamentsGameGrid({ games = [], selectedGameId, onSelectGame }) {
     return (
-        <section className="bg-[#090909] px-4 pb-16 sm:px-6 lg:px-8">
+        <section className="bg-[radial-gradient(circle_at_top_right,_rgba(227,24,55,0.28),_transparent_48%),radial-gradient(circle_at_18%_78%,_rgba(227,24,55,0.14),_transparent_44%),linear-gradient(180deg,_#141414_0%,_#090909_100%)] px-4 pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1400px]">
                 <div className="mb-8 flex items-end justify-between gap-4">
                     <div>
@@ -52,15 +52,6 @@ export default function TournamentsGameGrid({ games = [], selectedGameId, onSele
                                     <p className="line-clamp-2 text-xs leading-5 text-gray-400">{game.descripcion}</p>
                                 </div>
                             </button>
-                            <div className="px-4 pb-4">
-                                <button
-                                    type="button"
-                                    onClick={() => onSelectGame(game)}
-                                    className="min-h-11 w-full rounded-xl bg-red-600 px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
-                                >
-                                    Ver torneos
-                                </button>
-                            </div>
                         </article>
                     ))}
                 </div>

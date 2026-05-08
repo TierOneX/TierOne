@@ -108,14 +108,14 @@ export default function Matches({ juegos = [], categorias = [] }) {
                 onSearchChange={setSearchTerm}
                 totalGames={filteredGames.length}
                 onSelectGame={(game) => openGameDrawer(game, 'list')}
+                onJoinGame={(game) => openGameDrawer(game, 'list')}
+                onCreateGame={(game) => openGameDrawer(game, 'create')}
             />
 
             <MatchesGameGrid
                 games={filteredGames}
                 selectedGameId={selectedGameId}
                 onSelectGame={(game) => openGameDrawer(game, 'list')}
-                onJoinGame={(game) => openGameDrawer(game, 'list')}
-                onCreateGame={(game) => openGameDrawer(game, 'create')}
             />
 
             <MyMatchesSection
