@@ -67,4 +67,12 @@ class Juego extends Model
     {
         return $this->hasMany(Partida::class, 'id_juego');
     }
+
+    /**
+     * Relacion: torneos creados para este juego.
+     */
+    public function torneos()
+    {
+        return $this->hasMany(Torneo::class, 'id_juego');
+    }
 }

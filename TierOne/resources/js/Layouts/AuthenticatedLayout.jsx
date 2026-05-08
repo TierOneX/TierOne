@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const isAdmin = user?.rol === 'admin';
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -30,6 +31,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                {isAdmin && (
+                                    <NavLink href="/paneladmingaming" active={route().current('panel.gaming')}>
+                                        Administrar
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -147,6 +153,11 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
+                            {isAdmin && (
+                                <ResponsiveNavLink href="/paneladmingaming">
+                                    Administrar
+                                </ResponsiveNavLink>
+                            )}
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>

@@ -11,6 +11,7 @@ export default function Header() {
     const { cartCount } = useCart();
     const { auth } = usePage().props;
     const user = auth?.user ?? null;
+    const isAdmin = user?.rol === "admin";
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -152,6 +153,14 @@ export default function Header() {
 
                         {/* === ACCIONES DERECHA === */}
                         <div className="flex items-center gap-3">
+                            {isAdmin && (
+                                <Link
+                                    href="/paneladmingaming"
+                                    className="hidden lg:inline-flex items-center px-4 py-2 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all duration-200"
+                                >
+                                    Administrar
+                                </Link>
+                            )}
                             {/* Carrito */}
                             <Link
                                 href="/cart"
@@ -328,6 +337,15 @@ export default function Header() {
                             </Link>
                         ))}
                         <div className="pt-3 border-t border-white/5">
+                            {isAdmin && (
+                                <Link
+                                    href="/paneladmingaming"
+                                    className="mb-2 block w-full text-center px-4 py-3 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    ADMINISTRAR
+                                </Link>
+                            )}
                             <Link
                                 href={user ? "/profile" : "/login"}
                                 className="block w-full text-center px-4 py-3 bg-[#e31837] hover:bg-[#c2102d] text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"

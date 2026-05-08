@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Web\MatchController;
+use App\Http\Controllers\Web\TournamentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,6 +61,11 @@ Route::get('/matches', [MatchController::class, 'index'])->name('matches');
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
 Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');
+Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments');
+Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])->name('tournaments.join');
+Route::get('/paneladmingaming', function () {
+    return Inertia::render('PanelAdminGaming');
+})->name('panel.gaming');
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])
@@ -120,7 +126,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
 });
 
 // =========================================================================
-// STRIPE / PAYMENT ROUTES
+    // STRIPE / PAYMENT ROUTES
 // =========================================================================
 
 Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');

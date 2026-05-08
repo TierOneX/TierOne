@@ -11,6 +11,7 @@ import "../../../css/panel.css";
 export default function PanelLayout({ title, activeItem, children }) {
     const { menu_admin, auth } = usePage().props; // Atrapamos el menú y el user del servidor
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const isAdmin = auth?.user?.rol === "admin";
 
     // Usamos auth.user usando las propiedades correctas de TierOne (username, rol)
     const userDisplay = auth.user || {
@@ -51,6 +52,11 @@ export default function PanelLayout({ title, activeItem, children }) {
                     <h1 className="page-title">{title}</h1>
                 </div>
                 <div className="header-actions">
+                    {isAdmin && (
+                        <Link href="/paneladmingaming" className="btn-secondary">
+                            <span>Administrar Gaming</span>
+                        </Link>
+                    )}
                     <Link
                         href={route("home")}
                         className="btn-secondary"

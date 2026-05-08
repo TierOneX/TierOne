@@ -1,12 +1,12 @@
-﻿import GameDiscoveryFilters from './GameDiscoveryFilters';
+﻿import GameDiscoveryFilters from '@/Components/Matches/GameDiscoveryFilters';
 
 const imgUrl = (src) => {
-    if (!src) return '/images/landing/Partidas.jpg';
+    if (!src) return '/images/landing/torneos.jpg';
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
 
-export default function MatchesHero({
-    popularGames = [],
+export default function TournamentsHero({
+    featuredGames = [],
     activeCategory,
     onCategoryChange,
     categories = [],
@@ -23,22 +23,16 @@ export default function MatchesHero({
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <p className="mb-3 text-[11px] font-black uppercase tracking-[0.35em] text-red-500">
-                            Matchmaking TierOne
+                            Circuito TierOne
                         </p>
                         <h1 className="max-w-3xl text-4xl font-black uppercase italic tracking-tight text-white sm:text-6xl">
-                            Encuentra partida o crea la tuya en segundos
+                            Encuentra torneos y compite por el top
                         </h1>
-                        <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-gray-400 sm:text-base">
-                            Explora los juegos mas activos, filtra por categoria y entra en una sala con lista de partidas en vivo o crea una nueva desde el panel lateral.
-                        </p>
                     </div>
 
                     <div className="rounded-2xl border border-red-500/20 bg-black/30 px-5 py-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur">
                         <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-500">Estado</p>
-                        <p className="mt-2 text-2xl font-black text-white">{popularGames.length} juegos activos</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-red-400">
-                            {popularGames.reduce((total, game) => total + game.partidas_abiertas, 0)} partidas abiertas ahora
-                        </p>
+                        <p className="mt-2 text-2xl font-black text-white">{featuredGames.length} juegos con torneos</p>
                     </div>
                 </div>
 
@@ -53,7 +47,7 @@ export default function MatchesHero({
                 />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    {popularGames.map((game, index) => (
+                    {featuredGames.map((game, index) => (
                         <button
                             key={game.id}
                             type="button"
@@ -72,15 +66,12 @@ export default function MatchesHero({
                                         {game.categoria}
                                     </span>
                                     <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-300">
-                                        {game.partidas_abiertas} abiertas
+                                        {game.torneos_abiertos} abiertos
                                     </span>
                                 </div>
                                 <h2 className="max-w-sm text-2xl font-black uppercase italic text-white">
                                     {game.nombre}
                                 </h2>
-                                <p className="mt-2 max-w-lg text-sm leading-6 text-gray-300">
-                                    {game.descripcion}
-                                </p>
                             </div>
                         </button>
                     ))}
