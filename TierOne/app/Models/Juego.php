@@ -59,4 +59,12 @@ class Juego extends Model
      * Deshabilitar timestamps automáticos
      */
     public $timestamps = false;
+
+    /**
+     * Relacion: partidas creadas para este juego.
+     */
+    public function partidas()
+    {
+        return $this->hasMany(Partida::class, 'id_juego');
+    }
 }

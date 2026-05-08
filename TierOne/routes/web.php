@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\Web\MatchController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,9 +32,9 @@ Route::get('/home', function () {
     ]);
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::redirect('/dashboard', '/profile')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // =========================================================================
 // SHOP & PRODUCT ROUTES
@@ -54,6 +55,11 @@ Route::get('/shop', function () {
             ->get(),
     ]);
 })->name('shop');
+
+Route::get('/matches', [MatchController::class, 'index'])->name('matches');
+Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
+Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])
