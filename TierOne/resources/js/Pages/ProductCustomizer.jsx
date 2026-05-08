@@ -106,23 +106,10 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
             const formData = new FormData();
             formData.append("imagen", file);
             
-            const response = await fetch(route("customization.upload"), {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    )?.content,
-                    "Accept": "application/json",
-                },
+            const { data } = await window.axios.post(route("customization.upload"), formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al subir la imagen");
-            }
-
-            const data = await response.json();
             if (data.url) {
                 canvasRef.current?.addImage(data.url);
             } else {
@@ -130,7 +117,8 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
             }
         } catch (error) {
             console.error("handleAddImage error:", error);
-            alert(error.message || "Hubo un problema al subir tu logo. Revisa el formato y tamaño.");
+            const msg = error.response?.data?.message || error.message || "Hubo un problema al subir tu logo. Revisa el formato y tamaño.";
+            alert(msg);
         }
     };
 
