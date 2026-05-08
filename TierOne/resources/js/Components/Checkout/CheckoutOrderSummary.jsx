@@ -50,7 +50,7 @@ export default function CheckoutOrderSummary() {
 
                             {/* Precio línea */}
                             <span className="text-white text-xs font-black flex-shrink-0">
-                                €{(Number(item.precio_venta) * item.quantity).toFixed(2)}
+                                €{((Number(item.precio_venta) + Number(item.customizationSurcharge || 0)) * item.quantity).toFixed(2)}
                             </span>
                         </div>
                     ))}

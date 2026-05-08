@@ -41,10 +41,17 @@ export default function Cart() {
                         <p className="text-gray-500 font-medium mb-8">Consigue algo de equipo y vuelve a la partida.</p>
                         <Link
                             href="/shop"
-                            className="bg-white text-black px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 group"
+                            className="bg-white text-black px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 group mb-4"
                         >
                             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                             VOLVER A LA TIENDA
+                        </Link>
+                        
+                        <Link 
+                            href="/profile?tab=compras" 
+                            className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 hover:text-white transition-colors"
+                        >
+                            VER HISTORIAL DE COMPRAS
                         </Link>
                     </div>
                 ) : (

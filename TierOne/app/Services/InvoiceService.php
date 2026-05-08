@@ -43,21 +43,21 @@ class InvoiceService
         }
 
         $data = [
-            'orden' => $orden,
-            'logo'  => $logoBase64,
+            'orden'   => $orden,
+            'logo'    => $logoBase64,
             'empresa' => [
-                'nombre' => 'TierOne eSports SL',
-                'cif'    => 'B-12345678',
+                'nombre'    => 'TierOne eSports SL',
+                'cif'       => 'B-12345678',
                 'direccion' => 'Calle Falsa 123, Madrid, España',
-                'email'  => 'facturacion@tierone.com',
-            ]
+                'email'     => 'facturacion@tierone.com',
+            ],
         ];
 
         // Configurar opciones y cargar vista
         $pdf = Pdf::setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
-            'chroot' => public_path(),
+            'chroot' => [public_path(), storage_path()],
         ])->loadView('pdf.invoice', $data);
 
         $pdf->setPaper('a4', 'portrait');

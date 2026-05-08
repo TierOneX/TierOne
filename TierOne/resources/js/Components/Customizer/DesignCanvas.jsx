@@ -340,37 +340,75 @@ const DesignCanvas = forwardRef(({
         addImage: (url) => {
             const canvas = fabricRef.current;
             const zone = activeZoneRef.current;
-            if (!canvas || !zone) return;
+            if (!canvas || !zone) {
+                console.warn('DesignCanvas: No hay zona activa para añadir imagen');
+                return;
+            }
             
             const s = getZoneScale(zone);
-            fabric.FabricImage.fromURL(url, { crossOrigin: 'anonymous' }).then((img) => {
-                if (!img) return;
-                const maxW = zone.area_width * s * 0.8;
-                const imgScale = maxW / (img.width || 1);
-                img.set({
-                    left: zone.area_x * s + 10,
-                    top: zone.area_y * s + 10,
-                    scaleX: imgScale,
-                    scaleY: imgScale,
-                    originX: 'left',
-                    originY: 'top',
-                    clipPath: new fabric.Rect({
-                        left: zone.area_x * s,
-                        top: zone.area_y * s,
-                        width: zone.area_width * s,
-                        height: zone.area_height * s,
-                        strokeWidth: 0,
-                        originX: 'left',
-                        originY: 'top',
-                        absolutePositioned: true,
-                    }),
+            const fullUrl = imgUrl(url);
+
+            fabric.FabricImage.fromURL(fullUrl, { crossOrigin: 'anonymous' })
+                .then((img) => {
+                    if (!img) {
+                        console.error('DesignCanvas: Error al crear objeto de imagen');
+                        return;
+                    }
+
+                    // 1. Cálculo de escala óptima para que quepa en el 80% de la zona
+                    const padding = 0.8;
+                    const targetW = zone.area_width * s * padding;
+                    const targetH = zone.area_height * s * padding;
+                    
+                    const scaleX = targetW / img.width;
+                    const scaleY = targetH / img.height;
+                    const finalScale = Math.min(scaleX, scaleY, 1); // No agrandar si ya cabe
+
+                    // 2. Cálculo de centro de la zona para posicionar
+                    const centerX = (zone.area_x * s) + (zone.area_width * s) / 2;
+                    const centerY = (zone.area_y * s) + (zone.area_height * s) / 2;
+
+                    img.set({
+                        left: centerX,
+                        top: centerY,
+                        scaleX: finalScale,
+                        scaleY: finalScale,
+                        originX: 'center',
+                        originY: 'center',
+                        
+                        // Estética Premium para los controles
+                        cornerColor: '#a855f7',
+                        cornerStyle: 'circle',
+                        cornerSize: 10,
+                        transparentCorners: false,
+                        borderColor: '#a855f7',
+                        borderDashArray: [4, 4],
+                        padding: 5,
+
+                        clipPath: new fabric.Rect({
+                            left: zone.area_x * s,
+                            top: zone.area_y * s,
+                            width: zone.area_width * s,
+                            height: zone.area_height * s,
+                            strokeWidth: 0,
+                            originX: 'left',
+                            originY: 'top',
+                            absolutePositioned: true,
+                        }),
+                    });
+
+                    img._isUserObject = true;
+                    img._customType = 'imagen';
+                    img._customSrc = url;
+
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    canvas.renderAll();
+                })
+                .catch(err => {
+                    console.error('DesignCanvas: Error cargando imagen en Fabric.js', err);
+                    alert("Error visual al cargar la imagen. Inténtalo de nuevo.");
                 });
-                img._isUserObject = true;
-                img._customType = 'imagen';
-                img._customSrc = url;
-                canvas.add(img);
-                canvas.setActiveObject(img);
-            });
         },
         exportAllData: () => { saveCurrentZone(); return { ...zoneObjectsRef.current }; },
         exportViewPNG: () => {

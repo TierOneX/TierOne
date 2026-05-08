@@ -138,6 +138,7 @@ Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stri
 Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
 Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
+Route::get('/pedido/{orden}/factura', [\App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])->name('order.invoice');
 
 Route::get('/checkout', function () {
     return Inertia::render('Checkout', [

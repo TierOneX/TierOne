@@ -18,7 +18,8 @@ class CustomizationService
      */
     public function uploadUserImage(UploadedFile $file): string
     {
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $extension = $file->extension() ?: $file->getClientOriginalExtension() ?: 'png';
+        $filename = Str::uuid() . '.' . $extension;
         $path = $file->storeAs('customizations/uploads', $filename, 'public');
         return '/storage/' . $path;
     }

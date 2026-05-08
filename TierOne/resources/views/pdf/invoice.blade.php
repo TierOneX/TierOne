@@ -142,7 +142,7 @@
                     FACTURADO A
                 </div>
                 <div class="bold text-white text-md pb-5">
-                    {{ $orden->direccionEnvio->nombre_completo ?? $orden->usuario->nombre }}
+                    {{ $orden->direccionEnvio?->nombre_completo ?? $orden->usuario?->nombre }}
                 </div>
                 <div class="text-sm text-gray" style="line-height: 1.7;">
                     @if($orden->direccionEnvio)
