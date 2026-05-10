@@ -85,6 +85,22 @@ Route::get('/cart', function () {
 })->name('cart');
 
 // =========================================================================
+// LEGAL ROUTES
+// =========================================================================
+
+Route::get('/terms', function () {
+    return Inertia::render('Legal/Terms');
+})->name('legal.terms');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Legal/Privacy');
+})->name('legal.privacy');
+
+Route::get('/cookies', function () {
+    return Inertia::render('Legal/Cookies');
+})->name('legal.cookies');
+
+// =========================================================================
 // CUSTOMIZATION ROUTES (USUARIO)
 // =========================================================================
 
