@@ -100,6 +100,18 @@ Route::get('/cookies', function () {
     return Inertia::render('Legal/Cookies');
 })->name('legal.cookies');
 
+Route::get('/shipping', function () {
+    return Inertia::render('Legal/Shipping');
+})->name('legal.shipping');
+
+Route::get('/contact', function () {
+    return Inertia::render('Legal/Contact');
+})->name('legal.contact');
+
+Route::get('/help', function () {
+    return Inertia::render('Legal/Help');
+})->name('legal.help');
+
 // =========================================================================
 // CUSTOMIZATION ROUTES (USUARIO)
 // =========================================================================
