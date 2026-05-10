@@ -62,7 +62,9 @@ Route::post('/matches', [MatchController::class, 'store'])->name('matches.store'
 Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
 Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');
 Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments');
-Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])->name('tournaments.join');
+Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])
+    ->middleware('auth')
+    ->name('tournaments.join');
 Route::get('/paneladmingaming', function () {
     return Inertia::render('PanelAdminGaming');
 })->name('panel.gaming');

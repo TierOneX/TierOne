@@ -67,7 +67,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // ===================================
     // TORNEOS
     // ===================================
-    Route::post('/torneos', [TorneoController::class, 'store']);
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/torneos', [TorneoController::class, 'store']);
+    });
     Route::middleware('torneo.owner')->group(function () {
         Route::put('/torneos/{torneo}', [TorneoController::class, 'update']);
         Route::delete('/torneos/{torneo}', [TorneoController::class, 'destroy']);

@@ -6,17 +6,23 @@ use Illuminate\Database\Seeder;
 use App\Models\Torneo;
 use App\Models\Juego;
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 
 class TorneoSeeder extends Seeder
 {
     private const TOTAL_RECORDS = 20;
+    private const DATA_FILE = 'database/seeders/data/torneos.json';
 
     public function run(): void
     {
         $juegos = Juego::all();
-        $organizadores = User::whereIn('rol', ['admin', 'streamer'])->get();
+        $organizadores = User::where('rol', 'admin')->get();
 
         if ($juegos->isEmpty() || $organizadores->isEmpty()) {
+            return;
+        }
+
+        if ($this->seedFromJson($juegos, $organizadores)) {
             return;
         }
 
@@ -46,5 +52,57 @@ class TorneoSeeder extends Seeder
                 'verificado' => (bool) rand(0, 1),
             ]);
         }
+    }
+
+    private function seedFromJson($juegos, $organizadores): bool
+    {
+        $path = base_path(self::DATA_FILE);
+
+        if (! File::exists($path)) {
+            return false;
+        }
+
+        $content = File::get($path);
+        $records = json_decode($content, true);
+
+        if (! is_array($records) || empty($records)) {
+            return false;
+        }
+
+        foreach ($records as $record) {
+            $juego = Juego::where('slug', $record['juego_slug'] ?? '')->first();
+            $organizador = User::where('email', $record['organizador_email'] ?? '')
+                ->where('rol', 'admin')
+                ->first();
+
+            if (! $juego || ! $organizador) {
+                continue;
+            }
+
+            $cuota = (float) ($record['cuota_inscripcion'] ?? 0);
+
+            Torneo::create([
+                'id_juego' => $juego->id,
+                'id_organizador' => $organizador->id,
+                'nombre' => $record['nombre'] ?? 'Torneo sin nombre',
+                'descripcion' => $record['descripcion'] ?? 'Torneo de prueba',
+                'imagen_banner' => $record['imagen_banner'] ?? 'images/torneos/default-banner.png',
+                'formato' => $record['formato'] ?? 'eliminacion_simple',
+                'max_participantes' => (int) ($record['max_participantes'] ?? 16),
+                'cuota_inscripcion' => $cuota,
+                'premio_total' => (float) ($record['premio_total'] ?? 0),
+                'comision_plataforma_porcentaje' => (float) ($record['comision_plataforma_porcentaje'] ?? 10),
+                'es_gratuito' => $cuota <= 0,
+                'fecha_inicio' => $record['fecha_inicio'] ?? now()->addDays(7),
+                'fecha_fin' => $record['fecha_fin'] ?? now()->addDays(8),
+                'cierre_inscripciones' => $record['cierre_inscripciones'] ?? now()->addDays(6),
+                'estado' => $record['estado'] ?? 'inscripciones',
+                'reglas_url' => $record['reglas_url'] ?? 'https://example.com/reglas',
+                'stream_url' => $record['stream_url'] ?? 'https://twitch.tv/tierone',
+                'verificado' => (bool) ($record['verificado'] ?? true),
+            ]);
+        }
+
+        return true;
     }
 }
