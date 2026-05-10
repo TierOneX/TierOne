@@ -6,7 +6,7 @@ import TournamentsGameGrid from '@/Components/Tournaments/TournamentsGameGrid';
 import TournamentsDrawer from '@/Components/Tournaments/TournamentsDrawer';
 
 export default function Tournaments({ juegos = [], categorias = [] }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('TODOS');
     const [selectedGameId, setSelectedGameId] = useState(null);
@@ -67,6 +67,7 @@ export default function Tournaments({ juegos = [], categorias = [] }) {
                 onSearchChange={setSearchTerm}
                 totalGames={filteredGames.length}
                 onSelectGame={(game) => setSelectedGameId(game.id)}
+                isAdmin={auth?.user?.rol === 'admin'}
             />
 
             <TournamentsGameGrid

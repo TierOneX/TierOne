@@ -14,6 +14,7 @@ export default function TournamentsHero({
     onSearchChange,
     totalGames,
     onSelectGame,
+    isAdmin = false,
 }) {
     const availableCategories = ['TODOS', ...categories];
 
@@ -81,7 +82,7 @@ export default function TournamentsHero({
                                 <h2 className="max-w-sm text-2xl font-black uppercase italic text-white">
                                     {game.nombre}
                                 </h2>
-                                <div className="mt-4 flex justify-end">
+                                <div className={`mt-4 grid gap-2 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} sm:max-w-md sm:ml-auto`}>
                                     <button
                                         type="button"
                                         onClick={(event) => {
@@ -92,6 +93,17 @@ export default function TournamentsHero({
                                     >
                                         Ver torneos
                                     </button>
+                                    {isAdmin && (
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                            }}
+                                            className="min-h-11 rounded-xl bg-red-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
+                                        >
+                                            Crear torneo
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </article>
