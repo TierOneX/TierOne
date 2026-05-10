@@ -28,7 +28,7 @@ export default function CookieConsentBanner() {
     }
 
     return (
-        <div className="fixed inset-x-0 bottom-0 z-[100] px-3 pb-3 sm:px-5 sm:pb-5 lg:inset-x-auto lg:left-6 lg:max-w-[460px]">
+        <div className="fixed inset-x-0 bottom-0 z-[100] px-3 pb-3 sm:px-5 sm:pb-5 lg:inset-x-auto lg:left-6 lg:max-w-[540px]">
             <div className="rounded-lg border border-white/10 bg-[#111114]/95 p-4 text-white shadow-2xl shadow-black/50 backdrop-blur-md sm:p-5">
                 <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#e31837]/15 text-[#ff3354]">
@@ -83,7 +83,7 @@ export default function CookieConsentBanner() {
                             </button>
                             <Link
                                 href="/cookies"
-                                className="inline-flex min-h-11 items-center justify-center rounded-md px-3 py-2 text-sm font-bold text-gray-500 transition-colors hover:text-white sm:justify-start"
+                                className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-bold text-gray-500 transition-colors hover:text-white sm:justify-start"
                             >
                                 Ver politica
                             </Link>
