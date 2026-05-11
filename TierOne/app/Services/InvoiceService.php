@@ -54,7 +54,9 @@ class InvoiceService
 
         $pdf->setPaper('a4', 'portrait');
 
-        $filename = 'factura_' . $orden->numero_orden . '.pdf';
+        $nombreLimpio = \Illuminate\Support\Str::ascii($orden->direccionEnvio?->nombre_completo ?? ($orden->usuario?->nombre . $orden->usuario?->apellido));
+        $nombreUsuario = str_replace(' ', '', $nombreLimpio);
+        $filename = 'Factura-TierONE-' . $nombreUsuario . '.pdf';
 
         if ($action === 'download') {
             return $pdf->download($filename);
