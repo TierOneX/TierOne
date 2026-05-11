@@ -30,7 +30,7 @@ class OrdenSeeder extends Seeder
             Orden::create([
                 'id_usuario' => $usuario->id,
                 'id_direccion_envio' => $direccion->id,
-                'numero_orden' => 'ORD-' . strtoupper(Str::random(8)),
+                'numero_orden' => 'TIO-' . strtoupper(Str::random(8)),
                 'subtotal' => rand(50, 200),
                 'impuestos' => rand(10, 40),
                 'costo_envio' => rand(5, 15),
