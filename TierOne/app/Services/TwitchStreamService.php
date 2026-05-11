@@ -17,17 +17,23 @@ class TwitchStreamService
      * Obtener streams en vivo de un juego.
      * Caché: 90 segundos.
      */
-    public function getLiveStreams(string $twitchGameId, int $limit = 8): array
+    public function getLiveStreams(string $twitchGameId, int $limit = 8, ?string $language = null): array
     {
-        $cacheKey = "twitch:streams:{$twitchGameId}";
+        $cacheKey = "twitch:streams:{$twitchGameId}:{$language}";
 
-        return Cache::remember($cacheKey, 90, function () use ($twitchGameId, $limit) {
+        return Cache::remember($cacheKey, 90, function () use ($twitchGameId, $limit, $language) {
+            $params = [
+                'game_id' => $twitchGameId,
+                'first'   => $limit,
+                'type'    => 'live',
+            ];
+
+            if ($language) {
+                $params['language'] = $language;
+            }
+
             $response = Http::withHeaders($this->authService->getHeaders())
-                ->get(self::HELIX_BASE . '/streams', [
-                    'game_id' => $twitchGameId,
-                    'first'   => $limit,
-                    'type'    => 'live',
-                ]);
+                ->get(self::HELIX_BASE . '/streams', $params);
 
             if ($response->failed()) return [];
 

@@ -146,19 +146,27 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                         {juego.screenshot_ids?.map((id, idx) => (
                                             <div 
                                                 key={idx} 
-                                                className="overflow-hidden rounded-2xl bg-[#141414] aspect-video group cursor-zoom-in border border-white/5 relative shadow-xl"
+                                                className="group relative overflow-hidden rounded-[2rem] bg-[#141414] aspect-video cursor-zoom-in shadow-2xl transition-all hover:-translate-y-1"
                                                 onClick={() => window.open(igdbImageUrl(id, 't_original'), '_blank')}
                                             >
                                                 <img 
                                                     src={igdbImageUrl(id, 't_screenshot_big')} 
                                                     alt={`Screenshot ${idx}`}
-                                                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-75 group-hover:brightness-100"
                                                 />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
-                                                        <ImageIcon size={20} />
+                                                
+                                                {/* Zoom Overlay */}
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
+                                                    <div className="flex flex-col items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                                        <div className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                                                            <ImageIcon size={24} />
+                                                        </div>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Ampliar Captura</span>
                                                     </div>
                                                 </div>
+
+                                                {/* Shimmer line */}
+                                                <div className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/10 rounded-[2rem] pointer-events-none" />
                                             </div>
                                         ))}
                                     </div>

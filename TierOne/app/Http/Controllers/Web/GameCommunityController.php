@@ -13,7 +13,8 @@ class GameCommunityController extends Controller
     public function __construct(
         protected GameService $gameService,
         protected TwitchStreamService $twitchStreamService
-    ) {}
+    ) {
+    }
 
     /**
      * Página principal de comunidad: listado de juegos enriquecidos.
@@ -27,18 +28,31 @@ class GameCommunityController extends Controller
 
         $topGames = $this->twitchStreamService->getTopGames(10);
 
+        $topGames = $this->twitchStreamService->getTopGames(10);
+
         // Enriquecer topGames con slugs locales para enlazar a las fichas
         $igdbIds = collect($topGames)->pluck('igdb_id')->filter()->toArray();
-        $localGames = Juego::whereIn('igdb_id', $igdbIds)->get(['igdb_id', 'slug']);
-        
-        $topGames = collect($topGames)->map(function($game) use ($localGames) {
+        $names = collect($topGames)->pluck('name')->toArray();
+
+        $localGames = Juego::whereIn('igdb_id', $igdbIds)
+            ->orWhereIn('nombre', $names)
+            ->get(['igdb_id', 'slug', 'nombre']);
+
+        $topGames = collect($topGames)->map(function ($game) use ($localGames) {
+            // Intentar por IGDB ID primero
             $local = $localGames->firstWhere('igdb_id', $game['igdb_id']);
+
+            // Fallback por nombre si no hay match por ID
+            if (!$local) {
+                $local = $localGames->firstWhere('nombre', $game['name']);
+            }
+
             $game['slug'] = $local ? $local->slug : null;
             return $game;
         })->toArray();
 
         return Inertia::render('Community/Index', [
-            'juegos'   => $juegos,
+            'juegos' => $juegos,
             'topGames' => $topGames,
         ]);
     }
@@ -56,7 +70,12 @@ class GameCommunityController extends Controller
         $topClips = [];
 
         if ($juego->twitch_game_id) {
-            $liveStreams = $this->twitchStreamService->getLiveStreams($juego->twitch_game_id);
+            // Priorizamos streams en español para la zona del usuario
+            $liveStreams = $this->twitchStreamService->getLiveStreams($juego->twitch_game_id, 8, 'es');
+            
+            // Si no hay suficientes en español, podríamos traer globales, pero el usuario pidió por zonas.
+            // Para cumplir "la primera del país", traemos 'es'.
+            
             $topClips = $this->twitchStreamService->getTopClips($juego->twitch_game_id);
         }
 
@@ -72,10 +91,10 @@ class GameCommunityController extends Controller
             : [];
 
         return Inertia::render('Community/GameProfile', [
-            'juego'       => $juego,
-            'liveStreams'  => $liveStreams,
-            'topClips'    => $topClips,
-            'torneos'     => $torneos,
+            'juego' => $juego,
+            'liveStreams' => $liveStreams,
+            'topClips' => $topClips,
+            'torneos' => $torneos,
         ]);
     }
 }

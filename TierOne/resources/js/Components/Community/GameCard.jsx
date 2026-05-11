@@ -28,7 +28,7 @@ export default function GameCard({ juego }) {
                 {/* Badge de Rating Flotante */}
                 {rating > 0 && (
                     <div className="absolute right-3 top-3 flex items-center gap-1 rounded-xl bg-black/60 px-2 py-1 text-xs font-black backdrop-blur-md border border-white/10 shadow-lg">
-                        <Star size={12} className={`fill-current ${getRatingColor(rating)}`} />
+                        <Star size={12} className="fill-primary text-primary" />
                         <span className="text-white">{rating}</span>
                     </div>
                 )}

@@ -70,9 +70,9 @@ export default function GameHero({ juego }) {
                             {rating > 0 && (
                                 <div className="group flex items-center gap-5 bg-white/5 border border-white/10 rounded-[2rem] p-4 backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/20">
                                     <div className="relative">
-                                        <div className="absolute inset-0 bg-primary blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
-                                        <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-[#ff4b2b] shadow-xl">
-                                            <Star size={28} className="text-black fill-black" />
+                                        <div className="absolute inset-0 bg-primary/20 blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
+                                        <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-xl">
+                                            <Star size={28} className="text-primary fill-primary" />
                                         </div>
                                     </div>
                                     <div className="flex flex-col">
