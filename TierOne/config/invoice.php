@@ -13,7 +13,7 @@ return [
     'seller' => [
         'name'          => env('INVOICE_SELLER_NAME', 'TierOne eSports SL'),
         'id'            => env('INVOICE_SELLER_ID', 'B-12345678'), // CIF/NIF
-        'address'       => env('INVOICE_SELLER_ADDRESS', 'Calle Falsa 123, Madrid, España'),
+        'address'       => env('INVOICE_SELLER_ADDRESS', 'Polígono Industrial Las Mercedes, Nave 14, 28022 Madrid, España'),
         'city'          => env('INVOICE_SELLER_CITY', 'Madrid'),
         'postal_code'   => env('INVOICE_SELLER_POSTAL_CODE', '28001'),
         'country'       => env('INVOICE_SELLER_COUNTRY', 'España'),

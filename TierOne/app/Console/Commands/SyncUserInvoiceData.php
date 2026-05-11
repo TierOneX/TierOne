@@ -61,6 +61,16 @@ class SyncUserInvoiceData extends Command
                     'provincia'     => $user->provincia ?? 'Madrid',
                 ]);
             }
+
+            // IMPORTANTE: Actualizar todas las direcciones físicas de este usuario para que no tengan "Calle Falsa"
+            \App\Models\DireccionEnvio::where('id_usuario', $user->id)->update([
+                'direccion_linea1' => $user->direccion,
+                'ciudad'           => $user->ciudad,
+                'estado_provincia' => $user->provincia,
+                'codigo_postal'    => $user->codigo_postal,
+                'telefono'         => $user->telefono,
+            ]);
+
             $count++;
         }
 

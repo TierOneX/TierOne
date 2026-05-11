@@ -227,9 +227,12 @@
             <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
                 <table style="width: 100%;">
                     <tr>
-                        @if(isset($item->personalizacion_imagen_base64))
+                        @php
+                            $imagenAMostrar = $item->personalizacion_imagen_base64 ?? $item->producto_imagen_base64 ?? null;
+                        @endphp
+                        @if($imagenAMostrar)
                         <td style="width: 60px; padding-right: 12px;">
-                            <img src="{{ $item->personalizacion_imagen_base64 }}" width="60" height="60" style="border: 1px solid #333; border-radius: 4px; object-fit: contain; background-color: #1a1a1a;">
+                            <img src="{{ $imagenAMostrar }}" width="60" height="60" style="border: 1px solid #333; border-radius: 4px; object-fit: contain; background-color: #1a1a1a;">
                         </td>
                         @endif
                         <td style="vertical-align: middle;">
