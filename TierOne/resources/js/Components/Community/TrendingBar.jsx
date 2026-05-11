@@ -1,79 +1,75 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { Flame, Users, Trophy, ChevronRight, MousePointer2 } from 'lucide-react';
-import { motion, useAnimation } from 'framer-motion';
+import { Flame, Users, Trophy, ChevronRight, Share2, Play } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function TrendingBar({ topGames }) {
-    const [isDragging, setIsDragging] = useState(false);
     const carouselRef = useRef(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     if (!topGames || topGames.length === 0) return null;
 
     return (
-        <div className="relative w-full">
-            {/* Header / Title */}
-            <div className="mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-primary blur-lg opacity-20 animate-pulse" />
-                        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-primary">
-                            <Flame size={28} className="fill-current" />
-                        </div>
+        <div className="relative w-full py-10 select-none">
+            {/* Header / Titulo Estilizado */}
+            <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="relative">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="h-[2px] w-12 bg-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Tendencias Globales</span>
                     </div>
-                    <div>
-                        <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white sm:text-4xl">
-                            Tendencias <span className="text-primary">Twitch</span>
-                        </h2>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-ping" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">En vivo ahora mismo</p>
-                        </div>
-                    </div>
+                    <h2 className="text-5xl font-black uppercase italic tracking-tighter text-white sm:text-7xl">
+                        TRENDING <span className="text-outline text-transparent opacity-50" style={{ WebkitTextStroke: '1px white' }}>TWITCH</span>
+                    </h2>
                 </div>
                 
-                <div className="hidden items-center gap-4 sm:flex">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/20">
-                        <MousePointer2 size={12} />
-                        <span>Arrastra para explorar</span>
+                <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Desliza para ver más</span>
+                        <div className="mt-2 h-1 w-32 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                                className="h-full bg-primary"
+                                animate={{ x: ["-100%", "100%"] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Draggable Carousel with Framer Motion */}
-            <div className="relative group">
+            {/* Carousel Container (Infinite Loop) */}
+            <div className="relative overflow-hidden" ref={carouselRef}>
                 <motion.div 
-                    ref={carouselRef}
-                    className="flex gap-6 overflow-x-hidden cursor-grab active:cursor-grabbing py-4"
-                    whileTap={{ cursor: "grabbing" }}
+                    className="flex gap-8"
+                    // Duplicate games to create seamless loop
+                    animate={{ x: [0, -((topGames.length * 280) + (topGames.length - 1) * 8)] }}
+                    transition={{
+                        repeat: Infinity,
+                        duration: topGames.length * 4,
+                        ease: "linear",
+                    }}
+                    // Pause on hover
+                    whileHover={{ animationPlayState: "paused" }}
                 >
-                    <motion.div 
-                        drag="x"
-                        dragConstraints={carouselRef}
-                        className="flex gap-6"
-                        onDragStart={() => setIsDragging(true)}
-                        onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
-                    >
-                        {topGames.map((game, index) => (
-                            <TrendingCard 
-                                key={game.twitch_game_id} 
-                                game={game} 
-                                index={index} 
-                                isDragging={isDragging}
-                            />
-                        ))}
-                    </motion.div>
+                    {/* Render duplicated items */}
+                    {[...topGames, ...topGames].map((game, idx) => (
+                        <TrendingCard 
+                            key={`${game.twitch_game_id}-${idx}`} 
+                            game={game} 
+                            index={idx % topGames.length} 
+                            isDragging={false}
+                        />
+                    ))}
                 </motion.div>
-
-                {/* Fade overlays for depth */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0a0a0a] to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Fade overlays for edges */}
+                <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-10 pointer-events-none" />
             </div>
         </div>
     );
 }
 
 function TrendingCard({ game, index, isDragging }) {
-    // Si el juego tiene slug, enlazamos a la comunidad, si no, es solo informativo
     const CardWrapper = game.slug ? Link : 'div';
     const wrapperProps = game.slug 
         ? { 
@@ -84,54 +80,56 @@ function TrendingCard({ game, index, isDragging }) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="relative min-w-[280px] sm:min-w-[320px] select-none"
+            className="relative min-w-[240px] sm:min-w-[280px]"
+            whileHover={{ y: -10 }}
+            transition={{ type: "spring", stiffness: 300 }}
         >
-            <CardWrapper {...wrapperProps} className="group block relative aspect-video rounded-3xl overflow-hidden bg-[#1A1A1A] border border-white/5 shadow-2xl transition-all duration-500 hover:border-primary/50 hover:shadow-primary/10">
-                {/* Background Image */}
+            {/* Numero de Ranking Gigante (Background) */}
+            <span 
+                className="absolute -top-12 -left-6 text-[12rem] font-black italic leading-none opacity-[0.03] pointer-events-none select-none text-white transition-opacity group-hover:opacity-10"
+                style={{ WebkitTextStroke: '2px rgba(255,255,255,0.5)' }}
+            >
+                {index + 1}
+            </span>
+
+            <CardWrapper {...wrapperProps} className="group block relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-[#0F0F0F] border border-white/5 shadow-2xl">
+                {/* Imagen Vertical de Portada */}
                 <img 
                     src={game.box_art_url} 
                     alt={game.name}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 brightness-50 group-hover:brightness-75"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-75 group-hover:brightness-100"
                 />
                 
-                {/* Overlay Gradiente */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-                {/* Badge de Ranking */}
-                <div className="absolute top-4 left-4 flex items-center justify-center">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-white/20 blur-md rounded-full" />
-                        <div className="relative h-10 w-10 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-black italic">
-                            #{index + 1}
-                        </div>
+                {/* Overlay de Vidrio en el Bottom */}
+                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent backdrop-blur-[2px] transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#E10600]" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-primary">Top {index + 1} Global</span>
                     </div>
-                </div>
-
-                {/* Content Info */}
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="px-2 py-0.5 rounded-md bg-primary text-black text-[9px] font-black uppercase tracking-widest">
-                            Top Tier
-                        </div>
-                    </div>
-                    <h3 className="text-xl font-black uppercase italic tracking-tighter text-white group-hover:text-primary transition-colors line-clamp-1">
+                    
+                    <h3 className="text-xl font-black uppercase italic tracking-tighter text-white mb-4 line-clamp-2 leading-none">
                         {game.name}
                     </h3>
-                    
-                    {game.slug && (
-                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-white transition-colors">
-                            <span>Explorar Comunidad</span>
-                            <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+
+                    <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white/40">
+                            <Play size={12} className="fill-current text-primary" />
+                            <span>Explorar</span>
                         </div>
-                    )}
+                        <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10 group-hover:bg-primary group-hover:text-black group-hover:border-primary transition-all">
+                            <ChevronRight size={16} />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Hover Glow Effect */}
-                <div className="absolute inset-0 border-2 border-primary opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl pointer-events-none" />
+                {/* Ranking Badge Minimal */}
+                <div className="absolute top-6 right-6 h-10 w-10 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white font-black italic shadow-xl opacity-100 group-hover:opacity-0 transition-opacity">
+                    #{index + 1}
+                </div>
             </CardWrapper>
+
+            {/* Sombra proyectada */}
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] h-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
         </motion.div>
     );
 }
