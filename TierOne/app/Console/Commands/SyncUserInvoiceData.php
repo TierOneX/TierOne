@@ -31,8 +31,13 @@ class SyncUserInvoiceData extends Command
         $this->info("Iniciando sincronización de datos para " . $users->count() . " usuarios...");
 
         foreach ($users as $user) {
-            // Intentar encontrar una dirección predeterminada
-            $direccion = $user->carritos()->latest()->first()?->direccionEnvio // O buscar en DireccionEnvio directamente
+            // Siempre generar DNI si no tiene uno
+            if (!$user->dni_cif) {
+                $user->update(['dni_cif' => rand(10000000, 99999999) . chr(rand(65, 90))]);
+            }
+
+            // Intentar encontrar una dirección para autocompletar otros campos
+            $direccion = $user->carritos()->latest()->first()?->direccionEnvio 
                 ?? \App\Models\DireccionEnvio::where('id_usuario', $user->id)
                     ->orderBy('predeterminada', 'desc')
                     ->orderBy('created_at', 'desc')
@@ -40,15 +45,23 @@ class SyncUserInvoiceData extends Command
 
             if ($direccion) {
                 $user->update([
-                    'dni_cif'       => $user->dni_cif ?? (rand(10000000, 99999999) . chr(rand(65, 90))),
                     'telefono'      => $user->telefono ?? $direccion->telefono,
                     'direccion'     => $user->direccion ?? $direccion->direccion_linea1,
                     'codigo_postal' => $user->codigo_postal ?? $direccion->codigo_postal,
                     'ciudad'        => $user->ciudad ?? $direccion->ciudad,
                     'provincia'     => $user->provincia ?? $direccion->estado_provincia,
                 ]);
-                $count++;
+            } else {
+                // Si no hay ninguna dirección, ponemos datos genéricos de prueba
+                $user->update([
+                    'telefono'      => $user->telefono ?? '+34 600000000',
+                    'direccion'     => $user->direccion ?? 'Calle de Prueba 123',
+                    'codigo_postal' => $user->codigo_postal ?? '28001',
+                    'ciudad'        => $user->ciudad ?? 'Madrid',
+                    'provincia'     => $user->provincia ?? 'Madrid',
+                ]);
             }
+            $count++;
         }
 
         $this->info("Sincronización completada. Se actualizaron $count usuarios.");
