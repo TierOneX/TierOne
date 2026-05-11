@@ -22,7 +22,7 @@ class InvoiceService
         // Procesamiento seguro del logo
         $logoBase64 = '';
         if (extension_loaded('gd')) {
-            $logoPath = public_path('images/Logo.png');
+            $logoPath = config('invoice.logo_path');
             if (file_exists($logoPath)) {
                 $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
             }
@@ -45,20 +45,12 @@ class InvoiceService
         $data = [
             'orden'   => $orden,
             'logo'    => $logoBase64,
-            'empresa' => [
-                'nombre'    => 'TierOne eSports SL',
-                'cif'       => 'B-12345678',
-                'direccion' => 'Calle Falsa 123, Madrid, España',
-                'email'     => 'facturacion@tierone.com',
-            ],
+            'empresa' => config('invoice.seller'),
         ];
 
         // Configurar opciones y cargar vista
-        $pdf = Pdf::setOptions([
-            'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
-            'chroot' => [public_path(), storage_path()],
-        ])->loadView('pdf.invoice', $data);
+        $pdf = Pdf::setOptions(config('invoice.pdf_options'))
+            ->loadView('pdf.invoice', $data);
 
         $pdf->setPaper('a4', 'portrait');
 

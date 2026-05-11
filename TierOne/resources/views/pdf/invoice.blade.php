@@ -106,9 +106,9 @@
                 </table>
             </td>
             <td style="width: 50%;" class="text-right text-sm text-gray" style="line-height: 1.6;">
-                <span class="bold text-white text-md">{{ $empresa['nombre'] }}</span><br>
-                CIF: {{ $empresa['cif'] }}<br>
-                {{ $empresa['direccion'] }}<br>
+                <span class="bold text-white text-md">{{ $empresa['name'] }}</span><br>
+                CIF: {{ $empresa['id'] }}<br>
+                {{ $empresa['address'] }}<br>
                 {{ $empresa['email'] }}
             </td>
         </tr>
@@ -142,22 +142,29 @@
                     FACTURADO A
                 </div>
                 <div class="bold text-white text-md pb-5">
-                    {{ $orden->direccionEnvio?->nombre_completo ?? $orden->usuario?->nombre }}
+                    {{ $orden->direccionEnvio?->nombre_completo ?? ($orden->usuario?->nombre . ' ' . $orden->usuario?->apellido) }}
                 </div>
                 <div class="text-sm text-gray" style="line-height: 1.7;">
                     @if($orden->direccionEnvio)
                         {{ $orden->direccionEnvio->direccion_linea1 }}<br>
                         {{ $orden->direccionEnvio->codigo_postal }}, {{ $orden->direccionEnvio->ciudad }}<br>
-                        {{ $orden->direccionEnvio->pais }}<br>
+                        {{ $orden->direccionEnvio->pais }}
                         @if($orden->direccionEnvio->telefono)
-                            Tel: {{ $orden->direccionEnvio->telefono }}
+                            <br>Tel: {{ $orden->direccionEnvio->telefono }}
+                        @endif
+                    @elseif($orden->usuario?->direccion)
+                        {{ $orden->usuario->direccion }}<br>
+                        {{ $orden->usuario->codigo_postal }}, {{ $orden->usuario->ciudad }}<br>
+                        {{ $orden->usuario->provincia }}, {{ $orden->usuario->pais }}
+                        @if($orden->usuario->telefono)
+                            <br>Tel: {{ $orden->usuario->telefono }}
                         @endif
                     @else
-                        {{ $orden->usuario->email }}
+                        {{ $orden->usuario?->email }}
                     @endif
-                    {{-- Placeholder para NIF/CIF si se añade a la BD --}}
-                    @if(isset($orden->usuario->dni_cif))
-                        <br>NIF/CIF: {{ $orden->usuario->dni_cif }}
+
+                    @if($orden->usuario?->dni_cif)
+                        <br><span class="bold">NIF/CIF:</span> {{ $orden->usuario->dni_cif }}
                     @endif
                 </div>
             </td>
