@@ -136,20 +136,65 @@ export default function Categories({
         );
     };
 
+    // Función para ordenar jerárquicamente: Padre -> Sus Hijos -> Siguiente Padre
+    const sortHierarchically = (items) => {
+        if (!Array.isArray(items)) return [];
+        
+        // Categorías principales (sin padre)
+        const parents = items
+            .filter((cat) => !cat.padre)
+            .sort((a, b) => a.nombre.localeCompare(b.nombre));
+        
+        // Subcategorías (con padre)
+        const children = items.filter((cat) => cat.padre);
+
+        const sorted = [];
+        parents.forEach((parent) => {
+            sorted.push(parent);
+            // Buscamos los hijos directos de este padre
+            const subcategories = children
+                .filter((sub) => sub.padre === parent.id)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre));
+            sorted.push(...subcategories);
+        });
+
+        // Añadir huérfanas si existieran (subcategorías cuyo padre no está en la lista actual)
+        const orphans = children.filter(
+            (sub) => !parents.find((p) => p.id === sub.padre)
+        ).sort((a, b) => a.nombre.localeCompare(b.nombre));
+        
+        sorted.push(...orphans);
+
+        return sorted;
+    };
+
+    const sortedCategories = sortHierarchically(categorias);
+
     const renderRow = (cat) => (
         <tr
             key={cat.id}
-            className="hover:bg-gray-50 transition-colors group cursor-pointer"
+            className="hover:bg-white/5 transition-colors group cursor-pointer border-b border-white/5"
             onClick={() => openDetailsModal(cat)}
         >
             <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                    {cat.padre && (
-                        <CornerDownRight size={12} className="text-gray-300" />
+                <div className="flex items-center gap-3">
+                    {cat.padre ? (
+                        <div className="flex items-center gap-2 ml-4">
+                            <CornerDownRight size={14} className="text-red-500/50" />
+                            <span className="font-bold text-gray-400 text-sm italic font-['Outfit'] uppercase tracking-tight">
+                                {cat.nombre}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-600/10 rounded-lg text-red-500 border border-red-500/20">
+                                <Tag size={14} />
+                            </div>
+                            <span className="font-black text-white text-sm italic font-['Outfit'] uppercase tracking-widest">
+                                {cat.nombre}
+                            </span>
+                        </div>
                     )}
-                    <span className="font-bold text-gray-900">
-                        {cat.nombre}
-                    </span>
                 </div>
             </td>
             <td className="px-6 py-4 text-xs text-gray-400 font-mono italic tracking-tight">
@@ -160,51 +205,51 @@ export default function Categories({
             </td>
             <td className="px-6 py-4 text-center">
                 {cat.subcategorias > 0 ? (
-                    <span className="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[10px] font-black">
-                        {cat.subcategorias}
+                    <span className="bg-red-600/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        {cat.subcategorias} Subs
                     </span>
                 ) : (
-                    <span className="text-gray-300">—</span>
+                    <span className="text-gray-700 font-mono">—</span>
                 )}
             </td>
             <td className="px-6 py-4 text-center">
                 <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${cat.activa ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-tighter ${cat.activa ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
                 >
                     {cat.activa ? "Activa" : "Inactiva"}
                 </span>
             </td>
             <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex justify-end gap-2 opacity-100 transition-all">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             openDetailsModal(cat);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-white rounded-lg border border-white/5 hover:border-white/20 transition-all"
                         title="Ver Detalles"
                     >
-                        <Eye size={14} />
+                        <Eye size={14} className="hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             openEditModal(cat);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-amber-500 rounded-lg border border-white/5 hover:border-amber-500/20 transition-all"
                         title="Editar"
                     >
-                        <Edit2 size={14} />
+                        <Edit2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(cat.id);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-red-500 rounded-lg border border-white/5 hover:border-red-500/20 transition-all"
                         title="Eliminar"
                     >
-                        <Trash2 size={14} />
+                        <Trash2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                     </button>
                 </div>
             </td>
@@ -215,15 +260,15 @@ export default function Categories({
         <PanelLayout title="Gestión de Categorías" activeItem="Categorías">
             <Head title="Categorías - Admin Panel" />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white uppercase tracking-tight">
+            <div className="flex justify-between items-center mb-10">
+                <h2 className="text-xl font-black text-white tracking-[0.2em] uppercase italic font-['Outfit']">
                     Listado de Categorías
                 </h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-md shadow-red-200 tracking-widest flex items-center gap-2"
+                    className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:from-red-500 hover:to-red-700 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all flex items-center gap-2 italic font-['Outfit'] active:scale-95"
                 >
-                    <Plus size={14} /> Nueva Categoría
+                    <Plus size={16} /> Nueva Categoría
                 </button>
             </div>
 
@@ -235,7 +280,7 @@ export default function Categories({
 
             <AdminTable
                 columns={columns}
-                data={categorias}
+                data={sortedCategories}
                 filters={filters}
                 onSort={handleSort}
                 renderRow={renderRow}

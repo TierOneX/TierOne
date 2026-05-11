@@ -20,13 +20,13 @@ import {
 
 const estadoBadge = (estado) => {
     const map = {
-        pendiente: "bg-orange-50 text-orange-700 border-orange-200",
-        procesando: "bg-red-50 text-red-700 border-red-200",
-        enviada: "bg-purple-50 text-purple-700 border-purple-200",
-        entregada: "bg-green-50 text-green-700 border-green-200",
-        cancelada: "bg-gray-100 text-gray-800 border-gray-200",
+        pendiente: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+        procesando: "bg-red-500/10 text-red-400 border-red-500/20",
+        enviada: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+        entregada: "bg-green-500/10 text-green-400 border-green-500/20",
+        cancelada: "bg-gray-500/10 text-gray-400 border-gray-500/20",
     };
-    return map[estado] ?? "bg-gray-100 text-gray-800 border-gray-200";
+    return map[estado] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20";
 };
 
 export default function Orders({
@@ -195,10 +195,10 @@ export default function Orders({
     const renderRow = (orden) => (
         <React.Fragment key={orden.id}>
             <tr
-                className="hover:bg-gray-50 transition-colors group cursor-pointer"
+                className="transition-colors group cursor-pointer border-b border-white/5 hover:bg-white/5"
                 onClick={() => openViewModal(orden)}
             >
-                <td className="px-6 py-4 font-bold text-gray-900">
+                <td className="px-6 py-4 font-black text-white italic font-['Outfit'] uppercase tracking-tight">
                     <div className="flex items-center gap-2">
                         <button
                             onClick={(e) => {
@@ -209,7 +209,7 @@ export default function Orders({
                                         : orden.id,
                                 );
                             }}
-                            className="text-gray-400 hover:text-red-600 transition-colors"
+                            className="text-gray-500 hover:text-red-500 transition-colors"
                         >
                             {expandedOrder === orden.id ? (
                                 <ChevronDown size={14} />
@@ -225,52 +225,52 @@ export default function Orders({
                 </td>
                 <td className="px-6 py-4">
                     <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">
+                        <span className="font-bold text-white">
                             {orden.cliente}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-500">
                             {orden.email}
                         </span>
                     </div>
                 </td>
                 <td className="px-6 py-4">
                     <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${estadoBadge(orden.estado)}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-tighter ${estadoBadge(orden.estado)}`}
                     >
                         {orden.estado}
                     </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-400 font-mono">
+                <td className="px-6 py-4 text-sm text-gray-500 font-mono">
                     {orden.tracking ?? "—"}
                 </td>
-                <td className="px-6 py-4 text-right font-black text-black">
+                <td className="px-6 py-4 text-right font-black text-white italic font-mono">
                     €{Number(orden.total).toFixed(2)}
                 </td>
                 <td
                     className="px-6 py-4 text-right"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-2 opacity-100 transition-all">
                         <button
                             onClick={() => openViewModal(orden)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-white rounded-lg border border-white/5 hover:border-white/20 transition-all shadow-xl"
                             title="Ver detalles"
                         >
-                            <Eye size={14} />
+                            <Eye size={14} className="hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
                         </button>
                         <button
                             onClick={() => openEditModal(orden)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-amber-400 rounded-lg border border-white/5 hover:border-amber-500/20 transition-all shadow-xl"
                             title="Editar"
                         >
-                            <Edit2 size={14} />
+                            <Edit2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                         </button>
                         <button
                             onClick={() => handleDelete(orden.id)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-red-500 rounded-lg border border-white/5 hover:border-red-500/20 transition-all shadow-xl"
                             title="Eliminar"
                         >
-                            <Trash2 size={14} />
+                            <Trash2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                         </button>
                     </div>
                 </td>
@@ -287,22 +287,22 @@ export default function Orders({
                                     orden.items.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex flex-col bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-3 last:mb-0"
+                                            className="flex flex-col bg-[#1A1A1A] p-4 rounded-xl border border-white/5 shadow-xl mb-3 last:mb-0"
                                         >
                                             <div className="flex justify-between items-center text-sm">
                                                 <div className="flex gap-4 items-center">
-                                                    <span className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-black text-red-600 text-[10px]">
+                                                    <span className="w-8 h-8 rounded-lg bg-red-600/10 flex items-center justify-center font-black text-red-500 text-[10px] border border-red-500/20">
                                                         x{item.cantidad}
                                                     </span>
-                                                    <span className="text-gray-900 font-bold">
+                                                    <span className="text-white font-bold italic font-['Outfit'] uppercase text-sm">
                                                         {item.producto}
                                                     </span>
                                                 </div>
                                                 <div className="flex gap-8 items-center">
-                                                    <span className="text-gray-400 text-[10px] font-black uppercase">
+                                                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">
                                                         €{Number(item.precio).toFixed(2)}/u
                                                     </span>
-                                                    <span className="font-black text-gray-900">
+                                                    <span className="font-black text-white italic">
                                                         €{Number(item.subtotal).toFixed(2)}
                                                     </span>
                                                 </div>
@@ -310,7 +310,7 @@ export default function Orders({
 
                                             {/* Detalles de personalización si existen */}
                                             {item.personalizacion_data && (
-                                                <div className="w-full mt-3 p-3 bg-purple-50 rounded-xl border border-purple-100 flex flex-col gap-3">
+                                                <div className="w-full mt-3 p-3 bg-purple-600/5 rounded-xl border border-purple-500/20 flex flex-col gap-3">
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-[9px] bg-purple-600 text-white px-2 py-0.5 rounded font-black uppercase tracking-widest">
@@ -331,29 +331,29 @@ export default function Orders({
                                                                     <Download size={12} /> PNG
                                                                 </a>
                                                             )}
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    const json = JSON.stringify(item.personalizacion_data, null, 2);
-                                                                    const blob = new Blob([json], { type: 'application/json' });
-                                                                    const url = URL.createObjectURL(blob);
-                                                                    const a = document.createElement('a');
-                                                                    a.href = url;
-                                                                    a.download = `diseno_item_${item.id}.json`;
-                                                                    a.click();
-                                                                    URL.revokeObjectURL(url);
-                                                                }}
-                                                                className="px-3 py-1.5 bg-white text-gray-700 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-gray-50 flex items-center gap-1.5 border border-gray-200"
-                                                            >
-                                                                <FileJson size={12} /> JSON
-                                                            </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const json = JSON.stringify(item.personalizacion_data, null, 2);
+                                                                        const blob = new Blob([json], { type: 'application/json' });
+                                                                        const url = URL.createObjectURL(blob);
+                                                                        const a = document.createElement('a');
+                                                                        a.href = url;
+                                                                        a.download = `diseno_item_${item.id}.json`;
+                                                                        a.click();
+                                                                        URL.revokeObjectURL(url);
+                                                                    }}
+                                                                    className="px-3 py-1.5 bg-white/5 text-gray-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-white/10 hover:text-white flex items-center gap-1.5 border border-white/5 transition-all"
+                                                                >
+                                                                    <FileJson size={12} /> JSON
+                                                                </button>
                                                         </div>
                                                     </div>
                                                     {item.personalizacion_imagen && (
                                                         <img
                                                             src={item.personalizacion_imagen}
                                                             alt="Preview diseño"
-                                                            className="w-24 h-24 rounded border border-purple-200 object-contain bg-white"
+                                                            className="w-24 h-24 rounded border border-white/10 object-contain bg-[#0F0F0F]"
                                                         />
                                                     )}
                                                 </div>
@@ -378,16 +378,16 @@ export default function Orders({
         <PanelLayout title="Gestión de Órdenes" activeItem="Órdenes">
             <Head title="Órdenes - Admin Panel" />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white tracking-tight uppercase">
+            <div className="flex justify-between items-center mb-10">
+                <h2 className="text-xl font-black text-white tracking-[0.2em] uppercase italic font-['Outfit']">
                     Listado de Órdenes
                 </h2>
                 <div className="flex gap-2">
                     <button
                         onClick={openCreateModal}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-md shadow-red-200 tracking-widest flex items-center gap-2"
+                        className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:from-red-500 hover:to-red-700 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all flex items-center gap-2 italic font-['Outfit'] active:scale-95"
                     >
-                        <Plus size={14} /> Crear Pedido
+                        <Plus size={16} /> Crear Pedido
                     </button>
                 </div>
             </div>

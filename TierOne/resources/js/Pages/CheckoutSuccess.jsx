@@ -17,6 +17,7 @@ export default function CheckoutSuccess() {
 
     const [status, setStatus] = useState('loading');
     const [orderNum, setOrderNum] = useState(null);
+    const [orderId, setOrderId] = useState(null);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -43,6 +44,7 @@ export default function CheckoutSuccess() {
                 .then(data => {
                     if (data.success) {
                         setOrderNum(data.data?.numero_orden);
+                        setOrderId(data.data?.order_id);
                         setStatus('success');
                     } else {
                         setStatus('failed');
@@ -80,7 +82,7 @@ export default function CheckoutSuccess() {
 
                 {/* Éxito */}
                 {status === 'success' && (
-                    <CheckoutSuccessView numeroOrden={orderNum} />
+                    <CheckoutSuccessView numeroOrden={orderNum} orderId={orderId} />
                 )}
 
                 {/* Fallido */}

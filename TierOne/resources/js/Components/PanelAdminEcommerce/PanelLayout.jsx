@@ -48,7 +48,7 @@ export default function PanelLayout({ title, activeItem, children }) {
                     <button className="menu-toggle" onClick={toggleSidebar}>
                         ☰
                     </button>
-                    <h1 className="page-title">{title}</h1>
+                    <h1 className="page-title italic font-['Outfit']">{title}</h1>
                 </div>
                 <div className="header-actions">
                     <Link

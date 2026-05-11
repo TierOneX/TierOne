@@ -1,14 +1,25 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, FileText } from 'lucide-react';
 
 /**
  * Vista de pago exitoso.
  *
  * Props:
  *  - numeroOrden {string|null} Número legible de la orden
+ *  - orderId {number|null} ID de la orden en la BD
  */
-export default function CheckoutSuccessView({ numeroOrden }) {
+export default function CheckoutSuccessView({ numeroOrden, orderId }) {
+    React.useEffect(() => {
+        if (orderId) {
+            // Disparar la descarga automática tras un breve delay
+            const timer = setTimeout(() => {
+                window.open(`/pedido/${orderId}/factura`, '_blank');
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [orderId]);
+
     return (
         <div className="flex flex-col items-center text-center py-12">
 
@@ -41,20 +52,32 @@ export default function CheckoutSuccessView({ numeroOrden }) {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs">
+            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
                 <Link
                     href="/shop"
-                    className="flex-1 bg-[#e31837] hover:bg-[#c2102d] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest text-center transition-all"
+                    className="flex-1 bg-[#e31837] hover:bg-[#c2102d] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest text-center transition-all shadow-lg shadow-red-500/20"
                 >
                     SEGUIR COMPRANDO
                 </Link>
-                <Link
-                    href="/"
-                    className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest text-center transition-all border border-white/5"
-                >
-                    INICIO
-                </Link>
+                
+                {orderId && (
+                    <a
+                        href={`/pedido/${orderId}/factura`}
+                        target="_blank"
+                        className="flex-1 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest text-center transition-all border border-white/10"
+                        onClick={() => {
+                            // Opcional: tracking de descarga
+                        }}
+                    >
+                        <FileText className="w-4 h-4 text-red-500" />
+                        DESCARGAR FACTURA
+                    </a>
+                )}
             </div>
+
+            <p className="mt-8 text-gray-600 text-[10px] uppercase tracking-widest font-medium">
+                Gracias por confiar en TierOne eSports
+            </p>
         </div>
     );
 }

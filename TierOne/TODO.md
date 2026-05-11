@@ -12,6 +12,7 @@
 - [ ] Optimizar carga de fuentes pesadas en el editor.
 - [ ] Implementar sistema de "Snap to grid" opcional para las zonas.
 - [ ] Revisar rendimiento de `toDataURL` en dispositivos móviles de gama baja.
+- [ ] **Escalabilidad Pro**: Implementar generador de PDF de impresión (CMYK) y exportación a SVG nativo para proveedores.
 
 ## 🐛 Bugs Conocidos (Trackeados)
 - [ ] El scroll horizontal en móviles a veces interfiere con el arrastre de elementos (Touch events).

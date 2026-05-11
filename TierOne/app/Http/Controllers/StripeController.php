@@ -91,7 +91,7 @@ class StripeController extends Controller
                     'id_variante' => $itemReq['id_variante'] ?? null,
                     'nombre' => $producto->nombre,
                     'cantidad' => $itemReq['cantidad'],
-                    'precio_unitario' => $precio,
+                    'precio_unitario' => $precio + $recargo,
                     'subtotal' => $lineSubtotal,
                     'personalizacion_data' => $itemReq['personalizacion_data'] ?? null,
                 ];

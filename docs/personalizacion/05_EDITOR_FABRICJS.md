@@ -32,7 +32,13 @@ Para evitar desplazamientos entre Admin y Cliente, se utiliza un sistema de **Co
 **Funcionalidades clave**:
 1. La imagen base se muestra en una etiqueta `<img>` estándar detrás del canvas (evita errores de offset de Fabric).
 2. El canvas de Fabric es 100% transparente y maneja los objetos de usuario.
-3. El área imprimible se delimita con un `clipPath` con `originX: 'left', originY: 'top'` (vital para Fabric v6).
+3. El área imprimible se delimita con un `clipPath` con `originX: 'left', originY: 'top'` (vital para Fabric v6/v7).
+
+> [!IMPORTANT]
+> **Fabric.js v7 Breaking Changes**: 
+> - En v7, el **origen por defecto** de los objetos cambió a `center`. Se DEBE forzar `originX: 'left', originY: 'top'` en cada objeto para evitar desplazamientos.
+> - Los métodos `getScaledWidth/Height()` ahora incluyen el grosor del borde. Para obtener la dimensión pura del objeto, calcular manualmente: `o.width * o.scaleX`.
+> - Usar `strokeAlign: 'inside'` en rectángulos de zona para que el borde no altere las coordenadas externas.
 
 **Manejo de tipos de zona en el editor del cliente**:
 - Las zonas de tipo `bloqueada` **no llegan al frontend** — se filtran en `CustomizationService.getProductCustomizationData()` antes de enviarlas

@@ -141,58 +141,62 @@ export default function Proveedores({ proveedores, filters = {} }) {
     const renderRow = (prov) => (
         <tr
             key={prov.id}
-            className="hover:bg-gray-50 transition-colors group cursor-pointer"
+            className="hover:bg-white/5 transition-colors group cursor-pointer border-b border-white/5"
             onClick={() => openDetailsModal(prov)}
         >
-            <td className="px-6 py-4 font-mono text-xs text-gray-400">
+            <td className="px-6 py-4 font-mono text-xs text-gray-500">
                 #{prov.id}
             </td>
-            <td className="px-6 py-4 font-bold text-gray-900">{prov.nombre}</td>
-            <td className="px-6 py-4 text-sm text-gray-600 font-medium">
+            <td className="px-6 py-4 font-black text-white italic font-['Outfit'] uppercase tracking-tight">
+                {prov.nombre}
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-400 font-medium">
                 {prov.contacto_nombre}
             </td>
-            <td className="px-6 py-4 text-sm text-gray-900">{prov.email}</td>
+            <td className="px-6 py-4 text-sm text-gray-400 font-mono">
+                {prov.email}
+            </td>
             <td className="px-6 py-4 text-sm text-gray-500 font-medium">
                 {new Date(prov.fecha_registro).toLocaleDateString()}
             </td>
-            <td className="px-6 py-4">
+            <td className="px-6 py-4 text-center">
                 <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${prov.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-widest ${prov.activo ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
                 >
                     {prov.activo ? "Activo" : "Inactivo"}
                 </span>
             </td>
             <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex justify-end gap-2 opacity-100 transition-all">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             openDetailsModal(prov);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-blue-600 rounded-lg border border-gray-200 hover:border-blue-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-white rounded-lg border border-white/5 hover:border-white/20 transition-all shadow-xl"
                         title="Ver Detalles"
                     >
-                        <Eye size={14} />
+                        <Eye size={14} className="hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             openEditModal(prov);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-amber-400 rounded-lg border border-white/5 hover:border-amber-500/20 transition-all shadow-xl"
                         title="Editar"
                     >
-                        <Edit2 size={14} />
+                        <Edit2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(prov.id);
                         }}
-                        className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm transition-all"
+                        className="p-2 bg-white/5 text-gray-600 hover:text-red-500 rounded-lg border border-white/5 hover:border-red-500/20 transition-all shadow-xl"
                         title="Eliminar"
                     >
-                        <Trash2 size={14} />
+                        <Trash2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                     </button>
                 </div>
             </td>
@@ -203,15 +207,15 @@ export default function Proveedores({ proveedores, filters = {} }) {
         <PanelLayout title="Gestión de Proveedores" activeItem="Proveedores">
             <Head title="Proveedores - Admin Panel" />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white uppercase tracking-tight">
+            <div className="flex justify-between items-center mb-10">
+                <h2 className="text-xl font-black text-white tracking-[0.2em] uppercase italic font-['Outfit']">
                     Listado de Proveedores
                 </h2>
                 <button
                     onClick={openCreateModal}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-red-200"
+                    className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:from-red-500 hover:to-red-700 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all flex items-center gap-2 italic font-['Outfit'] active:scale-95"
                 >
-                    <Plus size={14} /> Nuevo Proveedor
+                    <Plus size={16} /> Nuevo Proveedor
                 </button>
             </div>
 
@@ -231,15 +235,15 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
             {/* Pagination */}
             {links.length > 3 && (
-                <div className="flex justify-center gap-1 mt-6">
+                <div className="flex justify-center gap-2 mt-10">
                     {links.map((link, i) => (
                         <Link
                             key={i}
                             href={link.url ?? "#"}
-                            className={`px-3 py-1 rounded text-sm border ${link.active
-                                ? "bg-red-600 text-white border-red-600"
-                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                                } ${!link.url ? "opacity-40 pointer-events-none" : ""}`}
+                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all border ${link.active
+                                ? "bg-red-600 text-white border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+                                : "bg-white/5 text-gray-500 border-white/5 hover:text-white hover:bg-white/10"
+                                } ${!link.url ? "opacity-20 pointer-events-none" : ""}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}
