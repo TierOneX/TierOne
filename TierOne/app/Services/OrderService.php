@@ -92,6 +92,10 @@ class OrderService
                 $data['fecha_orden'] = now();
             }
 
+            if (!isset($data['descuento'])) {
+                $data['descuento'] = 0;
+            }
+
             // Crear Cabecera
             $orden = Orden::create($data);
 

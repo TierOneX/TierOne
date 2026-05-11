@@ -5,16 +5,18 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class JuegoFactory extends Factory
+class ProveedorFactory extends Factory
 {
     public function definition(): array
     {
-        $nombre = fake()->unique()->word();
+        $nombre = fake()->unique()->company();
         return [
             'nombre' => $nombre,
             'slug' => Str::slug($nombre),
-            'descripcion' => fake()->sentence(),
-            'categoria' => 'eSports',
+            'contacto_nombre' => fake()->name(),
+            'email' => fake()->unique()->companyEmail(),
+            'telefono' => fake()->phoneNumber(),
+            'direccion' => fake()->address(),
             'activo' => true,
         ];
     }

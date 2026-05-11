@@ -25,14 +25,14 @@ class StoreOrdenRequest extends FormRequest
             // Cabecera de la orden
             'id_usuario' => 'required|exists:users,id',
             'id_direccion_envio' => 'required|exists:direcciones_envio,id',
-            'numero_orden' => 'required|string|unique:ordenes,numero_orden',
+            'numero_orden' => 'nullable|string|unique:ordenes,numero_orden',
             'subtotal' => 'required|numeric|min:0',
             'impuestos' => 'required|numeric|min:0',
             'costo_envio' => 'required|numeric|min:0',
-            'descuento' => 'required|numeric|min:0',
+            'descuento' => 'sometimes|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'estado' => 'required|in:pendiente,pagada,enviada_proveedor,en_transito,entregada,cancelada',
-            'fecha_orden' => 'required|date',
+            'fecha_orden' => 'nullable|date',
             'tracking_number' => 'nullable|string',
             'transportista' => 'nullable|string',
 
@@ -41,7 +41,7 @@ class StoreOrdenRequest extends FormRequest
             'items' => 'required|array|min:1',
             'items.*.id_producto' => 'required|exists:productos,id',
             'items.*.id_variante' => 'nullable|exists:variantes_productos,id',
-            'items.*.id_proveedor' => 'required|exists:proveedores,id',
+            'items.*.id_proveedor' => 'nullable|exists:proveedores,id',
             'items.*.cantidad' => 'required|integer|min:1',
             'items.*.precio_unitario' => 'required|numeric|min:0',
         ];
