@@ -27,6 +27,16 @@ class GameCommunityController extends Controller
 
         $topGames = $this->twitchStreamService->getTopGames(10);
 
+        // Enriquecer topGames con slugs locales para enlazar a las fichas
+        $igdbIds = collect($topGames)->pluck('igdb_id')->filter()->toArray();
+        $localGames = Juego::whereIn('igdb_id', $igdbIds)->get(['igdb_id', 'slug']);
+        
+        $topGames = collect($topGames)->map(function($game) use ($localGames) {
+            $local = $localGames->firstWhere('igdb_id', $game['igdb_id']);
+            $game['slug'] = $local ? $local->slug : null;
+            return $game;
+        })->toArray();
+
         return Inertia::render('Community/Index', [
             'juegos'   => $juegos,
             'topGames' => $topGames,

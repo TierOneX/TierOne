@@ -88,10 +88,12 @@ export default function GameHero({ juego }) {
 
                         {/* Botones de acción rápida */}
                         <div className="mt-10 flex flex-wrap gap-4 sm:gap-6">
-                            <button className="relative flex items-center gap-3 rounded-2xl bg-primary px-12 py-5 font-black uppercase italic tracking-tighter text-black transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(227,24,55,0.6)] active:scale-95 group overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                                <Trophy size={22} strokeWidth={2.5} />
-                                Unirse al Torneo
+                            <button className="relative flex items-center gap-3 rounded-2xl bg-[#E10600] px-12 py-5 font-black uppercase italic tracking-tighter text-white transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(225,6,0,0.8)] active:scale-95 group overflow-hidden border border-white/20">
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                                <div className="relative z-10 flex items-center gap-3">
+                                    <Trophy size={22} strokeWidth={3} className="text-white" />
+                                    <span>Unirse al Torneo</span>
+                                </div>
                             </button>
                             
                             <TrailerPlayer videos={juego.video_ids} />
