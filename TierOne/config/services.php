@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'twitch' => [
+        'client_id' => env('TWITCH_CLIENT_ID'),
+        'client_secret' => env('TWITCH_CLIENT_SECRET'),
+        'verify_ssl' => env('TWITCH_VERIFY_SSL', true),
+    ],
+
 ];

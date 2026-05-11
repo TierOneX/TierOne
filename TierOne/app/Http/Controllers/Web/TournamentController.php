@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InscripcionTorneo;
 use App\Models\Juego;
 use App\Models\Torneo;
+use App\Services\GameImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +14,10 @@ use Inertia\Response;
 
 class TournamentController extends Controller
 {
+    public function __construct(private readonly GameImageService $gameImageService)
+    {
+    }
+
     public function index(): Response
     {
         $juegos = Juego::query()
@@ -64,7 +69,15 @@ class TournamentController extends Controller
                     'nombre' => $juego->nombre,
                     'slug' => $juego->slug,
                     'descripcion' => $juego->descripcion,
-                    'imagen_url' => $juego->imagen_url,
+                    'imagen_url' => $this->gameImageService->resolveTournamentImageUrl(
+                        gameName: $juego->nombre,
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
+                    'imagen_url_local' => $this->gameImageService->resolveTournamentLocalImageUrl(
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
                     'categoria' => $juego->categoria,
                     'total_torneos' => (int) $juego->total_torneos,
                     'torneos_abiertos' => (int) $juego->torneos_abiertos,

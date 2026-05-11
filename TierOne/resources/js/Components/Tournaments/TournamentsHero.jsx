@@ -1,4 +1,5 @@
-﻿import GameDiscoveryFilters from '@/Components/Matches/GameDiscoveryFilters';
+import { useState } from 'react';
+import GameDiscoveryFilters from '@/Components/Matches/GameDiscoveryFilters';
 
 const imgUrl = (src) => {
     if (!src) return '/images/landing/torneos.jpg';
@@ -17,6 +18,7 @@ export default function TournamentsHero({
     isAdmin = false,
 }) {
     const availableCategories = ['TODOS', ...categories];
+    const [imgErrors, setImgErrors] = useState({});
 
     return (
         <section className="relative overflow-hidden border-b border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(227,24,55,0.36),_transparent_52%),radial-gradient(circle_at_78%_22%,_rgba(227,24,55,0.18),_transparent_46%),linear-gradient(180deg,_#151515_0%,_#090909_100%)] px-4 pb-10 pt-10 sm:px-6 lg:px-8">
@@ -54,9 +56,10 @@ export default function TournamentsHero({
                             className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#101010] ${index === 0 ? 'xl:col-span-2 xl:row-span-2 min-h-[360px]' : 'min-h-[220px]'} `}
                         >
                             <img
-                                src={imgUrl(game.imagen_url)}
+                                src={imgErrors[game.id] ? imgUrl(game.imagen_url_local) : imgUrl(game.imagen_url)}
                                 alt={game.nombre}
                                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                onError={() => setImgErrors((prev) => ({ ...prev, [game.id]: true }))}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
                             <div
@@ -79,17 +82,17 @@ export default function TournamentsHero({
                                         {game.torneos_abiertos} abiertos
                                     </span>
                                 </div>
-                                <h2 className="max-w-sm text-2xl font-black uppercase italic text-white">
+                                <h2 className="max-w-sm line-clamp-2 text-2xl font-black uppercase italic text-white">
                                     {game.nombre}
                                 </h2>
-                                <div className={`mt-4 grid gap-2 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} sm:max-w-md sm:ml-auto`}>
+                                <div className={`mt-auto grid gap-2 pt-4 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} sm:max-w-md sm:ml-auto`}>
                                     <button
                                         type="button"
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             onSelectGame(game);
                                         }}
-                                        className="min-h-11 rounded-xl border border-white/20 bg-black/55 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-black/80"
+                                        className="flex h-11 items-center justify-center rounded-xl border border-white/20 bg-black/55 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-black/80"
                                     >
                                         Ver torneos
                                     </button>
@@ -99,7 +102,7 @@ export default function TournamentsHero({
                                             onClick={(event) => {
                                                 event.stopPropagation();
                                             }}
-                                            className="min-h-11 rounded-xl bg-red-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
+                                            className="flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
                                         >
                                             Crear torneo
                                         </button>

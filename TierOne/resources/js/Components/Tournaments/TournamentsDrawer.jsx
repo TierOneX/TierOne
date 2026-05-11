@@ -154,7 +154,7 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                 );
 
                                 return (
-                                    <article key={torneo.id} className="rounded-[22px] border border-white/10 bg-[#101010] p-4">
+                                    <article key={torneo.id} className="flex h-full flex-col rounded-[22px] border border-white/10 bg-[#101010] p-4">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0">
                                                 <h3 className="truncate text-base font-black uppercase text-white">{torneo.nombre}</h3>
@@ -184,7 +184,7 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                             </div>
                                         </div>
 
-                                        <div className="mt-4 flex items-center justify-between gap-3">
+                                        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                                             <p className="text-xs font-semibold text-gray-400">
                                                 {torneo.plazas_disponibles} plazas disponibles
                                             </p>
@@ -192,7 +192,7 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                                 type="button"
                                                 onClick={() => joinTournament(torneo.id)}
                                                 disabled={!isAuthenticated || isJoined || joinForm.processing || torneo.plazas_disponibles === 0}
-                                                className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
+                                                className="flex h-11 min-w-[120px] items-center justify-center rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
                                             >
                                                 {isJoined ? 'Inscrito' : 'Unirme'}
                                             </button>
