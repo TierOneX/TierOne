@@ -39,13 +39,13 @@ export default function AdminModal({
             ></div>
 
             {/* Container */}
-            <div className={`relative bg-white w-full ${maxWidth} rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200`}>
+            <div className={`relative bg-[#141414] w-full ${maxWidth} rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-white/5`}>
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+                <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider italic font-['Outfit']">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                        className="text-gray-400 hover:text-white transition-colors p-1"
                     >
                         ✕
                     </button>

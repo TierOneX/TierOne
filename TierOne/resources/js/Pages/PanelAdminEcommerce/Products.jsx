@@ -33,6 +33,13 @@ export default function Products({
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('data:')) return path; 
+        return `/${path.replace(/^\//, '')}`;
+    };
+
     const filtersConfig = [
         { name: "search", label: "Buscar", type: "text" },
         {
@@ -222,7 +229,7 @@ export default function Products({
     const renderRow = (product) => (
         <React.Fragment key={product.id}>
             <tr
-                className="hover:bg-gray-50 transition-colors group border-b border-gray-100 cursor-pointer"
+                className="hover:bg-white/5 transition-colors group border-b border-white/5 cursor-pointer"
                 onClick={() => openViewModal(product)}
             >
                 <td className="px-6 py-4">
@@ -246,30 +253,30 @@ export default function Products({
                         </button>
                         {product.imagen_principal ? (
                             <img
-                                src={product.imagen_principal}
+                                src={getImageUrl(product.imagen_principal)}
                                 alt={product.nombre}
-                                className="w-10 h-10 rounded-lg object-cover border border-gray-200 shadow-sm"
+                                className="w-10 h-10 rounded-lg object-cover border border-white/10 shadow-lg group-hover:scale-110 transition-transform"
                             />
                         ) : (
-                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 border border-gray-100">
+                            <div className="w-10 h-10 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-gray-500 border border-white/5">
                                 <Package size={16} />
                             </div>
                         )}
                         <div>
-                            <p className="font-bold text-gray-900 text-sm">
+                            <p className="font-black text-white text-sm uppercase tracking-tight italic font-['Outfit']">
                                 {product.nombre}
                             </p>
                             <div className="flex gap-1 mt-1">
-                                <span className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded border border-gray-200 uppercase font-black tracking-tighter">
+                                <span className="text-[9px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded border border-white/10 uppercase font-black tracking-tighter">
                                     {product.categoria?.nombre || "General"}
                                 </span>
                                 {product.variantes?.length > 0 && (
-                                    <span className="text-[9px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 uppercase font-black tracking-tighter">
+                                    <span className="text-[9px] bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded border border-red-500/20 uppercase font-black tracking-tighter">
                                         {product.variantes.length} Variantes
                                     </span>
                                 )}
                                 {product.personalizable && (
-                                    <span className="text-[9px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded border border-purple-100 uppercase font-black tracking-tighter">
+                                    <span className="text-[9px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded border border-purple-500/20 uppercase font-black tracking-tighter">
                                         Personalizable
                                     </span>
                                 )}
@@ -277,10 +284,10 @@ export default function Products({
                         </div>
                     </div>
                 </td>
-                <td className="px-6 py-4 font-bold text-gray-400 text-right">
+                <td className="px-6 py-4 font-bold text-gray-400 text-right italic font-mono">
                     €{Number(product.precio_proveedor).toFixed(2)}
                 </td>
-                <td className="px-6 py-4 font-black text-black text-right">
+                <td className="px-6 py-4 font-black text-white text-right italic font-mono">
                     €{Number(product.precio_venta).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500 text-right font-mono">
@@ -288,7 +295,7 @@ export default function Products({
                 </td>
                 <td className="px-6 py-4 text-center">
                     <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${product.activo ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200"}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${product.activo ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
                     >
                         {product.activo ? "Activo" : "Pausado"}
                     </span>
@@ -297,37 +304,37 @@ export default function Products({
                     className="px-6 py-4 text-right"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-2 opacity-100 transition-all">
                         <button
                             onClick={() => openViewModal(product)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-white rounded-lg border border-white/5 hover:border-white/20 transition-all"
                             title="Ver Detalles"
                         >
-                            <Eye size={14} />
+                            <Eye size={14} className="hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
                         </button>
                         <button
                             onClick={() => openEditModal(product)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-amber-600 rounded-lg border border-gray-200 hover:border-amber-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-amber-500 rounded-lg border border-white/5 hover:border-amber-500/20 transition-all"
                             title="Editar"
                         >
-                            <Edit2 size={14} />
+                            <Edit2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                         </button>
                         {product.personalizable && (
                             <Link
                                 href={route('panel.ecommerce.products.zonas', product.id)}
-                                className="p-2 bg-gray-50 text-gray-600 hover:text-purple-600 rounded-lg border border-gray-200 hover:border-purple-200 shadow-sm"
+                                className="p-2 bg-white/5 text-gray-600 hover:text-purple-500 rounded-lg border border-white/5 hover:border-purple-500/20 transition-all"
                                 title="Configurar Zonas"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <Layers size={14} />
+                                <Layers size={14} className="hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]" />
                             </Link>
                         )}
                         <button
                             onClick={() => handleDelete(product.id)}
-                            className="p-2 bg-gray-50 text-gray-600 hover:text-red-600 rounded-lg border border-gray-200 hover:border-red-200 shadow-sm"
+                            className="p-2 bg-white/5 text-gray-600 hover:text-red-500 rounded-lg border border-white/5 hover:border-red-500/20 transition-all"
                             title="Eliminar"
                         >
-                            <Trash2 size={14} />
+                            <Trash2 size={14} className="hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                         </button>
                     </div>
                 </td>
@@ -342,7 +349,7 @@ export default function Products({
                                 <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     Variantes Disponibles
                                 </h3>
-                                <button className="text-[10px] font-black text-red-600 hover:text-red-700 uppercase tracking-widest bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 transition-all flex items-center gap-2">
+                                <button className="text-[10px] font-black text-red-500 hover:text-white uppercase tracking-widest bg-red-600/10 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-600 transition-all flex items-center gap-2">
                                     <Plus size={12} /> Añadir Variante
                                 </button>
                             </div>
@@ -356,11 +363,11 @@ export default function Products({
                                     {product.variantes.map((v) => (
                                         <div
                                             key={v.id}
-                                            className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between group/v transition-all hover:border-red-400/30"
+                                            className="bg-[#1A1A1A] p-4 rounded-xl border border-white/5 shadow-xl flex flex-col justify-between group/v transition-all hover:border-red-500/30"
                                         >
                                             <div className="flex justify-between items-start mb-3">
                                                 <div>
-                                                    <p className="font-black text-black text-sm uppercase tracking-tight">
+                                                    <p className="font-black text-white text-sm uppercase tracking-tight italic font-['Outfit']">
                                                         {v.nombre}
                                                     </p>
                                                     <p className="text-[9px] font-mono text-gray-400 uppercase mt-0.5">
@@ -406,16 +413,16 @@ export default function Products({
         <PanelLayout title="Gestión de Productos" activeItem="Productos">
             <Head title="Productos - Admin Panel" />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white tracking-tight uppercase">
+            <div className="flex justify-between items-center mb-10">
+                <h2 className="text-xl font-black text-white tracking-[0.2em] uppercase italic font-['Outfit']">
                     Listado de Productos
                 </h2>
                 <div className="flex gap-2">
                     <button
                         onClick={openCreateModal}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase hover:bg-red-700 transition-colors flex items-center gap-2 tracking-widest shadow-md shadow-red-200"
+                        className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:from-red-500 hover:to-red-700 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all flex items-center gap-2 italic font-['Outfit'] active:scale-95"
                     >
-                        <Plus size={14} /> Nuevo Producto
+                        <Plus size={16} /> Nuevo Producto
                     </button>
                 </div>
             </div>
