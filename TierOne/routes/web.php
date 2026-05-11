@@ -172,6 +172,7 @@ Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stri
 Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
 Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
+Route::get('/pedido/{orden}/factura', [\App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])->name('order.invoice');
 
 Route::get('/checkout', function () {
     return Inertia::render('Checkout', [
@@ -182,6 +183,16 @@ Route::get('/checkout', function () {
 Route::get('/checkout/success', function () {
     return Inertia::render('CheckoutSuccess');
 })->name('checkout.success');
+
+// =========================================================================
+// COMMUNITY ROUTES
+// =========================================================================
+
+Route::get('/community', [App\Http\Controllers\Web\GameCommunityController::class, 'index'])
+    ->name('community.index');
+
+Route::get('/community/{slug}', [App\Http\Controllers\Web\GameCommunityController::class, 'show'])
+    ->name('community.show');
 
 // =========================================================================
 // AUTH & PROFILE ROUTES

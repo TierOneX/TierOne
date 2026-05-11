@@ -43,6 +43,7 @@ export default function Checkout({ stripeKey }) {
             id: item.id,
             cantidad: item.quantity,
             id_variante: item.variant?.id ?? null,
+            personalizacion_data: item.customization ?? null,
         }));
 
         fetch('/stripe/create-intent', {
@@ -107,7 +108,10 @@ export default function Checkout({ stripeKey }) {
             <MainLayout>
                 <Head title="¡Pedido confirmado! — TierOne" />
                 <div className="max-w-[700px] mx-auto px-4 sm:px-6 py-12">
-                    <CheckoutSuccessView numeroOrden={orderData?.numero_orden ?? orderData?.numeroOrden} />
+                    <CheckoutSuccessView 
+                        numeroOrden={orderData?.numero_orden ?? orderData?.numeroOrden} 
+                        orderId={orderData?.orderId ?? orderData?.order_id}
+                    />
                 </div>
             </MainLayout>
         );

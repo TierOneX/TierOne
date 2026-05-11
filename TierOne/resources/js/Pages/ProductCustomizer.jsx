@@ -1,17 +1,17 @@
-import { Head, router, Link } from '@inertiajs/react';
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useCart } from '@/Contexts/CartContext';
-import MainLayout from '@/Layouts/MainLayout';
-import DesignCanvas from '@/Components/Customizer/DesignCanvas';
-import TextTool from '@/Components/Customizer/TextTool';
-import ImageTool from '@/Components/Customizer/ImageTool';
-import LayerPanel from '@/Components/Customizer/LayerPanel';
-import ZoneSelector from '@/Components/Customizer/ZoneSelector';
-import PriceSummary from '@/Components/Customizer/PriceSummary';
-import { ShoppingCart, ArrowLeft } from 'lucide-react';
-import ConfirmationModal from '@/Components/Customizer/ConfirmationModal';
+import { Head, router, Link } from "@inertiajs/react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useCart } from "@/Contexts/CartContext";
+import MainLayout from "@/Layouts/MainLayout";
+import DesignCanvas from "@/Components/Customizer/DesignCanvas";
+import TextTool from "@/Components/Customizer/TextTool";
+import ImageTool from "@/Components/Customizer/ImageTool";
+import LayerPanel from "@/Components/Customizer/LayerPanel";
+import ZoneSelector from "@/Components/Customizer/ZoneSelector";
+import PriceSummary from "@/Components/Customizer/PriceSummary";
+import { ShoppingCart, ArrowLeft } from "lucide-react";
+import ConfirmationModal from "@/Components/Customizer/ConfirmationModal";
 
-import { imgUrl } from '@/Utils/imageUtils';
+import { imgUrl } from "@/Utils/imageUtils";
 
 export default function ProductCustomizer({ producto, zonas, precios }) {
     const { addToCart } = useCart();
@@ -21,12 +21,12 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     // ──────────────────────────────────────────────────
     const views = useMemo(() => {
         const seen = new Map();
-        zonas.forEach(z => {
+        zonas.forEach((z) => {
             const key = imgUrl(z.imagen_base);
             if (!seen.has(key)) {
                 seen.set(key, {
                     image: z.imagen_base,
-                    nombre: z.nombre || 'Vista',
+                    nombre: z.nombre || "Vista",
                     zonas: [],
                 });
             }
@@ -40,18 +40,24 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     // ──────────────────────────────────────────────────
     const [activeViewIndex, setActiveViewIndex] = useState(0);
     const [activeZoneId, setActiveZoneId] = useState(null);
-    const [zonesData, setZonesData] = useState({});   // { [zoneId]: { layers, userObjects } }
+    const [zonesData, setZonesData] = useState({}); // { [zoneId]: { layers, userObjects } }
     const [allZonesLayers, setAllZonesLayers] = useState({}); // { [zoneId]: layers[] } para precio
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const canvasRef = useRef(null);
 
-    const activeView = (views && views.length > 0) ? views[activeViewIndex] : null;
-    const activeZone = (activeView && activeZoneId) ? activeView.zonas.find(z => z.id === activeZoneId) : null;
+    const activeView =
+        views && views.length > 0 ? views[activeViewIndex] : null;
+    const activeZone =
+        activeView && activeZoneId
+            ? activeView.zonas.find((z) => z.id === activeZoneId)
+            : null;
 
     // Inicializar zona activa al cargar o cambiar de vista
     useEffect(() => {
         if (!activeView) return;
-        const firstPrintable = activeView.zonas.find(z => z.tipo === 'impresion');
+        const firstPrintable = activeView.zonas.find(
+            (z) => z.tipo === "impresion",
+        );
         setActiveZoneId(firstPrintable?.id || activeView.zonas[0]?.id);
     }, [activeViewIndex, activeView]);
 
@@ -59,16 +65,25 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     // Cálculo de precios
     // ──────────────────────────────────────────────────
     const totalElements = useMemo(() => {
-        return Object.values(allZonesLayers).reduce((acc, layers) => {
-            const ls = layers || [];
-            return {
-                textos: acc.textos + ls.filter(l => l.tipo === 'texto').length,
-                imagenes: acc.imagenes + ls.filter(l => l.tipo === 'imagen').length,
-            };
-        }, { textos: 0, imagenes: 0 });
+        return Object.values(allZonesLayers).reduce(
+            (acc, layers) => {
+                const ls = layers || [];
+                return {
+                    textos:
+                        acc.textos +
+                        ls.filter((l) => l.tipo === "texto").length,
+                    imagenes:
+                        acc.imagenes +
+                        ls.filter((l) => l.tipo === "imagen").length,
+                };
+            },
+            { textos: 0, imagenes: 0 },
+        );
     }, [allZonesLayers]);
 
-    const recargo = (totalElements.textos * precios.texto) + (totalElements.imagenes * precios.imagen);
+    const recargo =
+        totalElements.textos * precios.texto +
+        totalElements.imagenes * precios.imagen;
 
     // Zonas con contenido (para badges en el selector)
     const zonesWithContent = useMemo(() => {
@@ -87,26 +102,35 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
     };
 
     const handleAddImage = async (file) => {
-        const formData = new FormData();
-        formData.append('imagen', file);
-        const response = await fetch(route('customization.upload'), {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content }
-        });
-        const data = await response.json();
-        canvasRef.current?.addImage(data.url);
+        try {
+            const formData = new FormData();
+            formData.append("imagen", file);
+            
+            const { data } = await window.axios.post(route("customization.upload"), formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (data.url) {
+                canvasRef.current?.addImage(data.url);
+            } else {
+                throw new Error("No se recibió la URL de la imagen");
+            }
+        } catch (error) {
+            console.error("handleAddImage error:", error);
+            const msg = error.response?.data?.message || error.message || "Hubo un problema al subir tu logo. Revisa el formato y tamaño.";
+            alert(msg);
+        }
     };
 
     const handleLayersUpdate = useCallback((zoneId, layers) => {
-        setAllZonesLayers(prev => ({ ...prev, [zoneId]: layers }));
+        setAllZonesLayers((prev) => ({ ...prev, [zoneId]: layers }));
     }, []);
 
     const handleViewChange = (index) => {
         // Guardar todo el estado del canvas actual antes de cambiar de vista
         if (canvasRef.current) {
             const allData = canvasRef.current.exportAllData();
-            setZonesData(prev => ({ ...prev, ...allData }));
+            setZonesData((prev) => ({ ...prev, ...allData }));
         }
         setActiveViewIndex(index);
     };
@@ -125,7 +149,7 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
         // Guardar estado actual
         if (canvasRef.current) {
             const allData = canvasRef.current.exportAllData();
-            setZonesData(prev => ({ ...prev, ...allData }));
+            setZonesData((prev) => ({ ...prev, ...allData }));
         }
 
         // Exportar PNG de la vista actual
@@ -135,13 +159,20 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
         const personalizacionData = {
             producto_id: producto.id,
             producto_nombre: producto.nombre,
-            zonas: zonas.map(z => ({
-                zona_id: z.id,
-                zona_nombre: z.nombre,
-                imagen_base: z.imagen_base,
-                area_impresion: { x: z.area_x, y: z.area_y, width: z.area_width, height: z.area_height },
-                capas: allZonesLayers[z.id] || [],
-            })).filter(z => z.capas.length > 0),
+            zonas: zonas
+                .map((z) => ({
+                    zona_id: z.id,
+                    zona_nombre: z.nombre,
+                    imagen_base: z.imagen_base,
+                    area_impresion: {
+                        x: z.area_x,
+                        y: z.area_y,
+                        width: z.area_width,
+                        height: z.area_height,
+                    },
+                    capas: allZonesLayers[z.id] || [],
+                }))
+                .filter((z) => z.capas.length > 0),
             precio_elementos: {
                 textos: totalElements.textos,
                 imagenes: totalElements.imagenes,
@@ -153,7 +184,7 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
         };
 
         addToCart(producto, null, 1, personalizacionData);
-        router.visit(route('cart'));
+        router.visit(route("cart"));
     };
 
     return (
@@ -165,12 +196,17 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                            <Link href={route('product.show', producto.slug)}
-                                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                            <Link
+                                href={route("product.show", producto.slug)}
+                                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                            >
                                 <ArrowLeft className="w-5 h-5 text-white" />
                             </Link>
                             <h1 className="text-white font-black text-lg uppercase tracking-tight">
-                                Personalizar: <span className="text-[#e31837]">{producto.nombre}</span>
+                                Personalizar:{" "}
+                                <span className="text-[#e31837]">
+                                    {producto.nombre}
+                                </span>
                             </h1>
                         </div>
                     </div>
@@ -193,8 +229,12 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                             <ImageTool onAddImage={handleAddImage} />
                             <LayerPanel
                                 layers={allZonesLayers[activeZoneId] || []}
-                                onSelectLayer={(i) => canvasRef.current?.selectLayer(i)}
-                                onDeleteLayer={(i) => canvasRef.current?.deleteLayer(i)}
+                                onSelectLayer={(i) =>
+                                    canvasRef.current?.selectLayer(i)
+                                }
+                                onDeleteLayer={(i) =>
+                                    canvasRef.current?.deleteLayer(i)
+                                }
                             />
                         </div>
 
@@ -230,7 +270,8 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                             </button>
                             {recargo === 0 && (
                                 <p className="text-[9px] text-gray-500 text-center italic">
-                                    Puedes añadir el producto tal cual o personalizarlo primero.
+                                    Puedes añadir el producto tal cual o
+                                    personalizarlo primero.
                                 </p>
                             )}
                         </div>
@@ -238,7 +279,7 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
                 </div>
             </section>
 
-            <ConfirmationModal 
+            <ConfirmationModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}
                 onConfirm={confirmAddToCart}
