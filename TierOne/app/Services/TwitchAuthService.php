@@ -13,30 +13,34 @@ class TwitchAuthService
      */
     public function getAccessToken(): string
     {
-        return Cache::remember('twitch:access_token', now()->addDays(55), function () {
-            $clientId = config('services.twitch.client_id');
-            $clientSecret = config('services.twitch.client_secret');
+        $token = Cache::get('twitch:access_token');
 
-            if (empty($clientId) || empty($clientSecret)) {
-                // Si no hay credenciales, devolvemos un string vacío o lanzamos excepción
-                // Para desarrollo, podrías devolver un mock si fuera necesario
-                return 'MISSING_TWITCH_CREDENTIALS';
-            }
+        if ($token && !in_array($token, ['MISSING_TWITCH_CREDENTIALS', 'TWITCH_AUTH_ERROR'])) {
+            return $token;
+        }
 
-            $response = Http::asForm()->post('https://id.twitch.tv/oauth2/token', [
-                'client_id'     => $clientId,
-                'client_secret' => $clientSecret,
-                'grant_type'    => 'client_credentials',
-            ]);
+        $clientId = config('services.twitch.client_id');
+        $clientSecret = config('services.twitch.client_secret');
 
-            if ($response->failed()) {
-                // En lugar de lanzar excepción que rompa la app, logueamos y devolvemos error
-                \Illuminate\Support\Facades\Log::error('Twitch OAuth failed: ' . $response->body());
-                return 'TWITCH_AUTH_ERROR';
-            }
+        if (empty($clientId) || empty($clientSecret)) {
+            return 'MISSING_TWITCH_CREDENTIALS';
+        }
 
-            return $response->json('access_token');
-        });
+        $response = Http::asForm()->post('https://id.twitch.tv/oauth2/token', [
+            'client_id'     => $clientId,
+            'client_secret' => $clientSecret,
+            'grant_type'    => 'client_credentials',
+        ]);
+
+        if ($response->failed()) {
+            \Illuminate\Support\Facades\Log::error('Twitch OAuth failed: ' . $response->body());
+            return 'TWITCH_AUTH_ERROR';
+        }
+
+        $token = $response->json('access_token');
+        Cache::put('twitch:access_token', $token, now()->addDays(55));
+
+        return $token;
     }
 
     /**

@@ -1,50 +1,55 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
+import { Star, ChevronRight } from 'lucide-react';
 import { igdbImageUrl } from '@/Utils/igdb';
 
 export default function GameCard({ juego }) {
     const rating = Math.round(juego.community_rating || juego.critic_rating || 0);
     
     const getRatingColor = (score) => {
-        if (score >= 80) return 'text-green-400 border-green-400';
-        if (score >= 60) return 'text-yellow-400 border-yellow-400';
-        return 'text-red-400 border-red-400';
+        if (score >= 80) return 'text-green-400';
+        if (score >= 60) return 'text-yellow-400';
+        return 'text-red-400';
     };
 
     return (
         <Link 
             href={route('community.show', juego.slug)}
-            className="group relative block overflow-hidden rounded-xl bg-[#1A1A1A] transition-all hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+            className="group relative block w-full transition-all duration-500"
         >
-            {/* Imagen de Portada */}
-            <div className="aspect-[3/4] w-full overflow-hidden">
+            {/* Imagen de Portada con Efectos */}
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-[#1A1A1A] shadow-xl transition-all duration-500 group-hover:shadow-primary/20 group-hover:-translate-y-2">
                 <img 
                     src={igdbImageUrl(juego.cover_image_id, 't_cover_big')} 
                     alt={juego.nombre}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
-                {/* Badge de Rating */}
+                {/* Badge de Rating Flotante */}
                 {rating > 0 && (
-                    <div className={`absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-black/60 font-bold backdrop-blur-md ${getRatingColor(rating)}`}>
-                        {rating}
+                    <div className="absolute right-3 top-3 flex items-center gap-1 rounded-xl bg-black/60 px-2 py-1 text-xs font-black backdrop-blur-md border border-white/10 shadow-lg">
+                        <Star size={12} className={`fill-current ${getRatingColor(rating)}`} />
+                        <span className="text-white">{rating}</span>
                     </div>
                 )}
 
-                {/* Overlay al hacer Hover */}
-                <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">Ver Detalles</p>
+                {/* Overlay de Hover Premium */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100 backdrop-blur-[2px]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-black scale-50 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 shadow-[0_0_20px_rgba(227,24,55,0.4)]">
+                        <ChevronRight size={28} strokeWidth={3} />
+                    </div>
+                    <span className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-white">Ver Ficha</span>
                 </div>
             </div>
 
             {/* Info del Juego */}
-            <div className="p-4">
-                <h3 className="line-clamp-1 text-lg font-bold text-white transition-colors group-hover:text-primary">
+            <div className="mt-4 px-1">
+                <h3 className="line-clamp-1 text-base font-black uppercase italic tracking-tighter text-white transition-colors group-hover:text-primary">
                     {juego.nombre}
                 </h3>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {juego.genres && juego.genres.slice(0, 2).map((genre, idx) => (
-                        <span key={idx} className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-white/60">
+                        <span key={idx} className="rounded-md bg-white/5 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white/40 border border-white/5">
                             {genre}
                         </span>
                     ))}

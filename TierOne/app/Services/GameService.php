@@ -23,7 +23,8 @@ class GameService
         . 'franchises.name, collections.name;';
 
     public function __construct(
-        protected TwitchAuthService $authService
+        protected TwitchAuthService $authService,
+        protected TranslationService $translationService
     ) {}
 
     /**
@@ -74,26 +75,26 @@ class GameService
 
         $juego->update([
             'igdb_id'               => $igdbData['id'],
-            'summary'               => $igdbData['summary'] ?? null,
-            'storyline'             => $igdbData['storyline'] ?? null,
+            'summary'               => isset($igdbData['summary']) ? $this->translationService->translate($igdbData['summary']) : null,
+            'storyline'             => isset($igdbData['storyline']) ? $this->translationService->translate($igdbData['storyline']) : null,
             'cover_image_id'        => $igdbData['cover']['image_id'] ?? null,
             'screenshot_ids'        => collect($igdbData['screenshots'] ?? [])
-                                        ->pluck('image_id')->values()->toArray(),
+                                        ->pluck('image_id')->filter()->values()->toArray(),
             'artwork_ids'           => collect($igdbData['artworks'] ?? [])
-                                        ->pluck('image_id')->values()->toArray(),
+                                        ->pluck('image_id')->filter()->values()->toArray(),
             'video_ids'             => collect($igdbData['videos'] ?? [])
-                                        ->map(fn($v) => [
+                                        ->map(fn($v) => isset($v['video_id']) ? [
                                             'video_id' => $v['video_id'],
                                             'name' => $v['name'] ?? 'Trailer',
-                                        ])->values()->toArray(),
+                                        ] : null)->filter()->values()->toArray(),
             'genres'                => collect($igdbData['genres'] ?? [])
-                                        ->pluck('name')->values()->toArray(),
+                                        ->pluck('name')->filter()->values()->toArray(),
             'themes'                => collect($igdbData['themes'] ?? [])
-                                        ->pluck('name')->values()->toArray(),
+                                        ->pluck('name')->filter()->values()->toArray(),
             'game_modes'            => collect($igdbData['game_modes'] ?? [])
-                                        ->pluck('name')->values()->toArray(),
+                                        ->pluck('name')->filter()->values()->toArray(),
             'platforms'             => collect($igdbData['platforms'] ?? [])
-                                        ->pluck('name')->values()->toArray(),
+                                        ->pluck('name')->filter()->values()->toArray(),
             'developer'             => $companies->firstWhere('developer', true)['company']['name'] ?? null,
             'publisher'             => $companies->firstWhere('publisher', true)['company']['name'] ?? null,
             'critic_rating'         => $igdbData['aggregated_rating'] ?? null,
@@ -104,23 +105,23 @@ class GameService
                                         ? Carbon::createFromTimestamp($igdbData['first_release_date'])->toDateString()
                                         : null,
             'similar_game_ids'      => collect($igdbData['similar_games'] ?? [])
-                                        ->map(fn($g) => [
+                                        ->map(fn($g) => isset($g['name']) ? [
                                             'igdb_id' => $g['id'] ?? null,
                                             'name' => $g['name'],
                                             'cover_image_id' => $g['cover']['image_id'] ?? null,
                                             'slug' => $g['slug'] ?? null,
-                                        ])->values()->toArray(),
+                                        ] : null)->filter()->values()->toArray(),
             'websites'              => collect($igdbData['websites'] ?? [])
-                                        ->map(fn($w) => [
+                                        ->map(fn($w) => (isset($w['category']) && isset($w['url'])) ? [
                                             'category' => $w['category'],
                                             'url' => $w['url'],
-                                        ])->values()->toArray(),
+                                        ] : null)->filter()->values()->toArray(),
             'igdb_synced_at'        => now(),
         ]);
 
-        // Si no tenía descripción propia, usar el summary de IGDB
-        if (empty($juego->descripcion) && !empty($igdbData['summary'])) {
-            $juego->update(['descripcion' => \Illuminate\Support\Str::limit($igdbData['summary'], 255)]);
+        // Si no tenía descripción propia, usar el summary de IGDB (ya traducido)
+        if (empty($juego->descripcion) && !empty($juego->summary)) {
+            $juego->update(['descripcion' => \Illuminate\Support\Str::limit($juego->summary, 255)]);
         }
 
         return $juego->fresh();
