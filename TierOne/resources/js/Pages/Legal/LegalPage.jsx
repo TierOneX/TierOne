@@ -7,6 +7,7 @@ export default function LegalPage({
     description,
     updatedAt = "10 de mayo de 2026",
     sections = [],
+    children,
 }) {
     return (
         <MainLayout>
@@ -38,6 +39,7 @@ export default function LegalPage({
                         <p className="mt-6 text-sm font-semibold text-gray-500">
                             Ultima actualizacion: {updatedAt}
                         </p>
+                        {children && <div className="mt-8">{children}</div>}
                     </div>
 
                     <div className="grid gap-10 py-12 lg:grid-cols-[240px_1fr]">
