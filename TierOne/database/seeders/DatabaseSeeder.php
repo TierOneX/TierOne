@@ -42,5 +42,8 @@ class DatabaseSeeder extends Seeder
             ComunicacionProveedorSeeder::class,
             ReporteSeeder::class,
         ]);
+
+        // Sincronizar datos de factura para los usuarios creados aleatoriamente
+        \Illuminate\Support\Facades\Artisan::call('users:sync-invoice-data');
     }
 }

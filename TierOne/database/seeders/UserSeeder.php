@@ -18,6 +18,12 @@ class UserSeeder extends Seeder
             'password_hash' => bcrypt('password123'),
             'nombre' => 'Admin',
             'apellido' => 'TierOne',
+            'dni_cif' => 'B12345678',
+            'telefono' => '+34 912345678',
+            'direccion' => 'Calle Gran Vía 1',
+            'codigo_postal' => '28013',
+            'ciudad' => 'Madrid',
+            'provincia' => 'Madrid',
             'pais' => 'España',
             'rol' => 'admin',
             'verificado' => true,
@@ -29,7 +35,13 @@ class UserSeeder extends Seeder
             'password_hash' => bcrypt('password123'),
             'nombre' => 'Juan',
             'apellido' => 'García',
-            'pais' => 'México',
+            'dni_cif' => '12345678Z',
+            'telefono' => '+34 600000001',
+            'direccion' => 'Calle Mayor 15',
+            'codigo_postal' => '28001',
+            'ciudad' => 'Madrid',
+            'provincia' => 'Madrid',
+            'pais' => 'España',
             'rol' => 'player',
             'verificado' => true,
             'activo' => true,
@@ -40,7 +52,13 @@ class UserSeeder extends Seeder
             'password_hash' => bcrypt('password123'),
             'nombre' => 'María',
             'apellido' => 'López',
-            'pais' => 'Argentina',
+            'dni_cif' => '87654321X',
+            'telefono' => '+34 611223344',
+            'direccion' => 'Avenida de la Castellana 200',
+            'codigo_postal' => '28046',
+            'ciudad' => 'Madrid',
+            'provincia' => 'Madrid',
+            'pais' => 'España',
             'rol' => 'streamer',
             'verificado' => false,
             'activo' => true,
@@ -52,6 +70,12 @@ class UserSeeder extends Seeder
             'password_hash' => bcrypt('password123'),
             'nombre' => 'Pedro',
             'apellido' => 'Ramírez',
+            'dni_cif' => '55667788A',
+            'telefono' => '+57 300 123 4567',
+            'direccion' => 'Carrera 7 # 100-20',
+            'codigo_postal' => '110111',
+            'ciudad' => 'Bogotá',
+            'provincia' => 'Cundinamarca',
             'pais' => 'Colombia',
             'rol' => 'player',
             'verificado' => true,
@@ -249,5 +273,12 @@ class UserSeeder extends Seeder
             'verificado' => false,
             'activo' => true,
         ]);
+
+        // Asignar DNI aleatorio a todos los usuarios creados que no tengan uno
+        User::all()->each(function ($user) {
+            if (!$user->dni_cif) {
+                $user->update(['dni_cif' => rand(10000000, 99999999) . chr(rand(65, 90))]);
+            }
+        });
     }
 }
