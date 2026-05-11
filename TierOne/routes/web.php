@@ -151,6 +151,16 @@ Route::get('/checkout/success', function () {
 })->name('checkout.success');
 
 // =========================================================================
+// COMMUNITY ROUTES
+// =========================================================================
+
+Route::get('/community', [App\Http\Controllers\Web\GameCommunityController::class, 'index'])
+    ->name('community.index');
+
+Route::get('/community/{slug}', [App\Http\Controllers\Web\GameCommunityController::class, 'show'])
+    ->name('community.show');
+
+// =========================================================================
 // AUTH & PROFILE ROUTES
 // =========================================================================
 
