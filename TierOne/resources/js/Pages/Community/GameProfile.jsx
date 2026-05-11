@@ -66,7 +66,7 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                                 {juego.summary || 'No hay descripción disponible para este juego.'}
                                             </p>
                                             {juego.storyline && (
-                                                <div className="mt-10 p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden group">
+                                                <div className="mt-10 p-8 rounded-3xl bg-white/[0.02] relative overflow-hidden group">
                                                     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                                         <Info size={120} />
                                                     </div>
@@ -93,10 +93,10 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                                     <Link 
                                                         key={torneo.id} 
                                                         href={`/torneos/${torneo.id}`} 
-                                                        className="group relative overflow-hidden rounded-3xl bg-[#141414] p-6 border border-white/5 transition-all hover:border-primary/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                                                        className="group relative overflow-hidden rounded-3xl bg-[#141414] p-6 transition-all hover:border-primary/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
                                                     >
                                                         <div className="flex items-center justify-between mb-6">
-                                                            <div className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
+                                                            <div className="px-3 py-1 rounded-lg bg-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
                                                                 {torneo.estado}
                                                             </div>
                                                             <div className="flex items-center gap-2 text-white/30 text-[10px] font-bold">
@@ -145,28 +145,27 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                         {juego.screenshot_ids?.map((id, idx) => (
                                             <div 
-                                                key={idx} 
-                                                className="group relative overflow-hidden rounded-[2rem] bg-[#141414] aspect-video cursor-zoom-in shadow-2xl transition-all hover:-translate-y-1"
+                                                key={idx}
+                                                className="relative aspect-video w-full transition-all duration-300 hover:-translate-y-1 cursor-zoom-in shadow-2xl"
                                                 onClick={() => window.open(igdbImageUrl(id, 't_original'), '_blank')}
                                             >
-                                                <img 
-                                                    src={igdbImageUrl(id, 't_screenshot_big')} 
-                                                    alt={`Screenshot ${idx}`}
-                                                    className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-75 group-hover:brightness-100"
-                                                />
-                                                
-                                                {/* Zoom Overlay */}
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
-                                                    <div className="flex flex-col items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                                                        <div className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                                                            <ImageIcon size={24} />
+                                                <div className="absolute inset-0 overflow-hidden rounded-[2rem] bg-[#141414] group" style={{ transform: 'translateZ(0)' }}>
+                                                    <img 
+                                                        src={igdbImageUrl(id, 't_screenshot_big')} 
+                                                        alt={`Screenshot ${idx}`}
+                                                        className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-75 group-hover:brightness-100"
+                                                    />
+                                                    
+                                                    {/* Zoom Overlay */}
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
+                                                        <div className="flex flex-col items-center gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                                            <div className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                                                                <ImageIcon size={24} />
+                                                            </div>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">Ampliar Captura</span>
                                                         </div>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Ampliar Captura</span>
                                                     </div>
                                                 </div>
-
-                                                {/* Shimmer line */}
-                                                <div className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/10 rounded-[2rem] pointer-events-none" />
                                             </div>
                                         ))}
                                     </div>

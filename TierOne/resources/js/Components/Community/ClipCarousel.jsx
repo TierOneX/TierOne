@@ -12,7 +12,7 @@ export default function ClipCarousel({ clips }) {
                     className="group relative flex flex-col gap-4 p-4 rounded-3xl bg-white/[0.02] transition-all hover:bg-white/[0.05] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:-translate-y-1 cursor-pointer"
                     onClick={() => window.open(clip.url, '_blank')}
                 >
-                    {/* Thumbnail Container */}
+                    {/* Thumbnail Container — estático, nunca se transforma */}
                     <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
                         <img 
                             src={clip.thumbnail_url} 
@@ -28,7 +28,7 @@ export default function ClipCarousel({ clips }) {
                         </div>
 
                         {/* Duration Badge */}
-                        <div className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-black text-white backdrop-blur-md border border-white/10 flex items-center gap-1">
+                        <div className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-black text-white backdrop-blur-md flex items-center gap-1">
                             <Clock size={10} />
                             {Math.round(clip.duration)}s
                         </div>
@@ -49,7 +49,7 @@ export default function ClipCarousel({ clips }) {
                     </div>
 
                     {/* Shimmer Effect */}
-                    <div className="absolute inset-0 rounded-3xl border-2 border-primary/0 group-hover:border-primary/10 pointer-events-none transition-all" />
+                    <div className="absolute inset-0 rounded-3xl pointer-events-none transition-all" />
                 </div>
             ))}
         </div>

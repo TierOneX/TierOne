@@ -9,7 +9,7 @@ const StreamCard = ({ stream }) => {
             href={`https://twitch.tv/${stream.user_login}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#141414] border border-white/5 transition-all duration-300 hover:border-primary/30 hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)]"
+            className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#141414] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)]"
         >
             <div className="relative aspect-video w-full overflow-hidden">
                 <img 
@@ -25,7 +25,7 @@ const StreamCard = ({ stream }) => {
                 </div>
 
                 {/* Viewer Count Glass */}
-                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-xl bg-black/60 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md border border-white/10">
+                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-xl bg-black/60 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md">
                     <Users size={12} className="text-primary" />
                     {formattedViewers}
                 </div>
@@ -43,7 +43,7 @@ const StreamCard = ({ stream }) => {
                     {stream.title}
                 </h4>
                 
-                <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/5">
+                <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/[0.02]">
                     <div className="flex items-center gap-2">
                         <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
                             {stream.user_name[0]}
@@ -64,7 +64,7 @@ const StreamCard = ({ stream }) => {
 export default function LiveStreamGrid({ streams }) {
     if (!streams || streams.length === 0) {
         return (
-            <div className="flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] text-center p-8">
+            <div className="flex h-64 flex-col items-center justify-center rounded-3xl bg-white/[0.02] text-center p-8">
                 <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                     <MonitorPlay className="text-white/20" size={32} />
                 </div>

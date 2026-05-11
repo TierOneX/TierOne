@@ -8,10 +8,25 @@ export default function TrendingBar({ topGames }) {
 
     // Duplicamos para el efecto de loop infinito
     const duplicatedGames = [...topGames, ...topGames];
+    const duration = topGames.length * 5;
 
     return (
-        <div className="relative w-full py-16 select-none overflow-hidden">
-            {/* Header / Titulo */}
+        <div className="w-full py-16 select-none">
+            <style>{`
+                @keyframes marquee-scroll {
+                    from { transform: translateX(0); }
+                    to   { transform: translateX(-50%); }
+                }
+                .marquee-track {
+                    animation: marquee-scroll ${duration}s linear infinite;
+                    will-change: transform;
+                }
+                .marquee-track:hover {
+                    animation-play-state: paused;
+                }
+            `}</style>
+
+            {/* Header */}
             <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
                 <div className="relative">
                     <div className="flex items-center gap-3 mb-2">
@@ -24,32 +39,21 @@ export default function TrendingBar({ topGames }) {
                 </div>
             </div>
 
-            {/* Infinite Loop Container */}
-            <div className="relative flex">
-                <motion.div 
-                    className="flex gap-8 px-4"
-                    animate={{ 
-                        x: [0, -((topGames.length * 280) + (topGames.length * 32))] 
-                    }}
-                    transition={{ 
-                        duration: topGames.length * 5,
-                        ease: "linear", 
-                        repeat: Infinity 
-                    }}
-                    whileHover={{ animationPlayState: "paused" }}
-                >
-                    {duplicatedGames.map((game, index) => (
-                        <TrendingCard 
-                            key={`${game.twitch_game_id}-${index}`} 
-                            game={game} 
-                            index={index % topGames.length} 
-                        />
-                    ))}
-                </motion.div>
-
-                {/* Overlays para el efecto de desvanecimiento en los bordes */}
+            {/* Track con gradientes de borde */}
+            <div className="relative overflow-hidden">
                 <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
                 <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+
+                {/* CSS marquee — -50% es siempre exactamente una copia, sin píxeles hardcodeados */}
+                <div className="marquee-track flex gap-8 px-4" style={{ width: 'max-content' }}>
+                    {duplicatedGames.map((game, index) => (
+                        <TrendingCard
+                            key={`${game.twitch_game_id}-${index}`}
+                            game={game}
+                            index={index % topGames.length}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
@@ -75,7 +79,7 @@ function TrendingCard({ game, index }) {
 
             <CardWrapper 
                 {...wrapperProps} 
-                className={`group block relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-[#0F0F0F] border border-white/5 shadow-2xl ${game.slug ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`group block relative aspect-[3/4] rounded-[2rem] overflow-hidden bg-[#0F0F0F] shadow-2xl ${game.slug ? 'cursor-pointer' : 'cursor-default'}`}
             >
                 {/* Imagen Vertical de Portada */}
                 <img 
