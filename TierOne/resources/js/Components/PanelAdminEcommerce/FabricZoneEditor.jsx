@@ -41,14 +41,11 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
         const updatedZones = canvas.getObjects()
             .filter(o => o._id)
             .map(o => {
-                // getBoundingRect() devuelve coordenadas de pantalla ya escaladas
-                // y es más fiable que o.left/top cuando el objeto fue transformado.
-                const br = o.getBoundingRect(true); // true = sin incluir strokeWidth
                 const abs = toAbsCoords({
-                    x:      br.left,
-                    y:      br.top,
-                    width:  br.width,
-                    height: br.height,
+                    x:      o.left,
+                    y:      o.top,
+                    width:  o.width * o.scaleX,
+                    height: o.height * o.scaleY,
                 }, scale);
                 return {
                     id:            (typeof o._id === 'string' && o._id.startsWith('temp_')) ? null : o._id,
@@ -154,6 +151,9 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                     stroke:            cfg.stroke,
                     strokeWidth:       2,
                     strokeUniform:     true,
+                    strokeAlign:       'inside',
+                    originX:           'left',
+                    originY:           'top',
                     cornerColor:       '#fff',
                     cornerStrokeColor: cfg.stroke,
                     cornerSize:        8,
@@ -177,7 +177,7 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
                 fabricRef.current = null;
             }
         };
-    }, [imageUrl, canvasDimsKey]);
+    }, [imageUrl]);
 
     const addZone = (type) => {
         const canvas = fabricRef.current;
@@ -192,6 +192,9 @@ export default function FabricZoneEditor({ imageSrc, zones = [], onZonesChange }
             stroke:           cfg.stroke,
             strokeWidth:      2,
             strokeUniform:    true,
+            strokeAlign:      'inside',
+            originX:          'left',
+            originY:          'top',
             cornerColor:      '#fff',
             cornerSize:        8,
             transparentCorners: false,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, ShoppingCart, X } from 'lucide-react';
+import { AlertTriangle, ShoppingBag, X } from 'lucide-react';
 
 export default function ConfirmationModal({ isOpen, onClose, onConfirm, title, message }) {
     if (!isOpen) return null;
@@ -22,7 +22,7 @@ export default function ConfirmationModal({ isOpen, onClose, onConfirm, title, m
                     {/* Icono y Header */}
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
-                            <AlertCircle size={28} />
+                            <AlertTriangle size={28} strokeWidth={2.5} />
                         </div>
                         <div>
                             <h3 className="text-white font-black text-xl uppercase tracking-tight">
@@ -43,7 +43,7 @@ export default function ConfirmationModal({ isOpen, onClose, onConfirm, title, m
                             onClick={onConfirm}
                             className="w-full py-4 bg-[#e31837] hover:bg-red-700 text-white font-black text-sm uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-600/20 active:scale-95"
                         >
-                            <ShoppingCart size={18} />
+                            <ShoppingBag size={18} strokeWidth={2.5} />
                             ¡SÍ, AÑADIR AL CARRITO!
                         </button>
                         
@@ -61,7 +61,7 @@ export default function ConfirmationModal({ isOpen, onClose, onConfirm, title, m
                     onClick={onClose}
                     className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
                 >
-                    <X size={20} />
+                    <X size={20} strokeWidth={2.5} />
                 </button>
             </div>
         </div>

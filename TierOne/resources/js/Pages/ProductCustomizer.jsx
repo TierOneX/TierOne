@@ -8,7 +8,7 @@ import ImageTool from "@/Components/Customizer/ImageTool";
 import LayerPanel from "@/Components/Customizer/LayerPanel";
 import ZoneSelector from "@/Components/Customizer/ZoneSelector";
 import PriceSummary from "@/Components/Customizer/PriceSummary";
-import { ShoppingCart, ArrowLeft } from "lucide-react";
+import { ShoppingBag, ChevronLeft, Cpu } from "lucide-react";
 import ConfirmationModal from "@/Components/Customizer/ConfirmationModal";
 
 import { imgUrl } from "@/Utils/imageUtils";
@@ -191,40 +191,47 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
         <MainLayout>
             <Head title={`Personalizar ${producto.nombre} - TierOne`} />
 
-            <section className="bg-[#0a0a0a] min-h-screen pt-4 pb-12 px-4">
-                <div className="max-w-7xl mx-auto">
+            <section className="bg-[#050505] min-h-screen pt-6 pb-20 px-4 relative overflow-hidden">
+                {/* Fondo decorativo */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[500px] bg-red-600/5 blur-[120px] rounded-full pointer-events-none" />
+                
+                <div className="max-w-7xl mx-auto relative z-10">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+                        <div className="flex items-center gap-4">
                             <Link
                                 href={route("product.show", producto.slug)}
-                                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all group"
                             >
-                                <ArrowLeft className="w-5 h-5 text-white" />
+                                <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" strokeWidth={2.5} />
                             </Link>
-                            <h1 className="text-white font-black text-lg uppercase tracking-tight">
-                                Personalizar:{" "}
-                                <span className="text-[#e31837]">
-                                    {producto.nombre}
-                                </span>
-                            </h1>
+                            <div>
+                                <h1 className="text-white font-black text-2xl uppercase tracking-[0.1em] font-outfit italic leading-tight">
+                                    Configurador de <span className="text-red-600">Hardware</span>
+                                </h1>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
+                                    Personalizando <span className="text-white">{producto.nombre}</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* Vista + Zona Selector */}
-                    <ZoneSelector
-                        views={views}
-                        activeViewIndex={activeViewIndex}
-                        onViewChange={handleViewChange}
-                        activeZoneId={activeZoneId}
-                        onZoneChange={handleZoneChange}
-                        zonesWithContent={zonesWithContent}
-                    />
+                    <div className="mb-10">
+                        <ZoneSelector
+                            views={views}
+                            activeViewIndex={activeViewIndex}
+                            onViewChange={handleViewChange}
+                            activeZoneId={activeZoneId}
+                            onZoneChange={handleZoneChange}
+                            zonesWithContent={zonesWithContent}
+                        />
+                    </div>
 
                     {/* Main Grid: Tools | Canvas | Price */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_260px] gap-4 mt-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-8 mt-4">
                         {/* Left: Tools */}
-                        <div className="space-y-3 order-2 lg:order-1">
+                        <div className="space-y-6 order-2 lg:order-1">
                             <TextTool onAddText={handleAddText} />
                             <ImageTool onAddImage={handleAddImage} />
                             <LayerPanel
@@ -240,44 +247,62 @@ export default function ProductCustomizer({ producto, zonas, precios }) {
 
                         {/* Center: Canvas */}
                         <div className="flex flex-col items-center order-1 lg:order-2">
-                            {activeView && activeZone && (
-                                <DesignCanvas
-                                    ref={canvasRef}
-                                    viewImage={activeView.image}
-                                    activeZone={activeZone}
-                                    allViewZones={activeView.zonas}
-                                    initialZonesData={zonesData}
-                                    onLayersUpdate={handleLayersUpdate}
-                                    onZoneActivate={handleZoneChange}
-                                />
-                            )}
+                            <div className="relative group w-full flex justify-center">
+                                {/* Decoración de bordes del canvas */}
+                                <div className="absolute -inset-4 bg-red-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                
+                                {activeView && activeZone && (
+                                    <DesignCanvas
+                                        ref={canvasRef}
+                                        viewImage={activeView.image}
+                                        activeZone={activeZone}
+                                        allViewZones={activeView.zonas}
+                                        initialZonesData={zonesData}
+                                        onLayersUpdate={handleLayersUpdate}
+                                        onZoneActivate={handleZoneChange}
+                                    />
+                                )}
+                            </div>
+                            
+                            <div className="mt-6 flex items-center gap-6 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700">
+                                <div className="h-px w-20 bg-gradient-to-r from-transparent to-white/20" />
+                                <p className="text-[8px] text-gray-400 font-black uppercase tracking-[0.5em]">Lienzo de Precisión</p>
+                                <div className="h-px w-20 bg-gradient-to-l from-transparent to-white/20" />
+                            </div>
                         </div>
 
                         {/* Right: Price + Add to Cart */}
-                        <div className="space-y-3 order-3">
+                        <div className="space-y-6 order-3">
                             <PriceSummary
                                 precioBase={Number(producto.precio_venta)}
                                 elementos={totalElements}
                                 precios={precios}
                                 recargo={recargo}
                             />
-                            <button
-                                onClick={handleAddToCart}
-                                className="w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all bg-[#e31837] text-white hover:bg-red-700 active:scale-[0.98] shadow-lg shadow-red-500/20"
-                            >
-                                <ShoppingCart className="w-5 h-5" />
-                                AÑADIR AL CARRITO
-                            </button>
-                            {recargo === 0 && (
-                                <p className="text-[9px] text-gray-500 text-center italic">
-                                    Puedes añadir el producto tal cual o
-                                    personalizarlo primero.
+                            <div className="relative group">
+                                <div className="absolute -inset-1 bg-red-600 blur opacity-25 group-hover:opacity-60 transition-opacity rounded-2xl" />
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="relative w-full py-5 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-4 transition-all bg-gradient-to-r from-red-600 to-red-800 text-white shadow-xl italic font-outfit active:scale-95 border border-red-500/50 hover:border-white/20"
+                                >
+                                    <ShoppingBag className="w-5 h-5 shadow-lg" strokeWidth={2.5} />
+                                    COMPLETAR DISEÑO
+                                </button>
+                            </div>
+                            
+                            <div className="p-4 bg-white/3 border border-white/5 rounded-2xl">
+                                <h4 className="text-[9px] text-white font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <div className="w-1 h-1 bg-red-600 rounded-full" /> Nota técnica
+                                </h4>
+                                <p className="text-[9px] text-gray-500 italic leading-relaxed">
+                                    Al completar el diseño, se generará un render de alta fidelidad para que nuestro equipo lo valide técnicamente.
                                 </p>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
+
 
             <ConfirmationModal
                 isOpen={isConfirmModalOpen}

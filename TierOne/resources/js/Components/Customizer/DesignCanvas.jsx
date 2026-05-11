@@ -65,8 +65,8 @@ const DesignCanvas = forwardRef(({
             contenido: o._customType === 'texto' ? o.text : o._customSrc,
             x: Math.round(o.left / s),
             y: Math.round(o.top / s),
-            width: Math.round(o.getScaledWidth() / s),
-            height: Math.round(o.getScaledHeight() / s),
+            width: Math.round((o.width * o.scaleX) / s),
+            height: Math.round((o.height * o.scaleY) / s),
             rotation: Math.round(o.angle || 0),
             fontSize: o.fontSize,
             fontFamily: o.fontFamily,
@@ -181,7 +181,10 @@ const DesignCanvas = forwardRef(({
                     obj._isUserObject = true;
                     obj._customType = objData._customType;
                     obj._customSrc = objData._customSrc;
-                    
+
+                    // ─── FIX: fromObject() already restores left/top/scaleX/scaleY
+                    // in display (scaled) pixels. Do NOT re-multiply by s.
+                    // We only re-attach the clipPath using the same display coords.
                     obj.clipPath = new fabric.Rect({
                         left: zone.area_x * s,
                         top: zone.area_y * s,
@@ -192,6 +195,18 @@ const DesignCanvas = forwardRef(({
                         originY: 'top',
                         absolutePositioned: true,
                     });
+
+                    // Apply TierOne red palette to controls
+                    obj.set({
+                        cornerColor: '#e31837',
+                        cornerStyle: 'circle',
+                        cornerSize: 10,
+                        transparentCorners: false,
+                        borderColor: '#e31837',
+                        borderDashArray: [4, 4],
+                        padding: 5,
+                    });
+
                     canvas.add(obj);
                 }
             }
@@ -200,6 +215,7 @@ const DesignCanvas = forwardRef(({
             console.error('Error loading zone objects:', err);
         }
     }, [getZoneScale]);
+
 
     // ── Init Effect ──────────────────────────────────
     useEffect(() => {
@@ -316,7 +332,7 @@ const DesignCanvas = forwardRef(({
                 left: zone.area_x * s + 20,
                 top: zone.area_y * s + 20,
                 fontSize: (fontSize || 28) * s,
-                fontFamily: fontFamily || 'Arial',
+                fontFamily: fontFamily || 'Outfit',
                 fill: color || '#ffffff',
                 editable: true,
                 originX: 'left',
