@@ -5,6 +5,13 @@ const imgUrl = (src) => {
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
 
+const withFallback = (event, fallback) => {
+    const nextSrc = imgUrl(fallback);
+    if (event.currentTarget.src !== nextSrc) {
+        event.currentTarget.src = nextSrc;
+    }
+};
+
 const modeLabels = {
     '1v1': 'Duelo 1v1',
     '2v2': 'Escuadra 2v2',
@@ -71,6 +78,7 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
                                     <img
                                         src={imgUrl(match.juego.imagen_url)}
                                         alt={match.juego.nombre}
+                                        onError={(event) => withFallback(event, match.juego.imagen_url_local)}
                                         className="h-24 w-20 rounded-2xl object-cover"
                                     />
                                     <div className="flex-1">
@@ -107,3 +115,5 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
         </section>
     );
 }
+
+

@@ -1,6 +1,13 @@
-﻿const imgUrl = (src) => {
+const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
+
+const withFallback = (event, fallback) => {
+    const nextSrc = imgUrl(fallback);
+    if (event.currentTarget.src !== nextSrc) {
+        event.currentTarget.src = nextSrc;
+    }
 };
 
 export default function MatchesHero({
@@ -94,6 +101,7 @@ export default function MatchesHero({
                             <img
                                 src={imgUrl(game.imagen_url)}
                                 alt={game.nombre}
+                                onError={(event) => withFallback(event, game.imagen_url_local)}
                                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
@@ -120,3 +128,4 @@ export default function MatchesHero({
         </section>
     );
 }
+

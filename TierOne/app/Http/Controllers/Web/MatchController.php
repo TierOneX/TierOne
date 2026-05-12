@@ -7,6 +7,7 @@ use App\Models\Juego;
 use App\Models\Partida;
 use App\Models\ParticipantePartida;
 use App\Models\User;
+use App\Services\GameImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +15,10 @@ use Inertia\Response;
 
 class MatchController extends Controller
 {
+    public function __construct(private readonly GameImageService $gameImageService)
+    {
+    }
+
     public function index(): Response
     {
         $juegos = Juego::query()
@@ -70,7 +75,15 @@ class MatchController extends Controller
                     'nombre' => $juego->nombre,
                     'slug' => $juego->slug,
                     'descripcion' => $juego->descripcion,
-                    'imagen_url' => $juego->imagen_url,
+                    'imagen_url' => $this->gameImageService->resolveMatchImageUrl(
+                        gameName: $juego->nombre,
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
+                    'imagen_url_local' => $this->gameImageService->resolveMatchLocalImageUrl(
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
                     'categoria' => $juego->categoria,
                     'activo' => (bool) $juego->activo,
                     'total_partidas' => (int) $juego->total_partidas,
@@ -217,4 +230,3 @@ class MatchController extends Controller
         };
     }
 }
-

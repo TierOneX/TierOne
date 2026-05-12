@@ -57,6 +57,7 @@ export default function Matches({ juegos = [], categorias = [] }) {
                         id: game.id,
                         nombre: game.nombre,
                         imagen_url: game.imagen_url,
+                        imagen_url_local: game.imagen_url_local,
                         categoria: game.categoria,
                     },
                 })),

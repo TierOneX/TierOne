@@ -3,6 +3,13 @@ const imgUrl = (src) => {
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
 
+const withFallback = (event, fallback) => {
+    const nextSrc = imgUrl(fallback);
+    if (event.currentTarget.src !== nextSrc) {
+        event.currentTarget.src = nextSrc;
+    }
+};
+
 export default function MatchesGameGrid({ games = [], selectedGameId, onSelectGame, onJoinGame, onCreateGame }) {
     return (
         <section className="bg-[#090909] px-4 pb-16 sm:px-6 lg:px-8">
@@ -35,6 +42,7 @@ export default function MatchesGameGrid({ games = [], selectedGameId, onSelectGa
                                     <img
                                         src={imgUrl(game.imagen_url)}
                                         alt={game.nombre}
+                                        onError={(event) => withFallback(event, game.imagen_url_local)}
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -83,3 +91,4 @@ export default function MatchesGameGrid({ games = [], selectedGameId, onSelectGa
         </section>
     );
 }
+
