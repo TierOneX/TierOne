@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Modelo Juego
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Juego extends Model
 {
+    use HasFactory;
     /**
      * Nombre de la tabla asociada
      */

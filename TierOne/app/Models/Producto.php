@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Modelo Producto
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Producto extends Model
 {
+    use HasFactory;
 
     /**
      * Nombre de la tabla asociada
