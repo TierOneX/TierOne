@@ -1,4 +1,5 @@
 import LegalPage from "./LegalPage";
+import { openCookieSettings } from "@/Utils/cookieConsent";
 
 const sections = [
     {
@@ -13,7 +14,7 @@ const sections = [
         title: "Tipos de cookies",
         content: [
             "TierOne puede utilizar cookies tecnicas necesarias para iniciar sesion, mantener el carrito, proteger formularios, procesar pagos y recordar preferencias basicas.",
-            "Tambien pueden existir cookies de medicion o analitica para entender el uso de la plataforma y mejorar la experiencia, siempre de acuerdo con la normativa aplicable.",
+            "Tambien pueden existir cookies de preferencias, medicion o analitica y marketing para entender el uso de la plataforma, mejorar la experiencia o personalizar comunicaciones, solo cuando hayas dado tu consentimiento cuando sea necesario.",
         ],
     },
     {
@@ -28,7 +29,7 @@ const sections = [
         id: "gestion",
         title: "Como gestionarlas",
         content: [
-            "Puedes bloquear o eliminar cookies desde la configuracion de tu navegador. Si desactivas cookies tecnicas, algunas funciones como el carrito, el inicio de sesion o el checkout podrian dejar de funcionar correctamente.",
+            "Puedes aceptar, rechazar o configurar las cookies no necesarias desde el panel de preferencias de TierOne. Tambien puedes bloquear o eliminar cookies desde la configuracion de tu navegador. Si desactivas cookies tecnicas, algunas funciones como el carrito, el inicio de sesion o el checkout podrian dejar de funcionar correctamente.",
         ],
     },
     {
@@ -46,6 +47,14 @@ export default function Cookies() {
             title="Politica de Cookies"
             description="Informacion sobre el uso de cookies y tecnologias similares en la plataforma TierOne."
             sections={sections}
-        />
+        >
+            <button
+                type="button"
+                onClick={openCookieSettings}
+                className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#e31837] px-5 py-2 text-sm font-black uppercase tracking-wider text-white transition-colors hover:bg-[#ff2345]"
+            >
+                Configurar cookies
+            </button>
+        </LegalPage>
     );
 }
