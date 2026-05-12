@@ -32,7 +32,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
                                 {isAdmin && (
-                                    <NavLink href="/paneladmingaming" active={route().current('panel.gaming')}>
+                                    <NavLink href={route('panel.gaming.index')} active={route().current('panel.gaming.*')}>
                                         Administrar
                                     </NavLink>
                                 )}
@@ -154,7 +154,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         <div className="mt-3 space-y-1">
                             {isAdmin && (
-                                <ResponsiveNavLink href="/paneladmingaming">
+                                <ResponsiveNavLink href={route('panel.gaming.index')}>
                                     Administrar
                                 </ResponsiveNavLink>
                             )}

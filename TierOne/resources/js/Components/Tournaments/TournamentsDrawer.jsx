@@ -19,6 +19,8 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
     const isAuthenticated = Boolean(auth?.user);
     const currentUserId = auth?.user?.id ?? null;
     const [drawerMessage, setDrawerMessage] = useState(null);
+    const [selectedTournamentModal, setSelectedTournamentModal] = useState(null);
+    const [joinedTournamentIds, setJoinedTournamentIds] = useState([]);
     const [renderedGame, setRenderedGame] = useState(game);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const joinForm = useForm({});
@@ -38,6 +40,7 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
     useEffect(() => {
         if (!isOpen) {
             setDrawerMessage(null);
+            setSelectedTournamentModal(null);
         }
     }, [isOpen]);
 
@@ -61,8 +64,17 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
         joinForm.post(`/tournaments/${tournamentId}/join`, {
             preserveScroll: true,
             onSuccess: (page) => {
+                const joinedTournament = (openTournaments ?? []).find((torneo) => torneo.id === tournamentId) ?? null;
+
                 if (page.props?.flash?.success) {
-                    setDrawerMessage({ type: 'success', text: page.props.flash.success });
+                    setDrawerMessage(null);
+                    setSelectedTournamentModal({
+                        tournamentId,
+                        tournament: joinedTournament,
+                        message: page.props.flash.success,
+                        type: 'success',
+                    });
+                    setJoinedTournamentIds((prev) => (prev.includes(tournamentId) ? prev : [...prev, tournamentId]));
                 }
                 if (page.props?.flash?.error) {
                     setDrawerMessage({ type: 'error', text: page.props.flash.error });
@@ -122,13 +134,13 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                     </div>
                 </div>
 
-                <div className="border-b border-white/10 px-4 py-3 sm:px-6">
-                    {drawerMessage && (
-                        <div className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${drawerMessage.type === 'success' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300' : 'border-red-500/20 bg-red-500/10 text-red-300'}`}>
+                {drawerMessage && (
+                    <div className="border-b border-white/10 px-4 py-3 sm:px-6">
+                        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-300">
                             {drawerMessage.text}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 <div className="custom-scrollbar flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
                     {!isAuthenticated && (
@@ -152,6 +164,8 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                 const isJoined = (torneo.inscripciones ?? []).some(
                                     (inscripcion) => inscripcion.id_usuario === currentUserId,
                                 );
+                                const isLocallyJoined = joinedTournamentIds.includes(torneo.id);
+                                const alreadyJoined = isJoined || isLocallyJoined;
 
                                 return (
                                     <article key={torneo.id} className="flex h-full flex-col rounded-[22px] border border-white/10 bg-[#101010] p-4">
@@ -191,10 +205,10 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                             <button
                                                 type="button"
                                                 onClick={() => joinTournament(torneo.id)}
-                                                disabled={!isAuthenticated || isJoined || joinForm.processing || torneo.plazas_disponibles === 0}
+                                                disabled={!isAuthenticated || alreadyJoined || joinForm.processing || torneo.plazas_disponibles === 0}
                                                 className="flex h-11 min-w-[120px] items-center justify-center rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
                                             >
-                                                {isJoined ? 'Inscrito' : 'Unirme'}
+                                                {alreadyJoined ? 'Inscrito' : 'Unirme'}
                                             </button>
                                         </div>
                                     </article>
@@ -208,6 +222,89 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                     </div>
                 </div>
             </aside>
+
+            {selectedTournamentModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+                    <button
+                        type="button"
+                        aria-label="Cerrar modal"
+                        onClick={() => setSelectedTournamentModal(null)}
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                    />
+
+                    <div className="relative z-10 w-full max-w-4xl overflow-hidden rounded-[28px] border border-white/15 bg-[#0f0f0f] shadow-[0_30px_120px_rgba(0,0,0,0.75)]">
+                        <button
+                            type="button"
+                            onClick={() => setSelectedTournamentModal(null)}
+                            className="absolute right-4 top-4 rounded-full border border-white/20 bg-black/50 p-2 text-gray-300 transition hover:text-white"
+                            aria-label="Cerrar modal"
+                        >
+                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="grid gap-0 md:grid-cols-[1.15fr_1fr]">
+                            <div className="relative min-h-[260px] md:min-h-[420px]">
+                                <img
+                                    src={selectedTournamentModal.tournament?.imagen_banner || renderedGame?.imagen_url || '/images/landing/torneos.jpg'}
+                                    alt={selectedTournamentModal.tournament?.nombre || 'Torneo'}
+                                    className="h-full w-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                                <div className="absolute bottom-5 left-5 right-5">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-300">Inscripcion completada</p>
+                                    <h3 className="mt-2 text-2xl font-black uppercase italic text-white">
+                                        {selectedTournamentModal.tournament?.nombre || 'Torneo'}
+                                    </h3>
+                                    <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-red-300">
+                                        {renderedGame?.nombre || 'Juego'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="p-5 sm:p-6">
+                                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
+                                    {selectedTournamentModal.message || 'Te has unido correctamente al torneo.'}
+                                </div>
+
+                                <div className="mt-5 grid grid-cols-2 gap-3">
+                                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Precio</p>
+                                        <p className="mt-2 text-lg font-black text-white">
+                                            {currency.format(selectedTournamentModal.tournament?.cuota_inscripcion ?? 0)}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Personas</p>
+                                        <p className="mt-2 text-lg font-black text-white">
+                                            {selectedTournamentModal.tournament?.inscripciones_count ?? 0}/{selectedTournamentModal.tournament?.max_participantes ?? 0}
+                                        </p>
+                                    </div>
+                                    <div className="col-span-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Inicio</p>
+                                        <p className="mt-2 text-sm font-semibold text-white">
+                                            {selectedTournamentModal.tournament?.fecha_inicio
+                                                ? dateFormatter.format(new Date(selectedTournamentModal.tournament.fecha_inicio))
+                                                : 'Pendiente'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedTournamentModal(null)}
+                                        className="inline-flex h-11 items-center justify-center rounded-2xl bg-white px-5 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

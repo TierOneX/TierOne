@@ -6,7 +6,7 @@ import TournamentsGameGrid from '@/Components/Tournaments/TournamentsGameGrid';
 import TournamentsDrawer from '@/Components/Tournaments/TournamentsDrawer';
 
 export default function Tournaments({ juegos = [], categorias = [] }) {
-    const { auth, flash } = usePage().props;
+    const { auth } = usePage().props;
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('TODOS');
     const [selectedGameId, setSelectedGameId] = useState(null);
@@ -41,22 +41,6 @@ export default function Tournaments({ juegos = [], categorias = [] }) {
     return (
         <MainLayout>
             <Head title="Torneos" />
-
-            {flash?.success && !selectedGame && (
-                <div className="px-4 pt-6 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-[1400px] rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
-                        {flash.success}
-                    </div>
-                </div>
-            )}
-
-            {flash?.error && !selectedGame && (
-                <div className="px-4 pt-6 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-[1400px] rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-300">
-                        {flash.error}
-                    </div>
-                </div>
-            )}
 
             <TournamentsHero
                 featuredGames={featuredGames}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import GameDiscoveryFilters from '@/Components/Matches/GameDiscoveryFilters';
+import { Link } from '@inertiajs/react';
 
 const imgUrl = (src) => {
     if (!src) return '/images/landing/torneos.jpg';
@@ -97,15 +98,13 @@ export default function TournamentsHero({
                                         Ver torneos
                                     </button>
                                     {isAdmin && (
-                                        <button
-                                            type="button"
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                            }}
+                                        <Link
+                                            href={route('panel.gaming.index')}
+                                            onClick={(event) => event.stopPropagation()}
                                             className="flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
                                         >
-                                            Crear torneo
-                                        </button>
+                                            Administrar
+                                        </Link>
                                     )}
                                 </div>
                             </div>

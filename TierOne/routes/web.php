@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Web\MatchController;
+use App\Http\Controllers\Web\GamingAdminController;
 use App\Http\Controllers\Web\TournamentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -65,9 +66,16 @@ Route::get('/tournaments', [TournamentController::class, 'index'])->name('tourna
 Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])
     ->middleware('auth')
     ->name('tournaments.join');
-Route::get('/paneladmingaming', function () {
-    return Inertia::render('PanelAdminGaming');
-})->name('panel.gaming');
+Route::middleware('auth')->prefix('paneladmingaming')->name('panel.gaming.')->group(function () {
+    Route::get('/', [GamingAdminController::class, 'index'])->name('index');
+    Route::post('/torneos', [GamingAdminController::class, 'storeTorneo'])->name('torneos.store');
+    Route::put('/torneos/{torneo}', [GamingAdminController::class, 'updateTorneo'])->name('torneos.update');
+    Route::delete('/torneos/{torneo}', [GamingAdminController::class, 'destroyTorneo'])->name('torneos.destroy');
+    Route::put('/partidas/{partida}', [GamingAdminController::class, 'updatePartida'])->name('partidas.update');
+    Route::delete('/partidas/{partida}', [GamingAdminController::class, 'destroyPartida'])->name('partidas.destroy');
+    Route::put('/incidencias/{reporte}', [GamingAdminController::class, 'updateIncidencia'])->name('incidencias.update');
+    Route::put('/cuentas/{user}', [GamingAdminController::class, 'updateCuenta'])->name('cuentas.update');
+});
 
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])

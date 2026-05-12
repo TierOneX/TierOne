@@ -23,7 +23,8 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
 
     const handleApply = (e) => {
         e.preventDefault();
-        router.get(route(routeName), values, {
+        const payload = { ...currentFilters, ...values };
+        router.get(route(routeName), payload, {
             preserveState: true,
             replace: true
         });
@@ -33,7 +34,9 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
         const resetValues = {};
         filtersConfig.forEach(f => resetValues[f.name] = '');
         setValues(resetValues);
-        router.get(route(routeName), {}, {
+        const staticFilters = { ...currentFilters };
+        filtersConfig.forEach((f) => delete staticFilters[f.name]);
+        router.get(route(routeName), staticFilters, {
             preserveState: true,
             replace: true
         });

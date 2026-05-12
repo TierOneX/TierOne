@@ -8,7 +8,16 @@ import { Home } from "lucide-react";
 // pero al ser CSS puro importado en JS suele funcionar.
 import "../../../css/panel.css";
 
-export default function PanelLayout({ title, activeItem, children }) {
+export default function PanelLayout({
+    title,
+    activeItem,
+    children,
+    menuItems = null,
+    homeRoute = "home",
+    showGamingShortcut = true,
+    shortcutLink = "/paneladmingaming",
+    shortcutLabel = "Administrar Gaming",
+}) {
     const { menu_admin, auth } = usePage().props; // Atrapamos el menú y el user del servidor
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const isAdmin = auth?.user?.rol === "admin";
@@ -31,7 +40,7 @@ export default function PanelLayout({ title, activeItem, children }) {
             <Head title={title} />
             {/* SIDEBAR */}
             <Sidebar
-                menuItems={menu_admin}
+                menuItems={menuItems ?? menu_admin}
                 activeItem={activeItem}
                 user={userDisplay}
                 isSidebarOpen={isSidebarOpen}
@@ -52,13 +61,13 @@ export default function PanelLayout({ title, activeItem, children }) {
                     <h1 className="page-title">{title}</h1>
                 </div>
                 <div className="header-actions">
-                    {isAdmin && (
-                        <Link href="/paneladmingaming" className="btn-secondary">
-                            <span>Administrar Gaming</span>
+                    {isAdmin && showGamingShortcut && (
+                        <Link href={shortcutLink} className="btn-secondary">
+                            <span>{shortcutLabel}</span>
                         </Link>
                     )}
                     <Link
-                        href={route("home")}
+                        href={route(homeRoute)}
                         className="btn-secondary"
                     >
                         <Home size={16} />
