@@ -29,6 +29,8 @@ class ResultadosPartida extends Model
      */
     protected $table = 'resultados_partida';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      */

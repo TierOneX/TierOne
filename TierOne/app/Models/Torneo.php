@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Modelo Torneo
@@ -39,6 +39,11 @@ class Torneo extends Model
      * Nombre de la tabla asociada
      */
     protected $table = 'torneos';
+
+    /**
+     * Deshabilitar timestamps automáticos
+     */
+    public $timestamps = false;
 
     /**
      * Campos asignables masivamente
@@ -85,10 +90,6 @@ class Torneo extends Model
         'premio_total' => 'decimal:2',
         'comision_plataforma_porcentaje' => 'decimal:2',
     ];
-
-    /**
-     * Timestamps automáticos de Laravel (created_at, updated_at)
-     */
 
     /**
      * Relación: Juego del torneo

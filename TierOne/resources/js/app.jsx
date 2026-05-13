@@ -7,6 +7,9 @@ import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+import { CartProvider } from './Contexts/CartContext';
+import CookieConsentBanner from './Components/CookieConsentBanner';
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -17,7 +20,12 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        root.render(
+            <CartProvider>
+                <App {...props} />
+                <CookieConsentBanner />
+            </CartProvider>
+        );
     },
     progress: {
         color: '#4B5563',

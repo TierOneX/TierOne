@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Modelo Orden
@@ -39,6 +39,8 @@ class Orden extends Model
      */
     protected $table = 'ordenes';
 
+    public $timestamps = false;
+
     /**
      * Campos asignables masivamente
      * 
@@ -63,6 +65,7 @@ class Orden extends Model
         'id_cancelado_por',
         'fecha_cancelacion',
         'razon_cancelacion',
+        'stripe_payment_intent_id', // Stripe PaymentIntent ID
     ];
 
     /**
@@ -147,4 +150,5 @@ class Orden extends Model
     {
         return $this->hasMany(Pago::class, 'id_orden');
     }
+
 }

@@ -1,0 +1,438 @@
+import { useState, useEffect, useRef } from "react";
+import { Link, usePage, router } from "@inertiajs/react";
+import { useCart } from "@/Contexts/CartContext";
+
+const imgUrl = (src) => {
+    if (!src) return null;
+    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+};
+
+export default function Header() {
+    const { cartCount } = useCart();
+    const { auth } = usePage().props;
+    const user = auth?.user ?? null;
+    const isAdmin = user?.rol === "admin";
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+
+    // Cerrar el menú de usuario al clicar fuera
+    useEffect(() => {
+        const handler = (e) => {
+            if (
+                userMenuRef.current &&
+                !userMenuRef.current.contains(e.target)
+            ) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    // Detectar scroll para efecto de sombra
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 10);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    // Cerrar menú móvil al redimensionar a desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) setIsMobileMenuOpen(false);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const navItems = [
+        { name: "INICIO", href: "/home" },
+        { name: "PARTIDAS", href: "/matches" },
+        { name: "TORNEOS", href: "/tournaments" },
+        { name: "TIENDA", href: "/shop" },
+        { name: "COMUNIDAD", href: "/community" },
+    ];
+
+    const mobileBottomNav = [
+        {
+            name: "INICIO",
+            href: "/",
+            icon: (
+                <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z" />
+                </svg>
+            ),
+        },
+        {
+            name: "PARTIDAS",
+            href: "/matches",
+            icon: (
+                <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M6 3h2v2H6V3zm4 0h4v2h-4V3zm6 0h2v2h-2V3zM4 7h16v2H4V7zm2 4h2l1 8H5l1-8zm10 0h2l1 8h-4l1-8zm-5 0h2l1 8h-4l1-8z" />
+                </svg>
+            ),
+        },
+        ...(user ? [{
+            name: "HYDRAS",
+            href: "/shop",
+            icon: (
+                <img 
+                    src="/assets/hydra-coin.png" 
+                    alt="H" 
+                    className="w-6 h-6 object-contain shadow-[0_0_8px_rgba(227,24,55,0.4)]"
+                />
+            ),
+        }] : []),
+        {
+            name: "TIENDA",
+            href: "/shop",
+            icon: (
+                <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z" />
+                </svg>
+            ),
+        },
+        {
+            name: "CUENTA",
+            href: user ? "/profile" : "/login",
+            icon: (
+                <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z" />
+                </svg>
+            ),
+        },
+    ];
+
+    return (
+        <>
+            {/* ========== HEADER PRINCIPAL ========== */}
+            <header
+                id="main-header"
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#111111] ${scrolled ? "shadow-lg shadow-black/50" : ""
+                    }`}
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+            >
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        {/* === LOGO === */}
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2.5 group shrink-0"
+                        >
+                            <img
+                                src={imgUrl("images/Logo.png")}
+                                alt="TierOne"
+                                className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <span className="logo-text text-xl !flex-row">
+                                <span className="word">TIER</span>
+                                <span className="word">ONE</span>
+                            </span>
+                        </Link>
+
+                        {/* === NAV DESKTOP (hidden en móvil) === */}
+                        <nav className="hidden lg:flex items-center gap-1">
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className="relative px-4 py-2 text-[13px] font-bold uppercase tracking-[0.15em] text-gray-400 hover:text-white transition-colors duration-200 group"
+                                >
+                                    {item.name}
+                                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[#e31837] group-hover:w-3/4 transition-all duration-300" />
+                                </Link>
+                            ))}
+                        </nav>
+
+                        {/* === ACCIONES DERECHA === */}
+                        <div className="flex items-center gap-3">
+                            {isAdmin && (
+                                <Link
+                                    href="/super-admin"
+                                    className="hidden lg:inline-flex items-center px-4 py-2 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all duration-200"
+                                >
+                                    Administrar
+                                </Link>
+                            )}
+                            {/* Saldo de Moneda Virtual (Premium Design) */}
+                            {user && (
+                                <Link 
+                                    href="/shop"
+                                    className="hidden sm:flex items-center gap-0 group relative"
+                                >
+                                    <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-l-xl bg-white/[0.03] border border-white/10 border-r-0 group-hover:bg-white/[0.06] transition-all duration-300">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-red-600 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
+                                            <img 
+                                                src="/assets/hydra-coin.png" 
+                                                alt="HC" 
+                                                className="relative w-5 h-5 object-contain animate-pulse"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col -space-y-1">
+                                            <span className="text-[8px] font-black text-red-500/80 uppercase tracking-widest">Saldo</span>
+                                            <span className="text-[13px] font-black text-white tabular-nums tracking-tight">
+                                                {Number(user.balance_tokens || 0).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-center h-[38px] px-2 rounded-r-xl bg-red-600/10 border border-white/10 border-l-0 group-hover:bg-red-600/20 transition-all duration-300">
+                                        <svg className="w-3.5 h-3.5 text-red-500 group-hover:text-red-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                                        </svg>
+                                    </div>
+                                    
+                                    {/* Custom Tooltip */}
+                                    <div className="absolute top-full right-0 mt-3 px-3 py-2 rounded-lg bg-black border border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-widest opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                        Recargar <span className="text-red-500">Hydra Coins</span>
+                                    </div>
+                                </Link>
+                            )}
+
+                            {/* Carrito */}
+                            <Link
+                                href="/cart"
+                                id="cart-button"
+                                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200"
+                                aria-label="Carrito de compras"
+                            >
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={1.8}
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                    />
+                                </svg>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 bg-[#e31837] text-white text-[10px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-lg shadow-red-900/50">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
+
+                            {/* Avatar con dropdown / botón Acceder */}
+                            {user ? (
+                                <div
+                                    ref={userMenuRef}
+                                    className="relative hidden lg:block"
+                                >
+                                    <button
+                                        onClick={() =>
+                                            setUserMenuOpen((v) => !v)
+                                        }
+                                        className={`relative w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-black text-white select-none transition-all duration-200 bg-[#1a0508] border-2 ${userMenuOpen ? "border-[#e31837] shadow-[0_0_12px_2px_rgba(227,24,55,0.35)]" : "border-[#e31837]/30 hover:border-[#e31837]/80 hover:shadow-[0_0_10px_1px_rgba(227,24,55,0.25)]"}`}
+                                        aria-label="Menú de usuario"
+                                    >
+                                        {user.username?.[0]?.toUpperCase() ??
+                                            "?"}
+                                        {/* Punto de estado online */}
+                                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#111111]" />
+                                    </button>
+
+                                    {/* Dropdown */}
+                                    {userMenuOpen && (
+                                        <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#141414] border border-white/[0.08] shadow-[0_16px_40px_rgba(0,0,0,0.7)] overflow-hidden z-50">
+                                            <div className="px-4 py-3 border-b border-white/[0.06]">
+                                                <p className="text-[10px] font-black text-white uppercase tracking-widest truncate">
+                                                    {user.username}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 truncate mt-0.5">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href="/profile"
+                                                onClick={() =>
+                                                    setUserMenuOpen(false)
+                                                }
+                                                className="flex items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0"
+                                                    />
+                                                </svg>
+                                                Mi Perfil
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    setUserMenuOpen(false);
+                                                    router.post("/logout");
+                                                }}
+                                                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-[11px] font-semibold text-[#e31837] hover:bg-[#e31837]/10 transition-colors border-t border-white/[0.05]"
+                                            >
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                    className="w-4 h-4"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                                                    />
+                                                </svg>
+                                                Cerrar sesión
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    id="login-button"
+                                    className="hidden lg:inline-flex items-center px-6 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-xs font-black uppercase tracking-widest rounded-md transition-all duration-200 hover:shadow-lg hover:shadow-red-900/30 active:scale-95"
+                                >
+                                    ACCEDER
+                                </Link>
+                            )}
+
+                            {/* Hamburguesa - solo móvil */}
+                            <button
+                                id="mobile-menu-toggle"
+                                onClick={() =>
+                                    setIsMobileMenuOpen(!isMobileMenuOpen)
+                                }
+                                className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors"
+                                aria-label="Abrir menú"
+                            >
+                                <svg
+                                    className="w-7 h-7"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                >
+                                    {isMobileMenuOpen ? (
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    ) : (
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M4 6h16M4 12h16M4 18h16"
+                                        />
+                                    )}
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* === MENÚ MÓVIL DESPLEGABLE (hamburguesa) === */}
+                <div
+                    id="mobile-menu-dropdown"
+                    className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen
+                            ? "max-h-[400px] opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                    style={{
+                        background:
+                            "linear-gradient(180deg, #111111 0%, #0a0a0a 100%)",
+                        borderTop: isMobileMenuOpen
+                            ? "1px solid rgba(255,255,255,0.06)"
+                            : "none",
+                    }}
+                >
+                    <div className="px-4 py-4 space-y-1">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.name}
+                                href={item.href}
+                                className="block px-4 py-3 text-sm font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                        <div className="pt-3 border-t border-white/5">
+                            {isAdmin && (
+                                <Link
+                                    href="/super-admin"
+                                    className="mb-2 block w-full text-center px-4 py-3 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    ADMINISTRAR
+                                </Link>
+                            )}
+                            <Link
+                                href={user ? "/profile" : "/login"}
+                                className="block w-full text-center px-4 py-3 bg-[#e31837] hover:bg-[#c2102d] text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                {user ? "MI PERFIL" : "ACCEDER"}
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* ========== BARRA INFERIOR MÓVIL (fija abajo) ========== */}
+            <nav
+                id="mobile-bottom-nav"
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
+                style={{
+                    background:
+                        "linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    borderTop: "1px solid rgba(255,255,255,0.08)",
+                }}
+            >
+                <div className="flex items-center justify-around h-16 px-2">
+                    {mobileBottomNav.map((item) => (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            className="flex flex-col items-center justify-center gap-1 py-1 px-3 text-white/70 hover:text-[#e31837] transition-colors duration-200 group"
+                        >
+                            <span className="group-hover:scale-110 transition-transform duration-200">
+                                {item.icon}
+                            </span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                {item.name}
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </nav>
+        </>
+    );
+}

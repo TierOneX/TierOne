@@ -67,4 +67,20 @@ trait ApiResponseTrait
             'message' => $message
         ], $code);
     }
+
+    protected function unauthorizedResponse(string $message = 'No autenticado', int $code = 401): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+        ], $code);
+    }
+
+    protected function forbiddenResponse(string $message = 'Acceso denegado', int $code = 403): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message
+        ], $code);
+    }
 }

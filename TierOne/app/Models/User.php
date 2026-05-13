@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Laravel\Sanctum\HasApiTokens;
 
+
 /**
  *  Modelo User 
  * 
@@ -29,7 +30,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * Campos asignables masivamente
@@ -45,6 +46,7 @@ class User extends Authenticatable
         'apellido',
         'pais',
         'rol',
+        'balance_tokens',
         'verificado',
         'activo',
     ];
@@ -64,16 +66,36 @@ class User extends Authenticatable
     protected $casts = [
         'verificado' => 'boolean',
         'activo' => 'boolean',
+        'balance_tokens' => 'decimal:2',
         'fecha_registro' => 'datetime',
         'ultima_conexion' => 'datetime',
     ];
 
     /**
      * Deshabilitar timestamps
-     * 
+     *
      * Usamos fecha_registro y ultima_conexion personalizados
      */
     public $timestamps = false;
+
+    /**
+     * Indica a Laravel que el campo de contraseña se llama `password_hash`
+     * (por defecto buscaría `password`). Necesario para que Auth::attempt()
+     * funcione correctamente.
+     */
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
+    }
+
+    /**
+     * Nombre del campo de contraseña (requerido en Laravel 10+)
+     */
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
+    }
+
 
     /**
      * Relación: Carritos del usuario
@@ -83,6 +105,13 @@ class User extends Authenticatable
         return $this->hasMany(Carrito::class, 'id_usuario');
     }
 
+    /**
+     * Relación: Órdenes de compra del usuario
+     */
+    public function ordenes()
+    {
+        return $this->hasMany(Orden::class, 'id_usuario');
+    }
     // --- Relaciones de Torneos ---
 
     /**

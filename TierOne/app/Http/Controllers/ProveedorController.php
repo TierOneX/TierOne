@@ -3,141 +3,99 @@
 namespace App\Http\Controllers;
 
 use App\Models\Proveedor;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProveedorController extends Controller
 {
-
-    use ApiResponseTrait; //Importar el trait
-
     /**
-     * Summary of index
-     * @return JsonResponse
+     * Lista todos los proveedores con filtrado y paginación.
      */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        try {
-            $proveedores = Proveedor::all();
-            return $this->successResponse($proveedores, 'Proveedores obtenidos correctamente');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener los proveedores', $e->getMessage());
-        }
+        $filters = $request->only(['nombre', 'email', 'activo', 'search', 'sort_by', 'sort_dir']);
+        $sortBy = $request->input('sort_by', 'fecha_registro');
+        $sortDir = $request->input('sort_dir', 'desc');
+
+        $sortMap = [
+            'fecha_registro' => 'fecha_registro',
+            'activo' => 'activo'
+        ];
+
+        $orderCol = $sortMap[$sortBy] ?? 'fecha_registro';
+
+        return Inertia::render('PanelAdminEcommerce/Proveedores', [
+            'proveedores' => Proveedor::query()
+                ->when($filters['search'] ?? null, function ($q, $v) {
+                    $q->where(function ($sq) use ($v) {
+                        $sq->where('id', 'like', "%$v%")
+                            ->orWhere('nombre', 'like', "%$v%")
+                            ->orWhere('contacto_nombre', 'like', "%$v%")
+                            ->orWhere('email', 'like', "%$v%")
+                            ->orWhere('telefono', 'like', "%$v%");
+                    });
+                })
+                ->when($filters['nombre'] ?? null, fn($q, $v) => $q->where('nombre', 'like', "%$v%"))
+                ->when($filters['email'] ?? null, fn($q, $v) => $q->where('email', 'like', "%$v%"))
+                ->when($filters['activo'] ?? null, function ($q, $v) {
+                    if ($v !== 'all') {
+                        $q->where('activo', $v === '1');
+                    }
+                })
+                ->orderBy($orderCol, $sortDir)
+                ->paginate(15)
+                ->withQueryString(),
+            'filters' => $filters
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Almacena un nuevo proveedor.
      */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'contacto_nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+            'notas' => 'nullable|string',
+            'activo' => 'boolean',
+        ]);
+
+        Proveedor::create($validated);
+
+        return redirect()->back()->with('success', 'Proveedor creado correctamente.');
     }
 
     /**
-     * Summary of store
-     * @param Request $request
-     * @return JsonResponse
+     * Actualiza un proveedor existente.
      */
-    public function store(Request $request): JsonResponse
+    public function update(Request $request, Proveedor $proveedor)
     {
-        try {
-            $validated = $request->validate([
-                'nombre' => 'required|string|max:100',
-                'contacto_nombre' => 'required|string|max:100',
-                'email' => 'required|email|max:100|unique:proveedores,email',
-                'telefono' => 'nullable|string|max:20',
-                'direccion' => 'nullable|string|max:500',
-                'notas' => 'nullable|string',
-                'activo' => 'nullable|boolean',
-            ]);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'contacto_nombre' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+            'notas' => 'nullable|string',
+            'activo' => 'boolean',
+        ]);
 
-            $proveedor = Proveedor::create($validated);
+        $proveedor->update($validated);
 
-            return $this->successResponse($proveedor, 'Proveedor creado correctamente', 201);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al crear el proveedor', $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Proveedor actualizado correctamente.');
     }
 
     /**
-     * Summary of show
-     * @param string $id
-     * @return JsonResponse
+     * Elimina un proveedor.
      */
-    public function show(string $id): JsonResponse
+    public function destroy(Proveedor $proveedor)
     {
-        try {
-            $proveedor = Proveedor::findOrFail($id);
-            return $this->successResponse($proveedor, 'Proveedor obtenido correctamente');
+        $proveedor->delete();
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->notFoundResponse('Proveedor no encontrado');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al obtener proveedor', $e->getMessage());
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Summary of update
-     * @param Request $request
-     * @param string $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, string $id): JsonResponse
-    {
-        try {
-            $proveedor = Proveedor::findOrFail($id);
-
-            //Validar 
-            $validated = $request->validate([
-                'nombre' => 'sometimes|required|string|max:100',
-                'contacto_nombre' => 'sometimes|required|string|max:100',
-                'email' => 'sometimes|required|email|max:100|unique:proveedores,email,' . $id,
-                'telefono' => 'nullable|string|max:20',
-                'direccion' => 'nullable|string|max:500',
-                'notas' => 'nullable|string',
-                'activo' => 'nullable|boolean',
-            ]);
-
-            $proveedor->update($validated);
-            return $this->successResponse($proveedor, 'Proveedor actualizado correctamente');
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->notFoundResponse('Proveedor no encontrado');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return $this->validationErrorResponse($e->validator->errors());
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al actualizar el proveedor', $e->getMessage());
-        }
-    }
-
-    /**
-     * Summary of destroy
-     * @param string $id
-     * @return JsonResponse
-     */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $proveedor = Proveedor::findOrFail($id);
-            $proveedor->delete();
-            return $this->successResponse(null, 'Proveedor eliminado correctamente');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->notFoundResponse('Proveedor no encontrado');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error al eliminar el proveedor', $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Proveedor eliminado correctamente.');
     }
 }
