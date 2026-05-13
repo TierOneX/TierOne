@@ -1,6 +1,44 @@
 import React from 'react';
-import { ShieldCheck, Package } from 'lucide-react';
+import { ShieldCheck, Package, Trophy, Coins, Gamepad2 } from 'lucide-react';
 import { useCart } from '@/Contexts/CartContext';
+
+/** Resuelve la imagen para el resumen de checkout */
+const resolveItemImage = (item) => {
+    // Render de personalización
+    if (item.customization?.render_principal) {
+        return item.customization.render_principal;
+    }
+
+    // Imagen explícita del item (manualItems de torneos/hydra)
+    if (item.imagenes?.[0]?.url_imagen) {
+        const url = item.imagenes[0].url_imagen;
+        return url.startsWith('http') || url.startsWith('/') ? url : `/storage/${url}`;
+    }
+
+    // Imagen del juego para torneos/partidas
+    if (item.imagen_url) {
+        const url = item.imagen_url;
+        return url.startsWith('http') || url.startsWith('/') ? url : `/${url}`;
+    }
+
+    // Imagen principal de producto
+    if (item.imagen_principal) {
+        const url = item.imagen_principal;
+        return url.startsWith('/') || url.startsWith('http') ? url : `/${url}`;
+    }
+
+    return null;
+};
+
+/** Icono de fallback según tipo */
+const FallbackIcon = ({ itemType }) => {
+    const icons = {
+        tournament: <Trophy className="w-5 h-5 text-amber-600" />,
+        hydra: <Coins className="w-5 h-5 text-emerald-600" />,
+        partida: <Gamepad2 className="w-5 h-5 text-blue-600" />,
+    };
+    return icons[itemType] || <Package className="w-5 h-5 text-gray-600" />;
+};
 
 /**
  * Panel de resumen del pedido en el checkout.
@@ -27,38 +65,41 @@ export default function CheckoutOrderSummary({ manualItems = null, manualSubtota
 
                 {/* Lista de items */}
                 <div className="space-y-3 mb-6 max-h-64 overflow-y-auto pr-1 scrollbar-thin">
-                    {cart.map((item, i) => (
-                        <div key={`${item.id}-${i}`} className="flex items-center gap-3">
-                            {/* Imagen o placeholder */}
-                            {item.imagenes?.[0]?.url_imagen ? (
-                                <img
-                                    src={item.imagenes[0].url_imagen.startsWith('http') || item.imagenes[0].url_imagen.startsWith('/')
-                                        ? item.imagenes[0].url_imagen
-                                        : `/storage/${item.imagenes[0].url_imagen}`}
-                                    alt={item.nombre}
-                                    className="w-12 h-12 rounded-lg object-cover bg-[#1a1a1a] flex-shrink-0"
-                                />
-                            ) : (
-                                <div className="w-12 h-12 rounded-lg bg-[#1a1a1a] flex-shrink-0 flex items-center justify-center">
-                                    <Package className="w-5 h-5 text-gray-600" />
-                                </div>
-                            )}
+                    {cart.map((item, i) => {
+                        const imageSrc = resolveItemImage(item);
+                        const isHydra = item.itemType === 'hydra' || item.nombre?.includes('Hydra');
 
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                                <p className="text-white text-xs font-black truncate">{item.nombre}</p>
-                                {item.variant && (
-                                    <p className="text-gray-500 text-[10px]">{item.variant.nombre}</p>
+                        return (
+                            <div key={`${item.id}-${i}`} className="flex items-center gap-3">
+                                {/* Imagen o placeholder */}
+                                {imageSrc ? (
+                                    <img
+                                        src={imageSrc}
+                                        alt={item.nombre}
+                                        className={`w-12 h-12 rounded-lg bg-[#1a1a1a] flex-shrink-0 ${isHydra ? 'object-contain p-1' : 'object-cover'}`}
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-lg bg-[#1a1a1a] flex-shrink-0 flex items-center justify-center">
+                                        <FallbackIcon itemType={item.itemType} />
+                                    </div>
                                 )}
-                                <p className="text-gray-500 text-[10px]">× {item.quantity}</p>
-                            </div>
 
-                            {/* Precio línea */}
-                            <span className="text-white text-xs font-black flex-shrink-0">
-                                €{((Number(item.precio_venta) + Number(item.customizationSurcharge || 0)) * item.quantity).toFixed(2)}
-                            </span>
-                        </div>
-                    ))}
+                                {/* Info */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white text-xs font-black truncate">{item.nombre}</p>
+                                    {item.variant && (
+                                        <p className="text-gray-500 text-[10px]">{item.variant.nombre}</p>
+                                    )}
+                                    <p className="text-gray-500 text-[10px]">× {item.quantity}</p>
+                                </div>
+
+                                {/* Precio línea */}
+                                <span className="text-white text-xs font-black flex-shrink-0">
+                                    €{((Number(item.precio_venta) + Number(item.customizationSurcharge || 0)) * item.quantity).toFixed(2)}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Desglose de totales */}

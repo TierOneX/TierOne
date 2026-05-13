@@ -253,6 +253,52 @@ class MatchController extends Controller
         // Descontar saldo
         $jugador->decrement('balance_tokens', $partida->buy_in);
 
+        // Generar orden para factura/auditoría (PTD- prefix)
+        // Conversión HC → EUR: 500 HC = 4.99€ → 1 HC = 0.00998€
+        $hcToEur = 0.00998;
+        $buyInEur = round((float)$partida->buy_in * $hcToEur, 2);
+        $numeroOrden = 'PTD-' . strtoupper(uniqid());
+
+        $partida->load('juego');
+
+        $orden = \App\Models\Orden::create([
+            'id_usuario' => $jugador->id,
+            'id_direccion_envio' => null, // Digital: no shipping
+            'numero_orden' => $numeroOrden,
+            'subtotal' => $buyInEur,
+            'impuestos' => 0, // HC internal transaction
+            'costo_envio' => 0,
+            'descuento' => 0,
+            'total' => $buyInEur,
+            'estado' => 'pagada',
+            'fecha_orden' => now(),
+        ]);
+
+        \App\Models\ItemOrden::create([
+            'id_orden' => $orden->id,
+            'id_producto' => 1, // Placeholder for digital services
+            'id_proveedor' => 1,
+            'cantidad' => 1,
+            'precio_unitario' => $buyInEur,
+            'subtotal' => $buyInEur,
+            'personalizacion_data' => [
+                'tipo' => 'partida',
+                'partida_id' => $partida->id,
+                'titulo' => $partida->titulo,
+                'juego' => $partida->juego->nombre ?? 'Juego',
+                'buy_in_hc' => (float)$partida->buy_in,
+            ],
+        ]);
+
+        \App\Models\Pago::create([
+            'id_orden' => $orden->id,
+            'monto' => $buyInEur,
+            'metodo' => 'hydra_coins',
+            'id_transaccion' => 'HC-' . strtoupper(uniqid()),
+            'estado' => 'completado',
+            'fecha_pago' => now(),
+        ]);
+
         return back()->with('success', 'Te has unido a la partida correctamente.');
     }
 

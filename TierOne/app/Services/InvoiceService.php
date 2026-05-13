@@ -19,7 +19,10 @@ class InvoiceService
         // Cargar las relaciones necesarias
         $orden->loadMissing(['usuario', 'items.producto.imagenes', 'items.variante', 'direccionEnvio']);
 
-        // 1. Procesamiento del logo
+        // 1. Determinar el tipo de factura
+        $tipoFactura = $this->resolverTipoFactura($orden->numero_orden);
+
+        // 2. Procesamiento del logo
         $logoBase64 = '';
         if (extension_loaded('gd')) {
             $logoPath = public_path('images/Logo.png');
@@ -28,14 +31,14 @@ class InvoiceService
             }
         }
 
-        // 2. Procesamiento dinámico de los items
-        $itemsProcesados = $orden->items->map(function ($item) use ($orden) {
+        // 3. Procesamiento dinámico de los items
+        $itemsProcesados = $orden->items->map(function ($item) use ($orden, $tipoFactura) {
             $nombre = $item->producto->nombre ?? 'Producto';
             $urlImagen = $item->producto->imagenes->first()->url_imagen ?? null;
             $imagenBase64 = '';
 
             // A. Lógica específica para TORNEOS
-            if (str_starts_with($orden->numero_orden, 'TRN-')) {
+            if ($tipoFactura === 'torneo') {
                 $inscripcion = \App\Models\InscripcionTorneo::where('id_usuario', $orden->id_usuario)
                     ->where(function($q) use ($orden) {
                         $q->where('pago_cuota', $orden->total)
@@ -47,17 +50,32 @@ class InvoiceService
                     ->first();
                 
                 if ($inscripcion && $inscripcion->torneo) {
-                    $nombre = 'Inscripción: ' . $inscripcion->torneo->nombre;
+                    $nombre = 'Inscripción Torneo: ' . $inscripcion->torneo->nombre;
                     $urlImagen = $inscripcion->torneo->juego->imagen_url ?? null;
                 }
             }
 
             // A.2 Lógica específica para HYDRA COINS
-            if (str_starts_with($orden->numero_orden, 'HYD-')) {
+            if ($tipoFactura === 'hydra') {
                 $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data, true);
                 if (isset($data['pack_name'])) {
                     $nombre = 'Pack ' . $data['pack_name'] . ': ' . number_format($data['hc_amount']) . ' Hydra Coins';
                     $urlImagen = 'assets/hydra-coin.png'; // Ruta al icono de Hydra
+                }
+            }
+
+            // A.3 Lógica específica para PARTIDAS
+            if ($tipoFactura === 'partida') {
+                $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data, true);
+                if (isset($data['tipo']) && $data['tipo'] === 'partida') {
+                    $nombre = 'Partida: ' . ($data['titulo'] ?? 'Match') . ' (' . ($data['juego'] ?? '') . ')';
+                }
+                // Intentar obtener la imagen del juego a través de la partida
+                if (isset($data['partida_id'])) {
+                    $partida = \App\Models\Partida::with('juego')->find($data['partida_id']);
+                    if ($partida && $partida->juego) {
+                        $urlImagen = $partida->juego->imagen_url ?? null;
+                    }
                 }
             }
 
@@ -72,18 +90,9 @@ class InvoiceService
                 }
             }
 
-            // C. Lógica de imagen Base64 estándar/torneo (si no hay personalización)
+            // C. Lógica de imagen Base64 estándar (si no hay personalización)
             if (empty($imagenBase64) && extension_loaded('gd') && $urlImagen) {
-                $path = public_path('storage/' . $urlImagen);
-                if (!file_exists($path)) {
-                    $path = public_path($urlImagen);
-                }
-                
-                if (file_exists($path)) {
-                    $type = pathinfo($path, PATHINFO_EXTENSION);
-                    $data = file_get_contents($path);
-                    $imagenBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                }
+                $imagenBase64 = $this->resolverImagenBase64($urlImagen);
             }
 
             return [
@@ -97,16 +106,23 @@ class InvoiceService
             ];
         });
 
-        // 3. Resolución de datos del cliente (Evitar Laura Marín en torneos)
-        $clienteNombre = $orden->direccionEnvio->nombre_completo ?? $orden->usuario->nombre;
-        if ($orden->id_direccion_envio == 1 && str_starts_with($orden->numero_orden, 'TRN-')) {
-            $clienteNombre = $orden->usuario->nombre . ' ' . $orden->usuario->apellido;
-        }
+        // 4. Resolución ROBUSTA de datos del cliente
+        $clienteNombre = $this->resolverNombreCliente($orden, $tipoFactura);
+
+        // 5. Etiqueta del tipo de factura
+        $etiquetaTipo = match($tipoFactura) {
+            'torneo' => 'INSCRIPCIÓN TORNEO',
+            'hydra' => 'COMPRA HYDRA COINS',
+            'partida' => 'ENTRADA PARTIDA',
+            default => 'PEDIDO MERCHANDISING',
+        };
 
         $data = [
             'orden' => $orden,
             'items_procesados' => $itemsProcesados,
             'cliente_nombre' => $clienteNombre,
+            'tipo_factura' => $tipoFactura,
+            'etiqueta_tipo' => $etiquetaTipo,
             'logo'  => $logoBase64,
             'empresa' => [
                 'nombre' => 'TierOne eSports SL',
@@ -128,5 +144,83 @@ class InvoiceService
         }
 
         return $pdf->stream('Factura-' . $orden->numero_orden . '.pdf');
+    }
+
+    /**
+     * Determina el tipo de factura basado en el prefijo del número de orden.
+     */
+    private function resolverTipoFactura(string $numeroOrden): string
+    {
+        if (str_starts_with($numeroOrden, 'TRN-')) return 'torneo';
+        if (str_starts_with($numeroOrden, 'HYD-')) return 'hydra';
+        if (str_starts_with($numeroOrden, 'PTD-')) return 'partida';
+        return 'merchandising'; // TIO- u otro
+    }
+
+    /**
+     * Resuelve el nombre del cliente de forma robusta.
+     * Para compras digitales (torneo, hydra, partida) → SIEMPRE usa datos del usuario.
+     * Para merchandising → usa la dirección de envío si existe, sino datos del usuario.
+     */
+    private function resolverNombreCliente(Orden $orden, string $tipoFactura): string
+    {
+        // Para compras digitales, SIEMPRE usar el nombre del usuario autenticado
+        if (in_array($tipoFactura, ['torneo', 'hydra', 'partida'])) {
+            return trim(($orden->usuario->nombre ?? '') . ' ' . ($orden->usuario->apellido ?? ''));
+        }
+
+        // Para merchandising, usar dirección de envío si existe y es válida
+        if ($orden->direccionEnvio && $orden->id_direccion_envio) {
+            // Verificar que la dirección pertenece al usuario de la orden
+            if ($orden->direccionEnvio->id_usuario === $orden->id_usuario) {
+                return $orden->direccionEnvio->nombre_completo;
+            }
+        }
+
+        // Fallback: nombre del usuario
+        return trim(($orden->usuario->nombre ?? '') . ' ' . ($orden->usuario->apellido ?? ''));
+    }
+
+    /**
+     * Resuelve la imagen a base64 desde una URL relativa.
+     */
+    private function resolverImagenBase64(?string $urlImagen): string
+    {
+        if (!$urlImagen || !extension_loaded('gd')) return '';
+
+        // Intentar múltiples rutas
+        $rutas = [
+            public_path('storage/' . $urlImagen),
+            public_path($urlImagen),
+            storage_path('app/public/' . $urlImagen),
+        ];
+
+        // Si es una URL externa (IGDB, etc.), intentar descargar
+        if (str_starts_with($urlImagen, 'http')) {
+            try {
+                $imageData = @file_get_contents($urlImagen);
+                if ($imageData) {
+                    $type = 'jpeg'; // Default
+                    $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imageData);
+                    if (str_contains($mimeType, 'png')) $type = 'png';
+                    elseif (str_contains($mimeType, 'webp')) $type = 'webp';
+                    return 'data:image/' . $type . ';base64,' . base64_encode($imageData);
+                }
+            } catch (\Exception $e) {
+                // Silently fail
+            }
+            return '';
+        }
+
+        foreach ($rutas as $path) {
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION) ?: 'png';
+                $data = file_get_contents($path);
+                return 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+        }
+
+        return '';
     }
 }

@@ -240,7 +240,7 @@ class StripeController extends Controller
 
                 $orden = Orden::create([
                     'id_usuario' => $user->id,
-                    'id_direccion_envio' => $direccion->id ?? 1, // Fallback to 1 ONLY if no address exists
+                    'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                     'numero_orden' => $numeroOrden,
                     'subtotal' => $subtotal,
                     'impuestos' => $impuestos,
@@ -336,7 +336,7 @@ class StripeController extends Controller
 
                 $orden = Orden::create([
                     'id_usuario' => $user->id,
-                    'id_direccion_envio' => $direccion->id ?? 1,
+                    'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                     'numero_orden' => $numeroOrden,
                     'subtotal' => $subtotal,
                     'impuestos' => $impuestos,
@@ -671,7 +671,7 @@ class StripeController extends Controller
 
             $orden = Orden::create([
                 'id_usuario' => $userId,
-                'id_direccion_envio' => 1, // No aplica para digital (usamos placeholder)
+                'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                 'numero_orden' => $numeroOrden,
                 'subtotal' => $subtotal,
                 'impuestos' => $impuestos,
