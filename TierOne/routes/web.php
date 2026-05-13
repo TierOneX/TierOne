@@ -85,6 +85,14 @@ Route::middleware('auth')->prefix('paneladmingaming')->name('panel.gaming.')->gr
     Route::put('/cuentas/{user}', [GamingAdminController::class, 'updateCuenta'])->name('cuentas.update');
 });
 
+Route::middleware('auth')->prefix('super-admin')->name('panel.superadmin.')->group(function () {
+    Route::get('/', function () {
+        abort_unless(request()->user()?->rol === 'admin', 403);
+
+        return Inertia::render('SuperAdmin');
+    })->name('index');
+});
+
 Route::get('/shop/{slug}', function (string $slug) {
     $producto = \App\Models\Producto::with(['categoria', 'imagenes', 'variantes', 'reviews.usuario'])
         ->where('slug', $slug)

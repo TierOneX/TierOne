@@ -61,6 +61,11 @@ export default function PanelLayout({
                     <h1 className="page-title italic font-['Outfit']">{title}</h1>
                 </div>
                 <div className="header-actions">
+                    {isAdmin && (
+                        <Link href={route("panel.superadmin.index")} className="btn-secondary">
+                            <span>Super Admin</span>
+                        </Link>
+                    )}
                     {isAdmin && showGamingShortcut && (
                         <Link href={shortcutLink} className="btn-secondary">
                             <span>{shortcutLabel}</span>

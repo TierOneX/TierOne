@@ -166,7 +166,7 @@ export default function Header() {
                         <div className="flex items-center gap-3">
                             {isAdmin && (
                                 <Link
-                                    href="/paneladmingaming"
+                                    href="/super-admin"
                                     className="hidden lg:inline-flex items-center px-4 py-2 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all duration-200"
                                 >
                                     Administrar
@@ -385,7 +385,7 @@ export default function Header() {
                         <div className="pt-3 border-t border-white/5">
                             {isAdmin && (
                                 <Link
-                                    href="/paneladmingaming"
+                                    href="/super-admin"
                                     className="mb-2 block w-full text-center px-4 py-3 border border-red-500/40 text-red-300 hover:bg-red-500 hover:text-white text-sm font-black uppercase tracking-widest rounded-lg transition-all duration-200"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
