@@ -99,6 +99,14 @@ if %ERRORLEVEL% EQU 0 (
 echo [*] Ejecutando migraciones y cargando datos de prueba...
 php artisan migrate:fresh --seed --no-interaction
 
+:: Crear enlace simbolico de almacenamiento
+echo [*] Creando enlace simbolico de almacenamiento (storage:link)...
+php artisan storage:link
+
+:: Sincronizar juegos con IGDB/Twitch
+echo [*] Sincronizando juegos con metadatos externos (IGDB/Twitch)...
+php artisan games:sync --all
+
 :: Compilar assets
 echo [*] Compilando assets frontend (Production Build)...
 call npm run build

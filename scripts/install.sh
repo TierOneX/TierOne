@@ -77,6 +77,14 @@ fi
 echo -e "${GREEN}[*] Ejecutando migraciones y cargando datos de prueba...${NC}"
 php artisan migrate:fresh --seed --no-interaction
 
+# Crear enlace simbolico de almacenamiento
+echo -e "${GREEN}[*] Creando enlace simbolico de almacenamiento (storage:link)...${NC}"
+php artisan storage:link
+
+# Sincronizar juegos con IGDB/Twitch
+echo -e "${GREEN}[*] Sincronizando juegos con metadatos externos (IGDB/Twitch)...${NC}"
+php artisan games:sync --all
+
 # Compilar assets
 echo -e "${GREEN}[*] Compilando assets frontend (Production Build)...${NC}"
 npm run build

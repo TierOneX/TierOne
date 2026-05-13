@@ -8,7 +8,7 @@ Esta guía te ayudará a instalar y configurar el proyecto **TierOne** utilizand
 
 Antes de comenzar, verifica que tienes instalado:
 
-1. **PHP 8.2+**
+1. **PHP 8.2+** (con extensión `gd` habilitada para PDFs)
 2. **Composer** (gestor de dependencias PHP)
 3. **Node.js 20+ & NPM** (para el frontend React)
 4. **MySQL 8.0+** (base de datos relacional)
@@ -99,6 +99,17 @@ php artisan serve
 npm run dev
 ```
 *Acceso:* [http://localhost:5173](http://localhost:5173)
+
+### 5.3 Pasos Post-Instalación (Vitales)
+Si realizaste la instalación manualmente sin usar los scripts de `scripts/`, debes ejecutar:
+
+```powershell
+# 1. Enlazar almacenamiento para imágenes
+php artisan storage:link
+
+# 2. Sincronizar juegos con IGDB (Para ver la sección de Comunidad)
+php artisan games:sync --all
+```
 
 ---
 
