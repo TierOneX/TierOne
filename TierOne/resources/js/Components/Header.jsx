@@ -194,7 +194,7 @@ export default function Header() {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-center h-[38px] px-2 rounded-r-xl bg-red-600/10 border border-white/10 border-l-0 group-hover:bg-red-600/20 transition-all duration-300">
+                                    <div className="flex items-center justify-center h-[42px] px-3.5 rounded-r-xl bg-red-600/10 border border-white/10 border-l-0 group-hover:bg-red-600/20 transition-all duration-300">
                                         <svg className="w-3.5 h-3.5 text-red-500 group-hover:text-red-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                                         </svg>
