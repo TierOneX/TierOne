@@ -2,13 +2,20 @@ import { Head, Link } from "@inertiajs/react";
 import {
     ArrowLeft,
     BarChart3,
+    Building2,
     ClipboardList,
+    CreditCard,
+    ExternalLink,
     Gamepad2,
     Package,
     ShieldCheck,
+    ShieldAlert,
     ShoppingBag,
+    Star,
     Swords,
+    Tag,
     Trophy,
+    Truck,
     Users,
 } from "lucide-react";
 
@@ -35,6 +42,105 @@ const panelCards = [
             { label: "Productos", icon: Package },
             { label: "Pedidos", icon: ClipboardList },
             { label: "Finanzas", icon: BarChart3 },
+        ],
+    },
+];
+
+const adminSections = [
+    {
+        title: "Gaming",
+        description: "Gestion competitiva, moderacion y catalogo de juegos.",
+        items: [
+            {
+                label: "Torneos",
+                description: "Crear, editar y controlar competiciones.",
+                href: route("panel.gaming.index", { section: "torneos" }),
+                icon: Trophy,
+            },
+            {
+                label: "Partidas",
+                description: "Revisar estados y administrar partidas.",
+                href: route("panel.gaming.index", { section: "partidas" }),
+                icon: Swords,
+            },
+            {
+                label: "Juegos",
+                description: "Mantener el catalogo gaming activo.",
+                href: route("panel.gaming.index", { section: "juegos" }),
+                icon: Gamepad2,
+            },
+            {
+                label: "Incidencias",
+                description: "Gestionar reportes y resoluciones.",
+                href: route("panel.gaming.index", { section: "incidencias" }),
+                icon: ShieldAlert,
+            },
+            {
+                label: "Cuentas",
+                description: "Editar roles, verificacion y estado.",
+                href: route("panel.gaming.index", { section: "cuentas" }),
+                icon: Users,
+            },
+        ],
+    },
+    {
+        title: "Ecommerce",
+        description: "Operacion comercial, catalogo, pedidos y finanzas.",
+        items: [
+            {
+                label: "Dashboard",
+                description: "Resumen principal de tienda.",
+                href: route("panel.ecommerce.dashboard"),
+                icon: BarChart3,
+            },
+            {
+                label: "Productos",
+                description: "Alta, edicion, imagenes y personalizacion.",
+                href: route("panel.ecommerce.products"),
+                icon: Package,
+            },
+            {
+                label: "Categorias",
+                description: "Organizacion del catalogo.",
+                href: route("panel.ecommerce.categories"),
+                icon: Tag,
+            },
+            {
+                label: "Proveedores",
+                description: "Gestion de proveedores.",
+                href: route("panel.ecommerce.proveedores"),
+                icon: Truck,
+            },
+            {
+                label: "Ordenes",
+                description: "Pedidos, estados y facturas.",
+                href: route("panel.ecommerce.orders"),
+                icon: ClipboardList,
+            },
+            {
+                label: "Pagos",
+                description: "Seguimiento de pagos.",
+                href: route("panel.ecommerce.finanzas.pagos"),
+                icon: CreditCard,
+            },
+            {
+                label: "Transacciones",
+                description: "Movimientos y trazabilidad financiera.",
+                href: route("panel.ecommerce.finanzas.transacciones"),
+                icon: BarChart3,
+            },
+            {
+                label: "Retiros",
+                description: "Solicitudes y revision administrativa.",
+                href: route("panel.ecommerce.finanzas.retiros"),
+                icon: Building2,
+            },
+            {
+                label: "Reviews",
+                description: "Moderacion de resenas de producto.",
+                href: route("panel.ecommerce.reviews"),
+                icon: Star,
+            },
         ],
     },
 ];
@@ -131,6 +237,55 @@ export default function SuperAdmin() {
                             </Link>
                         );
                     })}
+                </section>
+
+                <section className="mt-10 space-y-8">
+                    {adminSections.map((section) => (
+                        <div key={section.title}>
+                            <div className="mb-4 flex items-end justify-between gap-4">
+                                <div>
+                                    <h3 className="font-['Outfit'] text-lg font-black uppercase italic tracking-[0.14em]">
+                                        {section.title}
+                                    </h3>
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        {section.description}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                {section.items.map((item) => {
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            className="group flex min-h-[112px] items-start justify-between gap-4 rounded-lg border border-white/10 bg-[#121212] p-4 transition hover:border-red-500/40 hover:bg-[#171717]"
+                                        >
+                                            <div className="flex gap-3">
+                                                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-black/30 text-red-400">
+                                                    <Icon size={19} />
+                                                </span>
+                                                <div>
+                                                    <h4 className="text-sm font-black uppercase tracking-[0.12em] text-white">
+                                                        {item.label}
+                                                    </h4>
+                                                    <p className="mt-2 text-xs leading-5 text-gray-500">
+                                                        {item.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <ExternalLink
+                                                size={15}
+                                                className="mt-1 shrink-0 text-gray-600 transition group-hover:text-red-400"
+                                            />
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </section>
             </main>
         </div>
