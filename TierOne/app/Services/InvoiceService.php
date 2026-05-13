@@ -127,7 +127,7 @@ class InvoiceService
             'empresa' => [
                 'nombre' => 'TierOne eSports SL',
                 'cif'    => 'B-12345678',
-                'direccion' => 'Calle Falsa 123, Madrid, España',
+                'direccion' => 'Avenida de la Innovación, Sevilla, España',
                 'email'  => 'facturacion@tierone.com',
             ]
         ];
