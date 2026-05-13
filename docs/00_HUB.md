@@ -5,6 +5,7 @@ Bienvenido al centro de documentación unificado de **TierOne**. Este hub consol
 ## 📂 01. Arquitectura y Visión
 - [🚀 Decisiones Técnicas](./01_ARCHITECTURE/DECISIONES_TECNICAS.md): Justificación del stack y patrones.
 - [🔄 Flujos de Negocio](./01_ARCHITECTURE/FLUJOS_NEGOCIO.md): Diagramas de secuencia (Pagos, Torneos).
+- [👁️ Visión del Proyecto](./01_ARCHITECTURE/VISION_PROYECTO.md): Objetivos y alcance.
 
 ## 📂 02. Backend (Laravel Core)
 - [🎮 Controladores y Métodos](./02_BACKEND/CONTROLADORES.md): Definición de toda la lógica de control.
@@ -25,6 +26,12 @@ Bienvenido al centro de documentación unificado de **TierOne**. Este hub consol
 
 ## 📂 06. Guías de Configuración
 - [⚙️ Instalación y Setup](./06_SETUP/INSTALLATION.md): Guía para nuevos desarrolladores.
+
+## 📂 08. Aseguramiento de Calidad
+- [🧪 Guía de Testing](./08_TESTING/GUIDE.md): Suite de pruebas unitarias y de característica.
+
+## 📂 09. Gestión del Proyecto
+- [📝 TODO List](./09_PROJECT/TODO.md): Seguimiento de tareas, bugs y próximos pasos.
 
 ---
 *Documentación Unificada - TierOne Project*
