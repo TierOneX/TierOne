@@ -79,7 +79,7 @@ export default function HydraCheckout({ pack, stripeKey }) {
                             Has adquirido correctamente <strong>{pack.hc.toLocaleString()} Hydra Coins</strong>. 
                             Tu saldo ha sido actualizado y hemos generado tu factura <span className="text-white font-mono">#{orderData?.numero_orden}</span>.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                             <a
                                 href={`/orders/${orderData?.orderId}/invoice`}
                                 target="_blank"
@@ -92,10 +92,10 @@ export default function HydraCheckout({ pack, stripeKey }) {
                                 DESCARGAR FACTURA
                             </a>
                             <Link
-                                href="/matches"
-                                className="bg-white/5 text-white border border-white/10 px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+                                href="/shop"
+                                className="bg-white/5 text-white border border-white/10 px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all text-center"
                             >
-                                IR A PARTIDAS
+                                IR A LA TIENDA
                             </Link>
                         </div>
                     </div>
