@@ -40,7 +40,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
+        'username_changes_count',
+        'username_change_blocked_until',
+        'last_username_changed_at',
         'email',
+        'email_change_blocked_until',
+        'last_email_changed_at',
         'password_hash',
         'nombre',
         'apellido',
@@ -69,6 +74,10 @@ class User extends Authenticatable
         'balance_tokens' => 'decimal:2',
         'fecha_registro' => 'datetime',
         'ultima_conexion' => 'datetime',
+        'email_change_blocked_until' => 'datetime',
+        'username_change_blocked_until' => 'datetime',
+        'last_email_changed_at' => 'datetime',
+        'last_username_changed_at' => 'datetime',
     ];
 
     /**
