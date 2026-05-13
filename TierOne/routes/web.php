@@ -17,6 +17,10 @@ Route::get('/', function () {
     return Inertia::render('LandingPage');
 });
 
+Route::get('/debug-500', function () {
+    abort(500);
+});
+
 Route::get('/home', function () {
     return Inertia::render('Home', [
         'games' => \App\Models\Juego::where('activo', true)->get(),

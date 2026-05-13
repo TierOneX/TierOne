@@ -1,9 +1,10 @@
-﻿import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import TournamentsHero from '@/Components/Tournaments/TournamentsHero';
 import TournamentsGameGrid from '@/Components/Tournaments/TournamentsGameGrid';
 import TournamentsDrawer from '@/Components/Tournaments/TournamentsDrawer';
+import SponsorTriangle from '@/Components/SponsorTriangle';
 
 export default function Tournaments({ juegos = [], categorias = [] }) {
     const { auth } = usePage().props;
@@ -65,6 +66,8 @@ export default function Tournaments({ juegos = [], categorias = [] }) {
                 game={selectedGame}
                 onClose={() => setSelectedGameId(null)}
             />
+
+            <SponsorTriangle />
         </MainLayout>
     );
 }

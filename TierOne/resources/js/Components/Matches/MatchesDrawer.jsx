@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 
 const modeLabels = {
@@ -29,6 +29,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
     const [drawerMessage, setDrawerMessage] = useState(null);
     const [renderedGame, setRenderedGame] = useState(game);
     const [isPanelVisible, setIsPanelVisible] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const lastFlashKeyRef = useRef(null);
     const createForm = useForm({
         id_juego: game?.id ?? '',
@@ -88,6 +89,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
     useEffect(() => {
         if (!isOpen) {
             setDrawerMessage(null);
+            setShowLoginModal(false);
         }
     }, [isOpen]);
 
@@ -109,6 +111,10 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
 
     const submitCreate = (event) => {
         event.preventDefault();
+        if (!isAuthenticated) {
+            setShowLoginModal(true);
+            return;
+        }
         createForm.post('/matches', {
             preserveScroll: true,
             onSuccess: (page) => {
@@ -120,6 +126,10 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
     };
 
     const joinMatch = (matchId) => {
+        if (!isAuthenticated) {
+            setShowLoginModal(true);
+            return;
+        }
         joinForm.post(`/matches/${matchId}/join`, {
             preserveScroll: true,
             onSuccess: (page) => {
@@ -130,6 +140,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
 
     const handleClose = () => {
         setDrawerMessage(null);
+        setShowLoginModal(false);
         onClose();
     };
 
@@ -223,20 +234,6 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                 </div>
 
                 <div className="custom-scrollbar flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
-                    {!isAuthenticated && (
-                        <div className="mb-5 rounded-[22px] border border-amber-500/20 bg-amber-500/10 p-4">
-                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-300">Acceso requerido</p>
-                            <p className="mt-2 text-sm leading-6 text-amber-100/90">
-                                Para crear una partida o unirte a una existente necesitas iniciar sesion.
-                            </p>
-                            <Link
-                                href="/login"
-                                className="mt-4 inline-flex rounded-xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white"
-                            >
-                                Iniciar sesion
-                            </Link>
-                        </div>
-                    )}
 
                     {activeTab === 'list' ? (
                         <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
@@ -287,7 +284,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                                 <button
                                                     type="button"
                                                     onClick={() => joinMatch(match.id)}
-                                                    disabled={!isAuthenticated || isJoined || joinForm.processing || match.slots_disponibles === 0}
+                                                    disabled={isJoined || joinForm.processing || match.slots_disponibles === 0}
                                                     className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
                                                 >
                                                     {isJoined ? 'Unido' : 'Unirse'}
@@ -389,7 +386,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
 
                             <button
                                 type="submit"
-                                disabled={!isAuthenticated || createForm.processing}
+                                disabled={createForm.processing}
                                 className="w-full rounded-[22px] bg-red-600 px-5 py-4 text-sm font-black uppercase tracking-[0.25em] text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-900/60 lg:col-span-2 xl:col-span-3"
                             >
                                 {createForm.processing ? 'Creando...' : 'Crear partida'}
@@ -398,6 +395,57 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                     )}
                 </div>
             </aside>
+            {showLoginModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center px-4 py-6">
+                    <button
+                        type="button"
+                        aria-label="Cerrar modal"
+                        onClick={() => setShowLoginModal(false)}
+                        className="absolute inset-0 bg-black/90 backdrop-blur-md"
+                    />
+
+                    <div className="relative z-10 w-full max-w-md overflow-hidden rounded-[32px] border border-white/10 bg-[#0f0f0f] shadow-[0_40px_150px_rgba(0,0,0,0.9)]">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(227,24,55,0.15),_transparent_60%)]" />
+
+                        <div className="relative p-8 text-center sm:p-10">
+                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-500/10 text-red-500">
+                                <svg className="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </div>
+
+                            <p className="text-[11px] font-black uppercase tracking-[0.4em] text-red-500">Acceso restringido</p>
+                            <h3 className="mt-4 text-2xl font-black uppercase italic text-white sm:text-3xl">Inicia sesión</h3>
+                            <p className="mt-4 text-sm leading-relaxed text-gray-400">
+                                Para participar en las partidas y conectar con otros jugadores, necesitas una cuenta activa.
+                            </p>
+
+                            <div className="mt-10 flex flex-col gap-3">
+                                <Link
+                                    href="/login?redirect=/matches"
+                                    className="flex h-14 items-center justify-center rounded-2xl bg-red-600 px-6 text-xs font-black uppercase tracking-[0.25em] text-white shadow-[0_10px_30px_rgba(227,24,55,0.3)] transition hover:bg-red-500 hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                    Entrar ahora
+                                </Link>
+                                <Link
+                                    href="/register?redirect=/matches"
+                                    className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 text-xs font-black uppercase tracking-[0.25em] text-gray-300 transition hover:bg-white/[0.08] hover:text-white"
+                                >
+                                    Crear cuenta
+                                </Link>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowLoginModal(false)}
+                                className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 transition hover:text-white"
+                            >
+                                Volver atrás
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
