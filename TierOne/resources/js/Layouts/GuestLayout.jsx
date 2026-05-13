@@ -81,7 +81,7 @@ export default function GuestLayout({
     }, []);
     /* ── Panel izquierdo: logo + TIER ONE centrado + brandContent ── */
     const BrandPanel = (
-        <div className="relative z-10 hidden lg:flex lg:w-[55%] flex-col items-center justify-start pt-16 bg-[#0d0d0d] overflow-hidden min-h-screen">
+        <div className="relative z-10 hidden lg:flex lg:w-[55%] flex-col items-center justify-center py-16 bg-[#0d0d0d] overflow-hidden min-h-screen">
             <ParticleCanvas />
 
             <div className="orb-1 absolute top-[20%] left-[30%] w-[28rem] h-[28rem] bg-[#e31837]/10 blur-[140px] rounded-full pointer-events-none" />
