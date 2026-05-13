@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { useState, useMemo } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import ShopHero from "@/Components/Shop/ShopHero";
@@ -15,6 +15,11 @@ const SORT_OPTIONS = [
     { value: "sales", label: "Más vendidos" },
     { value: "name", label: "Nombre A-Z" },
 ];
+
+const imgUrl = (src) => {
+    if (!src) return "/images/placeholder.jpg";
+    return src.startsWith("/") || src.startsWith("http") ? src : `/${src}`;
+};
 
 export default function Shop({ productos = [], categorias = [] }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -93,6 +98,10 @@ export default function Shop({ productos = [], categorias = [] }) {
         return result;
     }, [productos, activeCategory, searchTerm, sortBy, onlyFeatured]);
 
+    const featuredProducts = useMemo(() => {
+        return productos.filter(p => p.destacado).slice(0, 4);
+    }, [productos]);
+
     return (
         <MainLayout>
             <Head title="Tienda - TierOne" />
@@ -103,11 +112,51 @@ export default function Shop({ productos = [], categorias = [] }) {
                 />
             </Head>
 
-            {/* 1. Hero */}
-            <ShopHero />
+            {/* 1. Featured Products Section */}
+            <section className="relative overflow-hidden border-b border-white/5 bg-[radial-gradient(circle_at_top_left,_rgba(227,24,55,0.36),_transparent_52%),radial-gradient(circle_at_78%_22%,_rgba(227,24,55,0.18),_transparent_46%),linear-gradient(180deg,_#151515_0%,_#090909_100%)] px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+                <div className="mx-auto max-w-7xl relative z-10">
+                    <div className="mb-12">
+                        <p className="mb-3 text-[10px] font-black uppercase tracking-[0.4em] text-red-500">TierOne Selection</p>
+                        <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white">Productos <span className="text-red-600">Destacados</span></h2>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {featuredProducts.map((product) => (
+                            <Link 
+                                key={product.id}
+                                href={route('product.show', product.slug || product.id)}
+                                className="group relative aspect-[4/5] overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:border-red-500/50"
+                            >
+                                <img 
+                                    src={imgUrl(product.imagen_principal || product.imagen_url_local)} 
+                                    className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-100" 
+                                    alt={product.nombre} 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                                <div className="absolute bottom-6 left-6 right-6">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-2">{product.categoria?.nombre || 'Producto'}</p>
+                                    <h3 className="text-xl font-black text-white uppercase italic leading-tight mb-3 truncate">{product.nombre}</h3>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-lg font-black text-white">
+                                            {parseFloat(product.precio_venta).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                        </p>
+                                        <div className="px-4 py-2 rounded-xl bg-red-600 text-[10px] font-black text-white uppercase tracking-widest transition-all group-hover:shadow-[0_0_15px_rgba(220,38,38,0.4)]">
+                                            Ver más
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-            {/* 2. Buscador + Filtros de categoría */}
-            <section className="bg-[#0a0a0a] px-4 pb-8">
+            {/* 2. Hydra Coins Packs */}
+            <HydraPacks />
+
+            {/* 3. Buscador + Filtros de categoría */}
+            <section className="bg-[#0a0a0a] px-4 pb-8 pt-12">
                 <div className="max-w-7xl mx-auto space-y-6">
                     <SearchBar
                         searchTerm={searchTerm}
@@ -201,10 +250,7 @@ export default function Shop({ productos = [], categorias = [] }) {
                 </div>
             </section>
 
-            {/* 2.5 Hydra Coins Packs */}
-            <HydraPacks />
-
-            {/* 3. Grid de productos */}
+            {/* 4. Grid de productos */}
             <ProductGrid
                 productos={filteredProducts}
                 totalCount={productos.length}

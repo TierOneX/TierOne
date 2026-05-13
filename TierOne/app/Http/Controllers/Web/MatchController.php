@@ -181,6 +181,7 @@ class MatchController extends Controller
 
         $creador = $request->user();
         $buyIn = (float) ($validated['buy_in'] ?? 0);
+
         $premioTotal = (float) ($validated['premio_total'] ?? max($buyIn * $this->matchCapacity($validated['tipo']), 0));
         $partida = Partida::create([
             'id_juego' => $validated['id_juego'],
@@ -235,6 +236,11 @@ class MatchController extends Controller
             return back()->with('error', 'La partida ya esta llena.');
         }
 
+        // Validar saldo
+        if ($jugador->balance_tokens < $partida->buy_in) {
+            return back()->with('error', 'Saldo insuficiente. Necesitas ' . $partida->buy_in . ' HC para unirte.');
+        }
+
         ParticipantePartida::create([
             'id_partida' => $partida->id,
             'id_usuario' => $jugador->id,
@@ -243,6 +249,9 @@ class MatchController extends Controller
             'confirmado' => true,
             'fecha_union' => now(),
         ]);
+
+        // Descontar saldo
+        $jugador->decrement('balance_tokens', $partida->buy_in);
 
         return back()->with('success', 'Te has unido a la partida correctamente.');
     }

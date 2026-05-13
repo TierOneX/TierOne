@@ -9,7 +9,7 @@ const modeLabels = {
 };
 
 const hcFormatter = (val) => {
-    return `${Number(val || 0).toLocaleString()} HC`;
+    return Number(val || 0).toLocaleString();
 };
 
 const dateFormatter = new Intl.DateTimeFormat('es-ES', {
@@ -256,13 +256,27 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                             </div>
 
                                             <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-300 sm:grid-cols-4">
-                                                <div className="rounded-2xl bg-white/[0.03] p-3">
+                                                <div className="rounded-2xl bg-white/[0.03] p-3 group relative">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Entrada</p>
-                                                    <p className="mt-2 text-base font-black text-white">{hcFormatter(match.buy_in)}</p>
+                                                    <div className="flex items-center gap-1.5 mt-2 transition-transform group-hover:scale-105 duration-300">
+                                                        <img src="/assets/hydra-coin.png" className="w-4 h-4 object-contain" alt="" />
+                                                        <p className="text-base font-black text-white">{hcFormatter(match.buy_in)}</p>
+                                                    </div>
+                                                    {/* Tooltip */}
+                                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-black border border-white/10 text-[9px] font-bold text-gray-400 uppercase tracking-widest opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                                        <span className="text-red-500">Hydra</span> Coins
+                                                    </div>
                                                 </div>
-                                                <div className="rounded-2xl bg-white/[0.03] p-3">
+                                                <div className="rounded-2xl bg-white/[0.03] p-3 group relative">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Premio</p>
-                                                    <p className="mt-2 text-base font-black text-white">{hcFormatter(match.premio_total)}</p>
+                                                    <div className="flex items-center gap-1.5 mt-2 transition-transform group-hover:scale-105 duration-300">
+                                                        <img src="/assets/hydra-coin.png" className="w-4 h-4 object-contain" alt="" />
+                                                        <p className="text-base font-black text-white">{hcFormatter(match.premio_total)}</p>
+                                                    </div>
+                                                    {/* Tooltip */}
+                                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-black border border-white/10 text-[9px] font-bold text-gray-400 uppercase tracking-widest opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                                        <span className="text-red-500">Hydra</span> Coins
+                                                    </div>
                                                 </div>
                                                 <div className="rounded-2xl bg-white/[0.03] p-3 sm:col-span-2">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Creador</p>
@@ -286,14 +300,25 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                                     >
                                                         Detalles
                                                     </Link>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => joinMatch(match.id)}
-                                                        disabled={isJoined || joinForm.processing || match.slots_disponibles === 0}
-                                                        className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
-                                                    >
-                                                        {isJoined ? 'Unido' : 'Unirse'}
-                                                    </button>
+                                                    
+                                                    {isAuthenticated && auth.user.balance_tokens < match.buy_in ? (
+                                                        <Link
+                                                            href="/shop"
+                                                            className="rounded-2xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] flex items-center gap-2"
+                                                        >
+                                                            <img src="/assets/hydra-coin.png" className="w-4 h-4 object-contain" alt="" />
+                                                            Recargar
+                                                        </Link>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => joinMatch(match.id)}
+                                                            disabled={isJoined || joinForm.processing || match.slots_disponibles === 0}
+                                                            className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
+                                                        >
+                                                            {isJoined ? 'Unido' : 'Unirse'}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </article>
@@ -364,29 +389,39 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                             </div>
 
                             <div>
-                                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Entrada</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={createForm.data.buy_in}
-                                        onChange={(event) => createForm.setData('buy_in', event.target.value)}
-                                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-sm font-semibold text-white outline-none"
-                                    />
+                                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Entrada (HC)</label>
+                                    <div className="relative">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                                            <img src="/assets/hydra-coin.png" className="w-5 h-5 object-contain" alt="" />
+                                        </div>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="1"
+                                            value={createForm.data.buy_in}
+                                            onChange={(event) => createForm.setData('buy_in', event.target.value)}
+                                            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] pl-12 pr-4 py-4 text-sm font-semibold text-white outline-none focus:border-red-500/50 transition-colors"
+                                        />
+                                    </div>
                                     {createForm.errors.buy_in && <p className="mt-2 text-xs font-semibold text-red-400">{createForm.errors.buy_in}</p>}
                             </div>
 
                             <div>
-                                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Premio total</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={createForm.data.premio_total}
-                                        onChange={(event) => createForm.setData('premio_total', event.target.value)}
-                                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-sm font-semibold text-white outline-none"
-                                        placeholder="Se calcula si lo dejas vacio"
-                                    />
+                                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Premio total (HC)</label>
+                                    <div className="relative">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                                            <img src="/assets/hydra-coin.png" className="w-5 h-5 object-contain" alt="" />
+                                        </div>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="1"
+                                            value={createForm.data.premio_total}
+                                            onChange={(event) => createForm.setData('premio_total', event.target.value)}
+                                            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] pl-12 pr-4 py-4 text-sm font-semibold text-white outline-none focus:border-red-500/50 transition-colors"
+                                            placeholder="Se calcula si lo dejas vacio"
+                                        />
+                                    </div>
                                     {createForm.errors.premio_total && <p className="mt-2 text-xs font-semibold text-red-400">{createForm.errors.premio_total}</p>}
                             </div>
 

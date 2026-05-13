@@ -52,6 +52,15 @@ class InvoiceService
                 }
             }
 
+            // A.2 Lógica específica para HYDRA COINS
+            if (str_starts_with($orden->numero_orden, 'HYD-')) {
+                $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data, true);
+                if (isset($data['pack_name'])) {
+                    $nombre = 'Pack ' . $data['pack_name'] . ': ' . number_format($data['hc_amount']) . ' Hydra Coins';
+                    $urlImagen = 'assets/hydra-coin.png'; // Ruta al icono de Hydra
+                }
+            }
+
             // B. Lógica específica para PRODUCTOS PERSONALIZADOS
             if ($item->personalizacion_imagen) {
                 $path = str_replace('/storage/', '', $item->personalizacion_imagen);

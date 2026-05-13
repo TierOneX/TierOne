@@ -195,6 +195,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
 Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
 Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
 Route::post('/stripe/create-intent-torneo', [StripeController::class, 'crearPaymentIntentTorneo'])->name('stripe.create-intent-torneo');
+Route::post('/stripe/create-intent-hydra', [StripeController::class, 'crearPaymentIntentHydraPack'])->name('stripe.create-intent-hydra');
 Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
 Route::get('/pedido/{orden}/factura', [\App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])->name('order.invoice');
@@ -211,6 +212,23 @@ Route::get('/tournaments/{torneo}/checkout', function (\App\Models\Torneo $torne
         'stripeKey' => config('stripe.key'),
     ]);
 })->middleware('auth')->name('tournaments.checkout');
+
+Route::get('/shop/hydra-pack/{id}/checkout', function ($id) {
+    // Definimos los packs aquí para simplificar, o podrías traerlos de un config
+    $packs = [
+        'pack_1' => ['id' => 'pack_1', 'name' => 'Iniciación', 'hc' => 500, 'price' => 4.99],
+        'pack_2' => ['id' => 'pack_2', 'name' => 'Competitivo', 'hc' => 1200, 'price' => 9.99],
+        'pack_3' => ['id' => 'pack_3', 'name' => 'Pro Gamer', 'hc' => 3000, 'price' => 24.99],
+        'pack_4' => ['id' => 'pack_4', 'name' => 'Leyenda', 'hc' => 7500, 'price' => 49.99],
+    ];
+
+    $pack = $packs[$id] ?? abort(404);
+
+    return Inertia::render('HydraCheckout', [
+        'pack' => $pack,
+        'stripeKey' => config('stripe.key'),
+    ]);
+})->middleware('auth')->name('hydra.checkout');
 
 Route::get('/checkout/success', function () {
     return Inertia::render('CheckoutSuccess');

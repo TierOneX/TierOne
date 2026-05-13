@@ -8,11 +8,9 @@ const imgUrl = (src) => {
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
 
-const currency = new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 2,
-});
+const hcFormatter = (val) => {
+    return Number(val || 0).toLocaleString();
+};
 
 const dateFormatter = new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
@@ -121,21 +119,29 @@ export default function MatchDetail({ partida }) {
                             <div className="relative bg-[#0b0b0b] border border-white/10 rounded-[30px] p-8 shadow-2xl">
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between pb-6 border-b border-white/5">
-                                        <div>
+                                        <div className="group relative">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Precio Entrada</p>
-                                            <p className="text-3xl font-black text-white italic">{currency.format(partida.buy_in)}</p>
-                                        </div>
-                                        <div className="w-12 h-12 rounded-2xl bg-red-600/10 flex items-center justify-center text-red-500">
-                                            <DollarSign size={24} />
+                                            <div className="flex items-center gap-3 transition-transform group-hover:scale-105 duration-300">
+                                                <img src="/assets/hydra-coin.png" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(227,24,55,0.4)]" alt="HC" />
+                                                <p className="text-4xl font-black text-white italic leading-none">{hcFormatter(partida.buy_in)}</p>
+                                            </div>
+                                            {/* Tooltip */}
+                                            <div className="absolute -top-12 left-0 px-3 py-2 rounded-lg bg-black border border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-widest opacity-0 pointer-events-none group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                                <span className="text-red-500">Hydra</span> Coins
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 group relative">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Premio</p>
-                                            <div className="flex items-center gap-2 text-white font-black">
-                                                <Trophy size={16} className="text-amber-500" />
-                                                <span>{currency.format(partida.premio_total)}</span>
+                                            <div className="flex items-center gap-2 text-white font-black transition-transform group-hover:scale-105 duration-300">
+                                                <img src="/assets/hydra-coin.png" className="w-4 h-4 object-contain" alt="HC" />
+                                                <span>{hcFormatter(partida.premio_total)}</span>
+                                            </div>
+                                            {/* Tooltip */}
+                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-black border border-white/10 text-[9px] font-bold text-gray-400 uppercase tracking-widest opacity-0 pointer-events-none group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                                <span className="text-red-500">Hydra</span> Coins
                                             </div>
                                         </div>
                                         <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
@@ -171,6 +177,14 @@ export default function MatchDetail({ partida }) {
                                             <LogOut size={16} />
                                             Abandonar Partida
                                         </button>
+                                    ) : auth.user.balance_tokens < partida.buy_in ? (
+                                        <Link 
+                                            href="/shop"
+                                            className="w-full h-14 flex items-center justify-center gap-2 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-red-500 transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] active:scale-[0.98]"
+                                        >
+                                            <img src="/assets/hydra-coin.png" className="w-5 h-5 object-contain" alt="" />
+                                            Recargar para jugar
+                                        </Link>
                                     ) : (
                                         <button 
                                             onClick={handleJoin}

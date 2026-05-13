@@ -304,6 +304,103 @@ class StripeController extends Controller
         }
     }
 
+    /**
+     * Crea un PaymentIntent para la compra de un Pack de Hydra Coins.
+     */
+    public function crearPaymentIntentHydraPack(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'pack_id' => 'required|string',
+                'hc_amount' => 'required|integer',
+                'price' => 'required|numeric',
+                'name' => 'required|string',
+            ]);
+
+            $user = Auth::user();
+            $total = (float) $validated['price'];
+            $taxRate = 0.21;
+            $subtotal = round($total / (1 + $taxRate), 2);
+            $impuestos = round($total - $subtotal, 2);
+
+            $amountCents = (int)round($total * 100);
+
+            $result = DB::transaction(function () use ($validated, $user, $total, $subtotal, $impuestos, $amountCents) {
+                // 1. Crear Orden pendiente
+                $numeroOrden = 'HYD-' . strtoupper(uniqid());
+                
+                // Buscar dirección predeterminada
+                $direccion = \App\Models\DireccionEnvio::where('id_usuario', $user->id)
+                    ->orderBy('predeterminada', 'desc')
+                    ->first();
+
+                $orden = Orden::create([
+                    'id_usuario' => $user->id,
+                    'id_direccion_envio' => $direccion->id ?? 1,
+                    'numero_orden' => $numeroOrden,
+                    'subtotal' => $subtotal,
+                    'impuestos' => $impuestos,
+                    'costo_envio' => 0,
+                    'descuento' => 0,
+                    'total' => $total,
+                    'estado' => 'pendiente',
+                    'fecha_orden' => now(),
+                ]);
+
+                // 2. Crear ItemOrden
+                ItemOrden::create([
+                    'id_orden' => $orden->id,
+                    'id_producto' => 1, // ID genérico para servicios/tokens
+                    'id_proveedor' => 1,
+                    'cantidad' => 1,
+                    'precio_unitario' => $subtotal,
+                    'subtotal' => $subtotal,
+                    'personalizacion_data' => ['pack_name' => $validated['name'], 'hc_amount' => $validated['hc_amount']],
+                ]);
+
+                // 3. Crear PaymentIntent
+                $paymentIntent = $this->stripe->paymentIntents->create([
+                    'amount' => $amountCents,
+                    'currency' => config('stripe.currency', 'eur'),
+                    'automatic_payment_methods' => ['enabled' => true],
+                    'metadata' => [
+                        'type' => 'hydra_pack',
+                        'orden_id' => $orden->id,
+                        'hc_amount' => $validated['hc_amount'],
+                        'user_id' => $user->id,
+                    ],
+                    'description' => "Compra de {$validated['hc_amount']} Hydra Coins - {$validated['name']}",
+                ]);
+
+                $orden->update(['stripe_payment_intent_id' => $paymentIntent->id]);
+
+                // 4. Crear registro de Pago
+                Pago::create([
+                    'id_orden' => $orden->id,
+                    'monto' => $total,
+                    'metodo' => 'tarjeta',
+                    'id_transaccion' => $paymentIntent->id,
+                    'estado' => 'pendiente',
+                    'fecha_pago' => now(),
+                    'detalles_json' => ['payment_intent_id' => $paymentIntent->id],
+                ]);
+
+                return [
+                    'client_secret' => $paymentIntent->client_secret,
+                    'order_id' => $orden->id,
+                    'numero_orden' => $orden->numero_orden,
+                    'total' => $total,
+                ];
+            });
+
+            return $this->successResponse($result, 'Intent de Hydra Pack creado');
+
+        } catch (\Exception $e) {
+            Log::error('Error en crearPaymentIntentHydraPack: ' . $e->getMessage());
+            return $this->errorResponse('Error al procesar la compra de Hydra Coins', $e->getMessage(), 500);
+        }
+    }
+
     // =========================================================================
     // 2. WEBHOOK — Stripe notifica el resultado del pago
     // =========================================================================
@@ -397,6 +494,8 @@ class StripeController extends Controller
             // 3. Procesar el éxito
             if (isset($paymentIntent->metadata->type) && $paymentIntent->metadata->type === 'tournament_registration') {
                 $this->procesarExitoTorneo($paymentIntent, $paymentIntent->metadata);
+            } elseif (isset($paymentIntent->metadata->type) && $paymentIntent->metadata->type === 'hydra_pack') {
+                $this->procesarExitoHydraPack($orden, $paymentIntent);
             } else {
                 $this->procesarExitoOrden($orden, $paymentIntent);
             }
@@ -606,6 +705,34 @@ class StripeController extends Controller
             ]);
             
             Log::info("Factura generada para Torneo #{$torneoId} - Orden #{$numeroOrden}");
+        });
+    }
+
+    /**
+     * Procesa el éxito de una compra de Hydra Coins.
+     */
+    private function procesarExitoHydraPack(Orden $orden, object $paymentIntent): void
+    {
+        if ($orden->estado === 'pagada') return;
+
+        DB::transaction(function () use ($orden, $paymentIntent) {
+            // 1. Actualizar Orden y Pago
+            $orden->update(['estado' => 'pagada']);
+            
+            $pago = Pago::where('id_transaccion', $paymentIntent->id)->first();
+            if ($pago) {
+                $pago->update(['estado' => 'completado']);
+            }
+
+            // 2. Incrementar el balance del usuario
+            $userId = $paymentIntent->metadata->user_id;
+            $hcAmount = $paymentIntent->metadata->hc_amount;
+            
+            $user = \App\Models\User::find($userId);
+            if ($user) {
+                $user->increment('balance_tokens', $hcAmount);
+                Log::info("Usuario #{$userId} ha recibido {$hcAmount} Hydra Coins. Nuevo balance: {$user->balance_tokens}");
+            }
         });
     }
 }
