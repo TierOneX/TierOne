@@ -85,7 +85,7 @@ export default function SuperAdmin() {
         <PanelLayout title="Super Admin" activeItem="Dashboard" showGamingShortcut={false}>
             <Head title="Super Admin - TierOne" />
 
-            <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-8">
                 <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">
                         Acceso global TierOne
@@ -100,12 +100,6 @@ export default function SuperAdmin() {
                     </p>
                 </div>
 
-                <Link
-                    href={route("home")}
-                    className="btn-secondary w-fit"
-                >
-                    Volver a la web
-                </Link>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">

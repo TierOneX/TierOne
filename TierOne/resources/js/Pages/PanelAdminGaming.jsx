@@ -41,6 +41,9 @@ const partidaTypes = ["1v1", "2v2", "5v5", "custom"];
 const incidenciaStates = ["pendiente", "en_revision", "resuelta", "desestimada"];
 const roles = ["player", "admin", "streamer"];
 
+const hasActiveBlock = (blockedUntil) => blockedUntil && new Date(blockedUntil) > new Date();
+const formatBlockDate = (blockedUntil) => new Date(blockedUntil).toLocaleDateString("es-ES");
+
 export default function PanelAdminGaming({
     filters = {},
     juegos = [],
@@ -56,6 +59,7 @@ export default function PanelAdminGaming({
     const [modal, setModal] = useState({ type: null, item: null });
     const [form, setForm] = useState({});
     const [expandedTorneo, setExpandedTorneo] = useState(null);
+    const [validationError, setValidationError] = useState(null);
 
     const getImageUrl = (path) => {
         if (!path) return null;
@@ -104,6 +108,8 @@ export default function PanelAdminGaming({
             verificado: Boolean(item?.verificado ?? false),
             username: item?.username ?? "",
             email: item?.email ?? "",
+            username_changes_count: item?.username_changes_count ?? 0,
+            email_change_blocked_until: item?.email_change_blocked_until ?? null,
             id_juego: item?.id_juego ?? juegos[0]?.id ?? "",
             nombre: item?.nombre ?? "",
             descripcion: item?.descripcion ?? "",
@@ -130,32 +136,63 @@ export default function PanelAdminGaming({
     const closeModal = () => {
         setModal({ type: null, item: null });
         setForm({});
+        setValidationError(null);
     };
 
     const submitModal = (e) => {
         e.preventDefault();
         const id = modal.item?.id;
+        setValidationError(null);
+
+        const handleError = (errors) => {
+            const errorMessages = Object.values(errors).flat();
+            if (errorMessages.length > 0) {
+                setValidationError(errorMessages[0]);
+            }
+        };
 
         if (modal.type === "torneo-create") {
             router.post(routeUrl("panel.gaming.torneos.store"), normalizeTorneoPayload(form), {
                 preserveScroll: true,
                 onSuccess: closeModal,
+                onError: handleError,
             });
         } else if (modal.type === "torneo") {
             router.put(routeUrl("panel.gaming.torneos.update", id), normalizeTorneoPayload(form), {
                 preserveScroll: true,
                 onSuccess: closeModal,
+                onError: handleError,
             });
         } else if (modal.type === "partida") {
-            router.put(routeUrl("panel.gaming.partidas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.partidas.update", id), form, { 
+                preserveScroll: true, 
+                onSuccess: closeModal,
+                onError: handleError,
+            });
         } else if (modal.type === "incidencia") {
-            router.put(routeUrl("panel.gaming.incidencias.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.incidencias.update", id), form, { 
+                preserveScroll: true, 
+                onSuccess: closeModal,
+                onError: handleError,
+            });
         } else if (modal.type === "cuenta") {
-            router.put(routeUrl("panel.gaming.cuentas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.cuentas.update", id), form, { 
+                preserveScroll: true, 
+                onSuccess: closeModal,
+                onError: handleError,
+            });
         } else if (modal.type === "juego-create") {
-            router.post(routeUrl("panel.gaming.juegos.store"), form, { preserveScroll: true, onSuccess: closeModal });
+            router.post(routeUrl("panel.gaming.juegos.store"), form, { 
+                preserveScroll: true, 
+                onSuccess: closeModal,
+                onError: handleError,
+            });
         } else if (modal.type === "juego") {
-            router.put(routeUrl("panel.gaming.juegos.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.juegos.update", id), form, { 
+                preserveScroll: true, 
+                onSuccess: closeModal,
+                onError: handleError,
+            });
         }
     };
 
@@ -538,14 +575,24 @@ export default function PanelAdminGaming({
                             { label: "Acciones", key: "acciones", align: "right", sortable: false },
                         ]}
                         data={cuentas}
-                        renderRow={(item) => (
+                        renderRow={(item) => {
+                            const usernameBlocked = Number(item.username_changes_count ?? 0) >= 2;
+                            const emailBlocked = hasActiveBlock(item.email_change_blocked_until);
+                            return (
                             <tr key={item.id} className="hover:bg-white/5 transition-colors border-b border-white/5 cursor-pointer group">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-black text-white">
                                             {item.username[0].toUpperCase()}
                                         </div>
-                                        <span className="font-black text-white text-sm uppercase tracking-tight italic font-['Outfit']">{item.username}</span>
+                                        <div className="flex flex-col">
+                                            <span className="font-black text-white text-sm uppercase tracking-tight italic font-['Outfit']">{item.username}</span>
+                                            {(usernameBlocked || emailBlocked) && (
+                                                <span className="text-[9px] font-black uppercase tracking-wider text-amber-400">
+                                                    Restricciones activas
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-sm font-bold text-gray-400 italic">{item.email}</td>
@@ -565,7 +612,8 @@ export default function PanelAdminGaming({
                                     </div>
                                 </td>
                             </tr>
-                        )}
+                            );
+                        }}
                     />
                 )}
             </div>
@@ -578,6 +626,15 @@ export default function PanelAdminGaming({
                 maxWidth={modal.type === "torneo-create" ? "max-w-4xl" : "max-w-xl"}
             >
                 <form onSubmit={submitModal} className="space-y-6">
+                    {validationError && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-start gap-3">
+                            <XCircle className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+                            <div>
+                                <p className="text-[11px] font-black text-red-400 uppercase tracking-widest mb-1">No se puede guardar</p>
+                                <p className="text-xs text-red-300/90">{validationError}</p>
+                            </div>
+                        </div>
+                    )}
                     {modal.type === "torneo-create" ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="md:col-span-2 space-y-4">
@@ -722,6 +779,18 @@ export default function PanelAdminGaming({
                         </div>
                     ) : modal.type === "cuenta" ? (
                 <div className="space-y-4">
+                    {(hasActiveBlock(form.email_change_blocked_until) || Number(form.username_changes_count ?? 0) >= 2) && (
+                        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
+                            <p className="text-[10px] font-black text-amber-300 uppercase tracking-widest mb-2">Restricciones de cambios de identidad</p>
+                            <div className="space-y-1 text-xs text-amber-100/90">
+                                <p>Cambios de usuario usados: <span className="font-black">{Number(form.username_changes_count ?? 0)} / 2</span></p>
+                                {Number(form.username_changes_count ?? 0) >= 2 && <p>Username sin cambios disponibles.</p>}
+                                {hasActiveBlock(form.email_change_blocked_until) && (
+                                    <p>Email bloqueado hasta <span className="font-black">{formatBlockDate(form.email_change_blocked_until)}</span>.</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                         <FieldWrapper label="Username">
                             <input type="text" value={form.username} onChange={(e) => setForm(p => ({ ...p, username: e.target.value }))} className="w-full p-4 bg-[#1A1A1A] border border-white/5 rounded-xl outline-none focus:ring-2 focus:ring-red-500 text-white font-bold transition-all" />

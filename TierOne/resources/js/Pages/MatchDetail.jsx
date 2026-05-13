@@ -180,7 +180,7 @@ export default function MatchDetail({ partida }) {
                                     ) : auth.user.balance_tokens < partida.buy_in ? (
                                         <Link 
                                             href="/shop"
-                                            className="w-full h-14 flex items-center justify-center gap-2 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-red-500 transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] active:scale-[0.98]"
+                                            className="w-full h-14 flex items-center justify-center gap-2 px-6 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-red-500 transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] active:scale-[0.98]"
                                         >
                                             <img src="/assets/hydra-coin.png" className="w-5 h-5 object-contain" alt="" />
                                             Recargar para jugar

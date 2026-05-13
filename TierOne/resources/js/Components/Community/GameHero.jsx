@@ -3,7 +3,7 @@ import { Star, Calendar, Gamepad2, Layers, PlayCircle, Trophy } from 'lucide-rea
 import { igdbImageUrl } from '@/Utils/igdb';
 import TrailerPlayer from './TrailerPlayer';
 
-export default function GameHero({ juego }) {
+export default function GameHero({ juego, onJoinTournament }) {
     const rating = Math.round(juego.community_rating || juego.critic_rating || 0);
 
     return (
@@ -88,7 +88,11 @@ export default function GameHero({ juego }) {
 
                         {/* Botones de acción rápida */}
                         <div className="mt-10 flex flex-wrap gap-4 sm:gap-6">
-                            <button className="relative flex items-center gap-3 rounded-2xl bg-[#E10600] px-12 py-5 font-black uppercase italic tracking-tighter text-white transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(225,6,0,0.8)] active:scale-95 group overflow-hidden border border-white/20">
+<button
+                            type="button"
+                            onClick={onJoinTournament}
+                            className="relative flex items-center gap-3 rounded-2xl bg-[#E10600] px-12 py-5 font-black uppercase italic tracking-tighter text-white transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(225,6,0,0.8)] active:scale-95 group overflow-hidden border border-white/20"
+                        >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                                 <div className="relative z-10 flex items-center gap-3">
                                     <Trophy size={22} strokeWidth={3} className="text-white" />

@@ -195,6 +195,11 @@ function SectionMiPerfil({ user, status }) {
         e.preventDefault();
         patch(route("profile.update"));
     };
+    const now = new Date();
+    const emailBlockedUntil = user.email_change_blocked_until ? new Date(user.email_change_blocked_until) : null;
+    const isEmailBlocked = emailBlockedUntil && emailBlockedUntil > now;
+    const usernameChangesUsed = Number(user.username_changes_count ?? 0);
+    const usernameChangesLeft = Math.max(0, 2 - usernameChangesUsed);
 
     return (
         <div className="space-y-8">
@@ -238,6 +243,20 @@ function SectionMiPerfil({ user, status }) {
                     {Icon.check} Perfil actualizado correctamente
                 </div>
             )}
+            {(isEmailBlocked || usernameChangesLeft === 0) && (
+                <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-4 py-3 text-[11px] text-amber-300 space-y-1">
+                    <p className="font-semibold uppercase tracking-widest">Restricciones de cambio activas</p>
+                    <p>
+                        Cambios de usuario restantes: <span className="font-black">{usernameChangesLeft}</span> de 2.
+                    </p>
+                    {isEmailBlocked && (
+                        <p>
+                            Correo bloqueado hasta:{" "}
+                            <span className="font-black">{emailBlockedUntil.toLocaleDateString("es-ES")}</span>.
+                        </p>
+                    )}
+                </div>
+            )}
 
             <form
                 onSubmit={submit}
@@ -253,7 +272,7 @@ function SectionMiPerfil({ user, status }) {
                         className={inputCls}
                         value={data.username}
                         onChange={(e) => setData("username", e.target.value)}
-                        autoComplete="username"
+                        autoComplete="off"
                     />
                 </Field>
                 <Field label="Email" id="email" error={errors.email}>
@@ -263,6 +282,7 @@ function SectionMiPerfil({ user, status }) {
                         className={inputCls}
                         value={data.email}
                         onChange={(e) => setData("email", e.target.value)}
+                        autoComplete="off"
                     />
                 </Field>
                 <Field label="Nombre" id="nombre" error={errors.nombre}>
@@ -571,6 +591,7 @@ function SectionSeguridad({ status }) {
                     placeholder={placeholder}
                     value={data[field]}
                     onChange={(e) => setData(field, e.target.value)}
+                    autoComplete="off"
                 />
                 <button
                     type="button"
@@ -592,7 +613,7 @@ function SectionSeguridad({ status }) {
                     {Icon.check} Contraseña actualizada correctamente
                 </div>
             )}
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-4" autoComplete="off">
                 <PwdInput
                     id="current_password"
                     label="Contraseña actual"

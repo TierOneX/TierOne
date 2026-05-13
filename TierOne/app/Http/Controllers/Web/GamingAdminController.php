@@ -62,7 +62,20 @@ class GamingAdminController extends Controller
             ->get();
 
         $cuentas = User::query()
-            ->select('id', 'username', 'email', 'rol', 'verificado', 'activo', 'fecha_registro', 'ultima_conexion')
+            ->select(
+                'id',
+                'username',
+                'email',
+                'rol',
+                'verificado',
+                'activo',
+                'fecha_registro',
+                'ultima_conexion',
+                'username_changes_count',
+                'email_change_blocked_until',
+                'last_username_changed_at',
+                'last_email_changed_at'
+            )
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('username', 'like', "%{$search}%")
@@ -207,6 +220,21 @@ class GamingAdminController extends Controller
             'activo' => 'required|boolean',
             'verificado' => 'required|boolean',
         ]);
+
+        $now = now();
+        $newUsername = $data['username'];
+        $newEmail = $data['email'];
+
+        if ($newUsername !== $user->username) {
+            $data['username_changes_count'] = (int) ($user->username_changes_count ?? 0) + 1;
+            $data['last_username_changed_at'] = $now;
+        }
+
+        if ($newEmail !== $user->email) {
+            $data['last_email_changed_at'] = $now;
+            $data['email_change_blocked_until'] = $now->copy()->addDays(40);
+            $data['verificado'] = false;
+        }
 
         $user->update($data);
 

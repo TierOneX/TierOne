@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,13 +60,45 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
+        $now = now();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (
+            array_key_exists('username', $validated)
+            && $validated['username'] !== $user->username
+        ) {
+            if (($user->username_changes_count ?? 0) >= 2) {
+                throw ValidationException::withMessages([
+                    'username' => 'Has alcanzado el máximo de 2 cambios de nombre de usuario.',
+                ]);
+            }
+
+            $validated['username_changes_count'] = (int) ($user->username_changes_count ?? 0) + 1;
+            $validated['last_username_changed_at'] = $now;
         }
 
-        $request->user()->save();
+        if (
+            array_key_exists('email', $validated)
+            && $validated['email'] !== $user->email
+        ) {
+            if ($user->email_change_blocked_until && $now->lt($user->email_change_blocked_until)) {
+                throw ValidationException::withMessages([
+                    'email' => 'No puedes cambiar el correo hasta ' . $user->email_change_blocked_until->format('d/m/Y') . '.',
+                ]);
+            }
+
+            $validated['last_email_changed_at'] = $now;
+            $validated['email_change_blocked_until'] = $now->copy()->addDays(40);
+        }
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->verificado = false;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

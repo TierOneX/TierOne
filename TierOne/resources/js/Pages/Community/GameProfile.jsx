@@ -15,6 +15,7 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
 
     const tabs = [
         { id: 'about', name: 'Información', icon: <Info size={18} /> },
+        { id: 'torneos', name: 'Torneos', icon: <Trophy size={18} /> },
         { id: 'live', name: `En Vivo (${liveStreams?.length || 0})`, icon: <Radio size={18} /> },
         { id: 'clips', name: 'Clips', icon: <Film size={18} /> },
         { id: 'gallery', name: 'Galería', icon: <ImageIcon size={18} /> },
@@ -24,7 +25,7 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
         <MainLayout>
             <Head title={`${juego.nombre} - Comunidad TierOne`} />
 
-            <GameHero juego={juego} />
+            <GameHero juego={juego} onJoinTournament={() => setActiveTab('torneos')} />
 
             <div className="container mx-auto px-4 py-16">
                 <div className="flex flex-col gap-12 lg:flex-row">
@@ -76,51 +77,57 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                             )}
                                         </div>
                                     </div>
+                                </div>
+                            )}
 
-                                    {/* Torneos Activos */}
-                                    {torneos?.length > 0 && (
-                                        <div>
-                                            <div className="flex items-center justify-between mb-8">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-1 bg-primary rounded-full" />
-                                                    <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">Próximos Torneos</h3>
-                                                </div>
-                                                <Link href="/torneos" className="text-xs font-black uppercase tracking-widest text-white/30 hover:text-primary transition-colors">Ver todos</Link>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                                {torneos.map((torneo) => (
-                                                    <Link 
-                                                        key={torneo.id} 
-                                                        href={`/torneos/${torneo.id}`} 
-                                                        className="group relative overflow-hidden rounded-3xl bg-[#141414] p-6 transition-all hover:border-primary/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
-                                                    >
-                                                        <div className="flex items-center justify-between mb-6">
-                                                            <div className="px-3 py-1 rounded-lg bg-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
-                                                                {torneo.estado}
-                                                            </div>
-                                                            <div className="flex items-center gap-2 text-white/30 text-[10px] font-bold">
-                                                                <Trophy size={12} />
-                                                                <span>{torneo.inscripciones_count} / {torneo.max_participantes}</span>
-                                                            </div>
+                            {activeTab === 'torneos' && (
+                                <div className="space-y-10">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-1 bg-primary rounded-full" />
+                                            <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">Torneos Activos</h3>
+                                        </div>
+                                        <Link href="/tournaments" className="text-xs font-black uppercase tracking-widest text-white/30 hover:text-primary transition-colors">Ver todos</Link>
+                                    </div>
+
+                                    {torneos?.length > 0 ? (
+                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                            {torneos.map((torneo) => (
+                                                <Link 
+                                                    key={torneo.id} 
+                                                    href={`/tournaments?torneo=${torneo.id}`} 
+                                                    className="group relative overflow-hidden rounded-3xl bg-[#141414] p-6 transition-all hover:border-primary/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                                                >
+                                                    <div className="flex items-center justify-between mb-6">
+                                                        <div className="px-3 py-1 rounded-lg bg-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
+                                                            {torneo.estado}
                                                         </div>
-                                                        
-                                                        <h4 className="text-xl font-black uppercase italic tracking-tighter text-white group-hover:text-primary transition-colors mb-6 leading-none">
-                                                            {torneo.nombre}
-                                                        </h4>
-                                                        
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Premio Total</span>
-                                                                <span className="text-2xl font-black text-white">{torneo.premio_total}€</span>
-                                                            </div>
-                                                            <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-primary group-hover:text-black transition-all">
-                                                                <ChevronRight size={20} />
-                                                            </div>
+                                                        <div className="flex items-center gap-2 text-white/30 text-[10px] font-bold">
+                                                            <Trophy size={12} />
+                                                            <span>{torneo.inscripciones_count} / {torneo.max_participantes}</span>
                                                         </div>
-                                                    </Link>
-                                                ))}
-                                            </div>
+                                                    </div>
+                                                    
+                                                    <h4 className="text-xl font-black uppercase italic tracking-tighter text-white group-hover:text-primary transition-colors mb-6 leading-none">
+                                                        {torneo.nombre}
+                                                    </h4>
+                                                    
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Premio Total</span>
+                                                            <span className="text-2xl font-black text-white">{torneo.premio_total}€</span>
+                                                        </div>
+                                                        <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/30 group-hover:bg-primary group-hover:text-black transition-all">
+                                                            <ChevronRight size={20} />
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-[26px] border border-dashed border-white/10 bg-[#101010] px-6 py-14 text-center">
+                                            <p className="text-sm font-black uppercase tracking-[0.2em] text-white">No hay torneos activos para este juego.</p>
+                                            <p className="mt-3 text-sm text-gray-500">Vuelve más tarde para ver nuevas competiciones.</p>
                                         </div>
                                     )}
                                 </div>
@@ -211,7 +218,7 @@ export default function GameProfile({ juego, liveStreams, topClips, torneos }) {
                                 </p>
                                 <Link 
                                     href="/shop" 
-                                    className="mt-6 inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-black px-8 py-4 font-black uppercase italic tracking-widest text-xs transition-all hover:bg-primary hover:text-white hover:shadow-[0_10px_20px_rgba(227,24,55,0.3)] active:scale-95"
+                                    className="mt-6 inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-black px-8 py-4 font-black uppercase italic tracking-widest text-xs transition-all hover:bg-red-600 hover:text-white hover:shadow-[0_10px_20px_rgba(227,24,55,0.3)] active:scale-95"
                                 >
                                     Visitar Tienda
                                     <ChevronRight size={18} />
