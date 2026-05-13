@@ -51,6 +51,10 @@ const workspaces = [
         title: "Operacion Gaming",
         description: "Control competitivo y comunidad desde el mismo panel.",
         icon: Trophy,
+        shortcut: {
+            label: "Ir al panel admin gaming",
+            href: route("panel.gaming.index"),
+        },
         links: [
             { label: "Torneos", icon: Trophy, href: route("panel.superadmin.gaming.index", { section: "torneos" }) },
             { label: "Partidas", icon: Swords, href: route("panel.superadmin.gaming.index", { section: "partidas" }) },
@@ -63,6 +67,10 @@ const workspaces = [
         title: "Operacion Ecommerce",
         description: "Catalogo, pedidos y finanzas sin salir del superadmin.",
         icon: BarChart3,
+        shortcut: {
+            label: "Ir al panel admin ecommerce",
+            href: route("panel.ecommerce.dashboard"),
+        },
         links: [
             { label: "Dashboard tienda", icon: BarChart3, href: route("panel.superadmin.ecommerce.dashboard") },
             { label: "Productos", icon: Package, href: route("panel.superadmin.ecommerce.products") },
@@ -142,6 +150,13 @@ export default function SuperAdmin() {
                             <p className="mb-6 text-sm leading-6 text-gray-400">
                                 {workspace.description}
                             </p>
+                            <Link
+                                href={workspace.shortcut.href}
+                                className="mb-5 flex w-full items-center justify-between rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-red-500/20"
+                            >
+                                <span>{workspace.shortcut.label}</span>
+                                <ArrowRight size={16} className="text-red-500" />
+                            </Link>
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {workspace.links.map((link) => {
                                     const LinkIcon = link.icon;
