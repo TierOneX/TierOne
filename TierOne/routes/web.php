@@ -145,6 +145,7 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
 
 Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
 Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentIntent'])->name('stripe.create-intent');
+Route::post('/stripe/create-intent-torneo', [StripeController::class, 'crearPaymentIntentTorneo'])->name('stripe.create-intent-torneo');
 Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
 
@@ -153,6 +154,13 @@ Route::get('/checkout', function () {
         'stripeKey' => config('stripe.key'),
     ]);
 })->name('checkout');
+
+Route::get('/tournaments/{torneo}/checkout', function (\App\Models\Torneo $torneo) {
+    return Inertia::render('TournamentCheckout', [
+        'torneo' => $torneo->load('juego'),
+        'stripeKey' => config('stripe.key'),
+    ]);
+})->middleware('auth')->name('tournaments.checkout');
 
 Route::get('/checkout/success', function () {
     return Inertia::render('CheckoutSuccess');
@@ -166,6 +174,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Ruta para descargar facturas (propia)
+    Route::get('/orders/{orden}/invoice', [App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])
+        ->name('user.orders.invoice');
 });
 
 require __DIR__ . '/auth.php';

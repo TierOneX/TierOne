@@ -11,7 +11,7 @@ import { Link } from '@inertiajs/react';
  * @param {string} url - URL a la que redirigir al hacer clic
  */
 export default function SponsorTriangle({ 
-    videoSrc = "https://assets.mixkit.co/videos/preview/mixkit-gaming-setup-with-neon-lights-and-keyboard-34442-large.mp4",
+    videoSrc = "/assets/videos/sponsor.mp4",
     title = "Hydra Energy",
     subtitle = "TierOne Partner",
     side = "right",
@@ -26,23 +26,31 @@ export default function SponsorTriangle({
 
     if (!isVisible) return null;
 
-    const sideClasses = side === "right" ? "right-0 pr-2 items-end" : "left-0 pl-2 items-start";
+    const sideClasses = side === "right" ? "right-0 pr-0 items-end" : "left-0 pl-0 items-start";
     const labelClasses = side === "right" ? "-left-12 -rotate-90" : "-right-12 rotate-90";
     const clipPath = side === "right" ? 'polygon(100% 0, 100% 100%, 0 100%)' : 'polygon(0 0, 100% 100%, 0 100%)';
     const borderClasses = side === "right" ? "border-r-[4px] border-b-[4px]" : "border-l-[4px] border-b-[4px]";
 
     return (
-        <div className={`fixed top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-2 lg:flex ${sideClasses}`}>
+        <div className={`fixed bottom-0 z-50 hidden flex-col gap-2 lg:flex ${sideClasses}`}>
             <div className="relative">
-                {/* Etiqueta de Sponsor */}
-                <div className={`absolute top-1/2 text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ${labelClasses}`}>
-                    Sponsored
+                {/* Etiqueta de Sponsor EXTERNA (Como base la hipotenusa) */}
+                <div 
+                    className="absolute z-10 text-[10px] font-black uppercase tracking-[0.4em] text-white/20 whitespace-nowrap pointer-events-none"
+                    style={{
+                        top: '48%',
+                        left: side === "right" ? '48%' : '52%',
+                        transform: `translate(-50%, -50%) rotate(${side === "right" ? '-45deg' : '45deg'})`,
+                        transformOrigin: 'center center'
+                    }}
+                >
+                    Sponsored Content
                 </div>
 
                 {/* Contenedor del Triángulo */}
                 <Link 
                     href={url}
-                    className="group relative block h-[300px] w-[300px] overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+                    className="group relative block h-[450px] w-[450px] overflow-hidden transition-all duration-500 hover:scale-[1.02]"
                     style={{
                         clipPath: clipPath,
                         filter: 'drop-shadow(0 20px 50px rgba(0,0,0,0.5))'
@@ -54,7 +62,7 @@ export default function SponsorTriangle({
                         muted
                         loop
                         playsInline
-                        className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
+                        className="h-full w-full object-cover object-left grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
                     >
                         <source src={videoSrc} type="video/mp4" />
                     </video>

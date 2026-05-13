@@ -111,25 +111,27 @@ export default function CheckoutForm({ orderId, numeroOrden, total, onSuccess })
             )}
 
             {/* Botón confirmar */}
-            <button
-                type="submit"
-                id="btn-confirmar-pago"
-                disabled={!stripe || !ready || loading}
-                className="w-full bg-[#e31837] hover:bg-[#c2102d] disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-5 rounded-xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-red-900/20"
-            >
-                {loading ? (
-                    <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        PROCESANDO...
-                    </>
-                ) : (
-                    <>
-                        <Lock className="w-4 h-4" />
-                        PAGAR €{Number(total ?? 0).toFixed(2)}
-                        <ArrowRight className="w-5 h-5" />
-                    </>
-                )}
-            </button>
+            <div className="flex justify-end pt-4">
+                <button
+                    type="submit"
+                    id="btn-confirmar-pago"
+                    disabled={!stripe || !ready || loading}
+                    className="min-w-[240px] bg-[#e31837] hover:bg-[#c2102d] disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-5 px-8 rounded-xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-red-900/20"
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            PROCESANDO...
+                        </>
+                    ) : (
+                        <>
+                            <Lock className="w-4 h-4" />
+                            PAGAR €{Number(total ?? 0).toFixed(2)}
+                            <ArrowRight className="w-5 h-5" />
+                        </>
+                    )}
+                </button>
+            </div>
 
             <p className="text-center text-[10px] text-gray-600 font-medium">
                 Pago procesado de forma segura por Stripe.

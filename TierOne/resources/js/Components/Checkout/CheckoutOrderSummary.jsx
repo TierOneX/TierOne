@@ -4,12 +4,15 @@ import { useCart } from '@/Contexts/CartContext';
 
 /**
  * Panel de resumen del pedido en el checkout.
- * Lee el carrito del CartContext y calcula los totales.
+ * Lee el carrito del CartContext por defecto, pero permite pasar items manuales.
  */
-export default function CheckoutOrderSummary() {
-    const { cart, subtotal } = useCart();
+export default function CheckoutOrderSummary({ manualItems = null, manualSubtotal = null }) {
+    const { cart: cartFromContext, subtotal: subtotalFromContext } = useCart();
 
-    const taxRate = 0.08;
+    const cart = manualItems || cartFromContext;
+    const subtotal = manualSubtotal ?? subtotalFromContext;
+
+    const taxRate = 0.21;
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
 
@@ -17,7 +20,7 @@ export default function CheckoutOrderSummary() {
         <div className="space-y-4">
 
             {/* Tarjeta de resumen */}
-            <div className="bg-[#111111] rounded-2xl border border-white/5 p-6 lg:sticky lg:top-24">
+            <div className="bg-[#111111] rounded-2xl border border-white/5 p-6">
                 <h2 className="text-lg font-black italic uppercase tracking-tighter text-white mb-6">
                     Resumen del Pedido
                 </h2>
@@ -29,7 +32,9 @@ export default function CheckoutOrderSummary() {
                             {/* Imagen o placeholder */}
                             {item.imagenes?.[0]?.url_imagen ? (
                                 <img
-                                    src={`/storage/${item.imagenes[0].url_imagen}`}
+                                    src={item.imagenes[0].url_imagen.startsWith('http') || item.imagenes[0].url_imagen.startsWith('/')
+                                        ? item.imagenes[0].url_imagen
+                                        : `/storage/${item.imagenes[0].url_imagen}`}
                                     alt={item.nombre}
                                     className="w-12 h-12 rounded-lg object-cover bg-[#1a1a1a] flex-shrink-0"
                                 />
@@ -67,7 +72,7 @@ export default function CheckoutOrderSummary() {
                         <span className="text-green-500 font-black">GRATIS</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                        <span className="text-gray-400 font-bold uppercase tracking-widest">Impuestos (8%)</span>
+                        <span className="text-gray-400 font-bold uppercase tracking-widest">Impuestos (21%)</span>
                         <span className="text-white font-black">€{tax.toFixed(2)}</span>
                     </div>
                     <div className="border-t border-white/5 pt-3 flex justify-between items-baseline">

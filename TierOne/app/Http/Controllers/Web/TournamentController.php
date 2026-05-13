@@ -28,8 +28,12 @@ class TournamentController extends Controller
             ])
             ->with([
                 'torneos' => function ($query) {
-                    $query->withCount('inscripciones')
-                        ->with(['inscripciones.usuario:id,username,nombre'])
+                    $query->withCount(['inscripciones' => function ($q) {
+                        $q->where('estado', 'confirmada');
+                    }])
+                        ->with(['inscripciones' => function ($q) {
+                            $q->where('estado', 'confirmada')->with('usuario:id,username,nombre');
+                        }])
                         ->orderByRaw("case when estado = 'inscripciones' then 0 when estado = 'en_curso' then 1 else 2 end")
                         ->orderBy('fecha_inicio')
                         ->orderByDesc('id');
@@ -111,53 +115,33 @@ class TournamentController extends Controller
             return back()->with('error', 'Este torneo no acepta nuevas inscripciones.');
         }
 
-        if (InscripcionTorneo::where('id_torneo', $torneo->id)->where('id_usuario', $request->user()->id)->exists()) {
-            return back()->with('error', 'Ya estas inscrito en este torneo.');
+        $existingInscription = InscripcionTorneo::where('id_torneo', $torneo->id)
+            ->where('id_usuario', $request->user()->id)
+            ->first();
+
+        if ($existingInscription && $existingInscription->estado === 'confirmada') {
+            return back()->with('error', 'Ya estás inscrito y confirmado en este torneo.');
         }
 
-        $inscritos = InscripcionTorneo::where('id_torneo', $torneo->id)->count();
+        $inscritos = InscripcionTorneo::where('id_torneo', $torneo->id)
+            ->where('estado', 'confirmada')
+            ->count();
         if ($inscritos >= (int) $torneo->max_participantes) {
             return back()->with('error', 'El torneo ya esta completo.');
         }
 
-        // Si el torneo tiene cuota, redirigir a Stripe
+        // Si el torneo tiene cuota, crear inscripción pendiente y redirigir al checkout interno
         if ($torneo->cuota_inscripcion > 0) {
-            $stripe = new \Stripe\StripeClient(config('stripe.secret'));
-            
-            $session = $stripe->checkout->sessions->create([
-                'payment_method_types' => ['card'],
-                'line_items' => [[
-                    'price_data' => [
-                        'currency' => 'eur',
-                        'product_data' => [
-                            'name' => "Inscripción: {$torneo->nombre}",
-                            'description' => "Cuota de participación para el torneo de {$torneo->juego->nombre}",
-                        ],
-                        'unit_amount' => (int)($torneo->cuota_inscripcion * 100),
-                    ],
-                    'quantity' => 1,
-                ]],
-                'mode' => 'payment',
-                'success_url' => route('tournaments', ['success' => '¡Inscripción completada con éxito!']),
-                'cancel_url' => route('tournaments', ['error' => 'Se ha cancelado el proceso de pago.']),
-                'customer_email' => $request->user()->email,
-                'metadata' => [
-                    'type' => 'tournament_registration',
-                    'torneo_id' => $torneo->id,
-                    'user_id' => $request->user()->id,
-                ],
-            ]);
+            InscripcionTorneo::updateOrCreate(
+                ['id_torneo' => $torneo->id, 'id_usuario' => $request->user()->id],
+                [
+                    'pago_cuota' => $torneo->cuota_inscripcion,
+                    'fecha_inscripcion' => now(),
+                    'estado' => 'pendiente',
+                ]
+            );
 
-            // Crear la inscripción en estado pendiente
-            InscripcionTorneo::create([
-                'id_torneo' => $torneo->id,
-                'id_usuario' => $request->user()->id,
-                'pago_cuota' => $torneo->cuota_inscripcion,
-                'fecha_inscripcion' => now(),
-                'estado' => 'pendiente_pago',
-            ]);
-
-            return Inertia::location($session->url);
+            return redirect()->route('tournaments.checkout', $torneo->id);
         }
 
         // Si es gratuito, confirmar directamente

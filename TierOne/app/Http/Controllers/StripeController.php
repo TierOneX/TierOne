@@ -9,6 +9,9 @@ use App\Models\Pago;
 use App\Models\Producto;
 use App\Models\VarianteProducto;
 use App\Models\Orden;
+use App\Models\InscripcionTorneo;
+use App\Models\Torneo;
+use App\Services\InvoiceService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -86,7 +89,7 @@ class StripeController extends Controller
                 ];
             }
 
-            $taxRate = 0.08;
+            $taxRate = 0.21;
             $impuestos = round($subtotal * $taxRate, 2);
             $costoEnvio = 0.00;
             $descuento = 0.00;
@@ -188,6 +191,104 @@ class StripeController extends Controller
         }
     }
 
+    /**
+     * Crea un PaymentIntent para la inscripción a un torneo.
+     * Sigue el 'modelo de tienda' personalizado.
+     */
+    public function crearPaymentIntentTorneo(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'id_torneo' => 'required|exists:torneos,id',
+            ]);
+
+            $torneo = Torneo::with('juego')->findOrFail($validated['id_torneo']);
+            $user = Auth::user();
+            $total = (float) $torneo->cuota_inscripcion;
+            $taxRate = 0.21;
+            $subtotal = round($total / (1 + $taxRate), 2);
+            $impuestos = round($total - $subtotal, 2);
+
+            if ($total <= 0) {
+                return $this->errorResponse('Este torneo no requiere pago.', null, 400);
+            }
+
+            $amountCents = (int)round($total * 100);
+
+            $result = DB::transaction(function () use ($torneo, $user, $total, $subtotal, $impuestos, $amountCents) {
+                // 1. Crear Orden pendiente
+                $numeroOrden = 'TRN-' . strtoupper(uniqid());
+                
+                $direccion = \App\Models\DireccionEnvio::where('id_usuario', $user->id)
+                    ->orderBy('predeterminada', 'desc')
+                    ->first();
+
+                $orden = Orden::create([
+                    'id_usuario' => $user->id,
+                    'id_direccion_envio' => $direccion->id ?? 1, // Fallback to 1 ONLY if no address exists
+                    'numero_orden' => $numeroOrden,
+                    'subtotal' => $subtotal,
+                    'impuestos' => $impuestos,
+                    'costo_envio' => 0,
+                    'descuento' => 0,
+                    'total' => $total,
+                    'estado' => 'pendiente',
+                    'fecha_orden' => now(),
+                ]);
+
+                // 2. Crear ItemOrden
+                ItemOrden::create([
+                    'id_orden' => $orden->id,
+                    'id_producto' => 1, // Placeholder
+                    'id_proveedor' => 1, // Placeholder
+                    'cantidad' => 1,
+                    'precio_unitario' => $subtotal,
+                    'subtotal' => $subtotal,
+                ]);
+
+                // 3. Crear PaymentIntent
+                $paymentIntent = $this->stripe->paymentIntents->create([
+                    'amount' => $amountCents,
+                    'currency' => config('stripe.currency', 'eur'),
+                    'automatic_payment_methods' => ['enabled' => true],
+                    'metadata' => [
+                        'type' => 'tournament_registration',
+                        'orden_id' => $orden->id,
+                        'torneo_id' => $torneo->id,
+                        'user_id' => $user->id,
+                    ],
+                    'description' => "Inscripción Torneo #{$torneo->id} - {$torneo->nombre}",
+                ]);
+
+                $orden->update(['stripe_payment_intent_id' => $paymentIntent->id]);
+
+                // 4. Crear registro de Pago
+                Pago::create([
+                    'id_orden' => $orden->id,
+                    'monto' => $total,
+                    'metodo' => 'tarjeta',
+                    'id_transaccion' => $paymentIntent->id,
+                    'estado' => 'pendiente',
+                    'fecha_pago' => now(),
+                    'detalles_json' => ['payment_intent_id' => $paymentIntent->id],
+                ]);
+
+                return [
+                    'client_secret' => $paymentIntent->client_secret,
+                    'order_id' => $orden->id,
+                    'numero_orden' => $orden->numero_orden,
+                    'total' => $total,
+                ];
+            });
+
+            return $this->successResponse($result, 'Intent de torneo creado');
+
+        } catch (\Exception $e) {
+            Log::error('Error en crearPaymentIntentTorneo: ' . $e->getMessage());
+            return $this->errorResponse('Error al procesar el pago del torneo', $e->getMessage(), 500);
+        }
+    }
+
     // =========================================================================
     // 2. WEBHOOK — Stripe notifica el resultado del pago
     // =========================================================================
@@ -226,6 +327,10 @@ class StripeController extends Controller
 
             case 'payment_intent.payment_failed':
                 $this->handlePaymentIntentFailed($event->data->object);
+                break;
+            
+            case 'checkout.session.completed':
+                $this->handleCheckoutSessionCompleted($event->data->object);
                 break;
 
             default:
@@ -274,8 +379,12 @@ class StripeController extends Controller
                 return $this->notFoundResponse('Orden no encontrada para este pago.');
             }
 
-            // 3. Procesar el éxito de la orden de forma centralizada
-            $this->procesarExitoOrden($orden, $paymentIntent);
+            // 3. Procesar el éxito
+            if (isset($paymentIntent->metadata->type) && $paymentIntent->metadata->type === 'tournament_registration') {
+                $this->procesarExitoTorneo($paymentIntent, $paymentIntent->metadata);
+            } else {
+                $this->procesarExitoOrden($orden, $paymentIntent);
+            }
 
             Log::info("Orden #{$orden->numero_orden} confirmada directamente (sin webhook).");
 
@@ -407,5 +516,81 @@ class StripeController extends Controller
         });
 
         Log::info("Orden #{$orden->numero_orden} marcada como CANCELADA por fallo de pago.");
+    }
+
+    private function handleCheckoutSessionCompleted(object $session): void
+    {
+        $metadata = $session->metadata;
+
+        if (isset($metadata->type) && $metadata->type === 'tournament_registration') {
+            $this->procesarExitoTorneo($session, $metadata);
+        }
+    }
+
+    private function procesarExitoTorneo(object $session, object $metadata): void
+    {
+        $torneoId = $metadata->torneo_id;
+        $userId = $metadata->user_id;
+
+        $inscripcion = InscripcionTorneo::where('id_torneo', $torneoId)
+            ->where('id_usuario', $userId)
+            ->where('estado', 'pendiente')
+            ->first();
+
+        if (!$inscripcion) {
+            Log::error("Webhook: Inscripcion no encontrada para Torneo {$torneoId} y Usuario {$userId}");
+            return;
+        }
+
+        DB::transaction(function () use ($inscripcion, $session, $torneoId, $userId) {
+            // 1. Confirmar inscripción
+            $inscripcion->update(['estado' => 'confirmada']);
+
+            // 2. Crear Orden para la factura
+            $torneo = Torneo::find($torneoId);
+            $numeroOrden = 'TRN-' . strtoupper(uniqid());
+            
+            $total = (float) $inscripcion->pago_cuota;
+            $taxRate = 0.21;
+            $subtotal = round($total / (1 + $taxRate), 2);
+            $impuestos = round($total - $subtotal, 2);
+
+            $orden = Orden::create([
+                'id_usuario' => $userId,
+                'id_direccion_envio' => 1, // No aplica para digital (usamos placeholder)
+                'numero_orden' => $numeroOrden,
+                'subtotal' => $subtotal,
+                'impuestos' => $impuestos,
+                'costo_envio' => 0,
+                'descuento' => 0,
+                'total' => $total,
+                'estado' => 'pagada',
+                'fecha_orden' => now(),
+                'stripe_payment_intent_id' => $session->payment_intent ?? $session->id,
+            ]);
+
+            // 3. Crear ItemOrden
+            ItemOrden::create([
+                'id_orden' => $orden->id,
+                'id_producto' => 1, // Usar un ID genérico o crear uno para "Cuota Torneo"
+                'id_variante' => null,
+                'id_proveedor' => 1,
+                'cantidad' => 1,
+                'precio_unitario' => $subtotal,
+                'subtotal' => $subtotal,
+            ]);
+
+            // 4. Crear Pago
+            Pago::create([
+                'id_orden' => $orden->id,
+                'monto' => $inscripcion->pago_cuota,
+                'metodo' => 'stripe_checkout',
+                'id_transaccion' => $session->id,
+                'estado' => 'completado',
+                'fecha_pago' => now(),
+            ]);
+            
+            Log::info("Factura generada para Torneo #{$torneoId} - Orden #{$numeroOrden}");
+        });
     }
 }

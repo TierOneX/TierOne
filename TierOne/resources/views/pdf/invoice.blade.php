@@ -142,10 +142,10 @@
                     FACTURADO A
                 </div>
                 <div class="bold text-white text-md pb-5">
-                    {{ $orden->direccionEnvio->nombre_completo ?? $orden->usuario->nombre }}
+                    {{ $cliente_nombre }}
                 </div>
                 <div class="text-sm text-gray" style="line-height: 1.7;">
-                    @if($orden->direccionEnvio)
+                    @if($orden->direccionEnvio && $orden->id_direccion_envio != 1)
                         {{ $orden->direccionEnvio->direccion_linea1 }}<br>
                         {{ $orden->direccionEnvio->codigo_postal }}, {{ $orden->direccionEnvio->ciudad }}<br>
                         {{ $orden->direccionEnvio->pais }}
@@ -208,19 +208,30 @@
         </tr>
 
         <!-- Filas de productos -->
-        @foreach($orden->items as $index => $item)
+        @foreach($items_procesados as $index => $item)
         <tr>
             <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                <span class="bold text-white">{{ $item->producto->nombre ?? 'Producto Eliminado' }}</span>
+                <table>
+                    <tr>
+                        @if(!empty($item['imagen_base64']))
+                        <td style="width: 40px; padding-right: 10px;">
+                            <img src="{{ $item['imagen_base64'] }}" width="40" height="40" style="border-radius: 4px; object-cover: fit;">
+                        </td>
+                        @endif
+                        <td>
+                            <span class="bold text-white">{{ $item['nombre'] }}</span>
+                        </td>
+                    </tr>
+                </table>
             </td>
             <td class="text-right text-light" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                {{ $item->cantidad }}
+                {{ $item['cantidad'] }}
             </td>
             <td class="text-right text-light" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                {{ number_format($item->precio_unitario, 2, ',', '.') }} €
+                {{ number_format($item['precio_unitario'], 2, ',', '.') }} €
             </td>
             <td class="text-right text-white bold" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                {{ number_format($item->cantidad * $item->precio_unitario, 2, ',', '.') }} €
+                {{ number_format($item['cantidad'] * $item['precio_unitario'], 2, ',', '.') }} €
             </td>
         </tr>
         @endforeach
