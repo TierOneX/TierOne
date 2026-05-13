@@ -50,8 +50,15 @@ export default function CheckoutOrderSummary({ manualItems = null, manualSubtota
     const cart = manualItems || cartFromContext;
     const subtotal = manualSubtotal ?? subtotalFromContext;
 
-    const taxRate = 0.21;
-    const tax = subtotal * taxRate;
+    // Lógica de impuestos: Hydra Coins no tienen IVA, el resto 21%
+    const tax = cart.reduce((acc, item) => {
+        const isHydra = item.itemType === 'hydra' || item.nombre?.toLowerCase().includes('hydra');
+        if (isHydra) return acc;
+        
+        const linePrice = (Number(item.precio_venta) + Number(item.customizationSurcharge || 0)) * item.quantity;
+        return acc + (linePrice * 0.21);
+    }, 0);
+    
     const total = subtotal + tax;
 
     return (
@@ -112,10 +119,12 @@ export default function CheckoutOrderSummary({ manualItems = null, manualSubtota
                         <span className="text-gray-400 font-bold uppercase tracking-widest">Envío</span>
                         <span className="text-green-500 font-black">GRATIS</span>
                     </div>
-                    <div className="flex justify-between text-xs">
-                        <span className="text-gray-400 font-bold uppercase tracking-widest">Impuestos (21%)</span>
-                        <span className="text-white font-black">€{tax.toFixed(2)}</span>
-                    </div>
+                    {tax > 0 && (
+                        <div className="flex justify-between text-xs">
+                            <span className="text-gray-400 font-bold uppercase tracking-widest">Impuestos (21%)</span>
+                            <span className="text-white font-black">€{tax.toFixed(2)}</span>
+                        </div>
+                    )}
                     <div className="border-t border-white/5 pt-3 flex justify-between items-baseline">
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">TOTAL</span>
                         <span className="text-3xl font-black text-white">€{total.toFixed(2)}</span>

@@ -298,10 +298,10 @@
                         </td>
                         <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->impuestos, 2, ',', '.') }} €</td>
                     </tr>
-                    @elseif($tipo_factura === 'partida')
+                    @elseif($tipo_factura === 'partida' || $tipo_factura === 'hydra')
                     <tr>
                         <td class="text-sm text-gray" style="padding: 6px 0;">IVA</td>
-                        <td class="text-sm text-light text-right" style="padding: 6px 0;">N/A (Moneda virtual)</td>
+                        <td class="text-sm text-light text-right" style="padding: 6px 0;">N/A (Exento)</td>
                     </tr>
                     @else
                     <tr>
