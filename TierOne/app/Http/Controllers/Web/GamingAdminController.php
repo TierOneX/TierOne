@@ -22,7 +22,7 @@ class GamingAdminController extends Controller
         $search = trim((string) $request->input('search', ''));
         $incidenciasSort = $request->input('incidencias_sort', 'newest') === 'oldest' ? 'oldest' : 'newest';
 
-        $torneos = Torneo::with(['juego:id,nombre', 'organizador:id,username'])
+        $torneos = Torneo::with(['juego:id,nombre,imagen_url', 'organizador:id,username'])
             ->withCount('inscripciones')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
@@ -74,7 +74,16 @@ class GamingAdminController extends Controller
             ->take(60)
             ->get();
 
-        $juegos = Juego::query()
+        $juegosFull = Juego::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('nombre', 'like', "%{$search}%")
+                    ->orWhere('categoria', 'like', "%{$search}%");
+            })
+            ->latest('id')
+            ->take(60)
+            ->get();
+
+        $juegosSimple = Juego::query()
             ->select('id', 'nombre')
             ->where('activo', true)
             ->orderBy('nombre')
@@ -86,7 +95,8 @@ class GamingAdminController extends Controller
                 'search' => $search,
                 'incidencias_sort' => $incidenciasSort,
             ],
-            'juegos' => $juegos,
+            'juegos' => $juegosSimple,
+            'juegosFull' => $juegosFull,
             'torneos' => $torneos,
             'partidas' => $partidas,
             'incidencias' => $incidencias,
@@ -201,6 +211,55 @@ class GamingAdminController extends Controller
         $user->update($data);
 
         return back()->with('success', 'Cuenta actualizada correctamente.');
+    }
+
+    public function storeJuego(Request $request)
+    {
+        $this->authorizeAdmin($request);
+
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:juegos,slug',
+            'descripcion' => 'nullable|string',
+            'imagen_url' => 'nullable|string|max:1000',
+            'categoria' => 'required|string|max:255',
+            'activo' => 'required|boolean',
+        ]);
+
+        Juego::create($data);
+
+        return back()->with('success', 'Juego creado correctamente.');
+    }
+
+    public function updateJuego(Request $request, Juego $juego)
+    {
+        $this->authorizeAdmin($request);
+
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:255', Rule::unique('juegos', 'slug')->ignore($juego->id)],
+            'descripcion' => 'nullable|string',
+            'imagen_url' => 'nullable|string|max:1000',
+            'categoria' => 'required|string|max:255',
+            'activo' => 'required|boolean',
+        ]);
+
+        $juego->update($data);
+
+        return back()->with('success', 'Juego actualizado correctamente.');
+    }
+
+    public function destroyJuego(Request $request, Juego $juego)
+    {
+        $this->authorizeAdmin($request);
+        
+        if ($juego->torneos()->exists() || $juego->partidas()->exists()) {
+            return back()->with('error', 'No se puede eliminar el juego porque tiene torneos o partidas asociados.');
+        }
+
+        $juego->delete();
+
+        return back()->with('success', 'Juego eliminado correctamente.');
     }
 
     private function authorizeAdmin(Request $request): void

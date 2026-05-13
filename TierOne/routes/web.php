@@ -75,6 +75,9 @@ Route::middleware('auth')->prefix('paneladmingaming')->name('panel.gaming.')->gr
     Route::post('/torneos', [GamingAdminController::class, 'storeTorneo'])->name('torneos.store');
     Route::put('/torneos/{torneo}', [GamingAdminController::class, 'updateTorneo'])->name('torneos.update');
     Route::delete('/torneos/{torneo}', [GamingAdminController::class, 'destroyTorneo'])->name('torneos.destroy');
+    Route::post('/juegos', [GamingAdminController::class, 'storeJuego'])->name('juegos.store');
+    Route::put('/juegos/{juego}', [GamingAdminController::class, 'updateJuego'])->name('juegos.update');
+    Route::delete('/juegos/{juego}', [GamingAdminController::class, 'destroyJuego'])->name('juegos.destroy');
     Route::put('/partidas/{partida}', [GamingAdminController::class, 'updatePartida'])->name('partidas.update');
     Route::delete('/partidas/{partida}', [GamingAdminController::class, 'destroyPartida'])->name('partidas.destroy');
     Route::put('/incidencias/{reporte}', [GamingAdminController::class, 'updateIncidencia'])->name('incidencias.update');
