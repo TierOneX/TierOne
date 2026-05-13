@@ -22,8 +22,13 @@ export default function Sidebar({
                 href={route("panel.ecommerce.dashboard")}
                 className="logo-sidebar group"
             >
-                <span className="group-hover:opacity-80 transition-opacity uppercase tracking-[0.2em] font-black text-white">
-                    TIERONE
+                <img 
+                    src="/images/Logo.png" 
+                    alt="TierOne Logo" 
+                    className="logo-img group-hover:scale-110 transition-transform duration-300" 
+                />
+                <span className="group-hover:opacity-80 transition-opacity">
+                    TIER<b>ONE</b>
                 </span>
             </Link>
 
@@ -40,12 +45,12 @@ export default function Sidebar({
                             <Link
                                 key={idx}
                                 href={item.link || "#"}
-                                className={`nav-item ${activeItem === item.label ? "active" : ""}`}
+                                className={`nav-item group/item ${activeItem === item.label ? "active" : ""}`}
                             >
-                                <span className="icon">
+                                <span className="icon group-hover/item:text-red-500 group-hover/item:drop-shadow-[0_0_8px_rgba(225,6,0,0.5)] transition-all">
                                     {renderIcon(item.icon)}
                                 </span>
-                                <span>{item.label}</span>
+                                <span className="font-semibold text-sm">{item.label}</span>
                                 {item.badge && (
                                     <span className="badge">{item.badge}</span>
                                 )}

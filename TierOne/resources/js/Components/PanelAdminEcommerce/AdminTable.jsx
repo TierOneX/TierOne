@@ -29,11 +29,11 @@ export default function AdminTable({
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-[#141414] rounded-xl shadow-2xl border border-white/5 overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-gray-50/50 border-b border-gray-100">
+                        <tr className="bg-[#0B0B0B] border-b border-white/5">
                             {columns.map((col, idx) => (
                                 <th
                                     key={idx}
@@ -53,7 +53,7 @@ export default function AdminTable({
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-white/5">
                         {data.length === 0 ? (
                             <tr>
                                 <td colSpan={columns.length} className="px-6 py-12 text-center">

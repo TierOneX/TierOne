@@ -105,6 +105,43 @@ Route::get('/cart', function () {
 })->name('cart');
 
 // =========================================================================
+// LEGAL ROUTES
+// =========================================================================
+
+Route::get('/terms', function () {
+    return Inertia::render('Legal/Terms');
+})->name('legal.terms');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Legal/Privacy');
+})->name('legal.privacy');
+
+Route::get('/cookies', function () {
+    return Inertia::render('Legal/Cookies');
+})->name('legal.cookies');
+
+Route::get('/shipping', function () {
+    return Inertia::render('Legal/Shipping');
+})->name('legal.shipping');
+
+Route::get('/contact', function () {
+    return Inertia::render('Legal/Contact');
+})->name('legal.contact');
+
+Route::get('/help', function () {
+    return Inertia::render('Legal/Help');
+})->name('legal.help');
+
+// =========================================================================
+// CUSTOMIZATION ROUTES (USUARIO)
+// =========================================================================
+
+Route::get('/shop/{slug}/personalizar', [App\Http\Controllers\Web\CustomizationController::class, 'editor'])->name('product.customize');
+Route::post('/customization/upload-image', [App\Http\Controllers\Web\CustomizationController::class, 'uploadImage'])->name('customization.upload');
+Route::post('/customization/save-render', [App\Http\Controllers\Web\CustomizationController::class, 'saveRender'])->name('customization.saveRender');
+Route::post('/customization/calcular-precio', [App\Http\Controllers\Web\CustomizationController::class, 'calcularPrecio'])->name('customization.calcularPrecio');
+
+// =========================================================================
 // ADMIN PANEL ROUTES
 // =========================================================================
 
@@ -137,6 +174,14 @@ Route::prefix('panel-admin-ecommerce')->name('panel.ecommerce.')->group(function
     // Reviews
     Route::get('/reviews', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Zonas de personalización
+    Route::get('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'index'])->name('products.zonas');
+    Route::post('/products/{producto}/zonas', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'store'])->name('products.zonas.store');
+    Route::post('/products/{producto}/zonas/sync', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'bulkSync'])->name('products.zonas.sync');
+    Route::put('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'update'])->name('zonas.update');
+    Route::delete('/zonas/{zona}', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'destroy'])->name('zonas.destroy');
+    Route::put('/products/{producto}/precios-personalizacion', [App\Http\Controllers\Web\ZonaPersonalizacionController::class, 'updatePrecios'])->name('products.precios');
 });
 
 // =========================================================================
@@ -148,6 +193,7 @@ Route::post('/stripe/create-intent', [StripeController::class, 'crearPaymentInte
 Route::post('/stripe/create-intent-torneo', [StripeController::class, 'crearPaymentIntentTorneo'])->name('stripe.create-intent-torneo');
 Route::post('/stripe/confirm', [StripeController::class, 'confirmarPago'])->name('stripe.confirm');
 Route::get('/stripe/orden/{orderId}', [StripeController::class, 'obtenerOrden'])->name('stripe.orden');
+Route::get('/pedido/{orden}/factura', [\App\Http\Controllers\Web\OrderController::class, 'downloadInvoice'])->name('order.invoice');
 
 Route::get('/checkout', function () {
     return Inertia::render('Checkout', [
@@ -165,6 +211,16 @@ Route::get('/tournaments/{torneo}/checkout', function (\App\Models\Torneo $torne
 Route::get('/checkout/success', function () {
     return Inertia::render('CheckoutSuccess');
 })->name('checkout.success');
+
+// =========================================================================
+// COMMUNITY ROUTES
+// =========================================================================
+
+Route::get('/community', [App\Http\Controllers\Web\GameCommunityController::class, 'index'])
+    ->name('community.index');
+
+Route::get('/community/{slug}', [App\Http\Controllers\Web\GameCommunityController::class, 'show'])
+    ->name('community.show');
 
 // =========================================================================
 // AUTH & PROFILE ROUTES

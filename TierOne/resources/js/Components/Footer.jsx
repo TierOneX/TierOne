@@ -17,6 +17,7 @@ export default function Footer() {
         { name: 'Envíos y Devoluciones', href: '/shipping' },
         { name: 'Términos de Servicio', href: '/terms' },
         { name: 'Política de Privacidad', href: '/privacy' },
+        { name: 'Política de Cookies', href: '/cookies' },
     ];
 
     const socialLinks = [
@@ -239,6 +240,7 @@ export default function Footer() {
                             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
                                 <Link href="/terms" className="text-[11px] text-gray-600 hover:text-white transition-colors">Términos</Link>
                                 <Link href="/privacy" className="text-[11px] text-gray-600 hover:text-white transition-colors">Privacidad</Link>
+                                <Link href="/cookies" className="text-[11px] text-gray-600 hover:text-white transition-colors">Cookies</Link>
                                 <Link href="/contact" className="text-[11px] text-gray-600 hover:text-white transition-colors">Contacto</Link>
                             </div>
                             <div className="flex justify-center">

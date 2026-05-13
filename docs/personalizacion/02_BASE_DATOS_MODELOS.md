@@ -74,7 +74,19 @@ return new class extends Migration {
 
 **Archivo**: `TierOne/TierOne/database/migrations/2026_04_27_100100_create_zonas_personalizacion_table.php`
 
-Define las zonas de impresión configurables por producto.
+Define las zonas configurables por producto. Cada zona representa un área sobre una imagen del producto (una vista: frontal, espalda, manga, etc.).
+
+### Tipos de Zona
+
+| Tipo | Descripción | Visible al cliente |
+|------|-------------|--------------------|
+| `impresion` | Zona donde el cliente puede personalizar (añadir textos, imágenes) | ✅ Sí |
+| `bloqueada` | Zona con un elemento fijo (logo, símbolo) que no se puede cubrir | ❌ No — se excluye del editor del cliente |
+| `baja_visibilidad` | Zona con mala visibilidad (costuras, pliegues) — se puede usar pero con aviso | ⚠️ Sí, con warning visual |
+
+> **Superposición**: Las zonas pueden solaparse entre sí. Ejemplo: una zona de impresión grande con una zona bloqueada pequeña dentro donde hay un logo fijo del producto.
+
+### Campos de la tabla
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
@@ -82,16 +94,28 @@ Define las zonas de impresión configurables por producto.
 | `id_producto` | foreignId → productos | Producto al que pertenece la zona |
 | `nombre` | string | Nombre visible: "Frontal", "Espalda", "Manga Izq." |
 | `slug` | string | Identificador interno: "frontal", "espalda" |
+| `tipo` | string, default `'impresion'` | Tipo de zona: `impresion`, `bloqueada`, `baja_visibilidad` |
 | `imagen_base` | string | Ruta a la imagen del producto en esta vista |
-| `area_x` | integer | Coordenada X del inicio del área imprimible (px) |
-| `area_y` | integer | Coordenada Y del inicio del área imprimible (px) |
-| `area_width` | integer | Ancho del área imprimible (px) |
-| `area_height` | integer | Alto del área imprimible (px) |
-| `canvas_width` | integer, default 600 | Ancho total del canvas |
-| `canvas_height` | integer, default 700 | Alto total del canvas |
+| `area_x` | integer | Coordenada X del inicio del área (px, relativo al canvas) |
+| `area_y` | integer | Coordenada Y del inicio del área (px, relativo al canvas) |
+| `area_width` | integer | Ancho del área (px) |
+| `area_height` | integer | Alto del área (px) |
+| `canvas_width` | integer, default 600 | Ancho total del canvas (auto-calculado) |
+| `canvas_height` | integer, default 700 | Alto total del canvas (auto-calculado) |
 | `orden` | integer, default 0 | Orden de visualización (menor = primero) |
 | `activa` | boolean, default true | Si la zona está activa |
 | `timestamps` | — | created_at, updated_at |
+
+### Canvas Width/Height — Explicación
+
+`canvas_width` y `canvas_height` definen el **sistema de coordenadas virtual** sobre el que se posicionan las zonas. Se calculan **automáticamente** desde las dimensiones reales de la imagen seleccionada:
+
+- Cuando el admin selecciona una imagen del producto, el frontend obtiene sus dimensiones (`naturalWidth` × `naturalHeight`) y las guarda como `canvas_width` × `canvas_height`.
+- Las coordenadas de la zona (`area_x`, `area_y`, `area_width`, `area_height`) son relativas a este canvas.
+- Esto permite que la zona se posicione de forma consistente independientemente del tamaño de pantalla del admin o del cliente.
+- El editor Fabric.js del cliente usa las mismas coordenadas.
+
+> **El usuario admin no necesita introducir estos valores manualmente** — se calculan automáticamente al seleccionar la imagen base.
 
 ```php
 <?php
@@ -108,6 +132,7 @@ return new class extends Migration {
             $table->foreignId('id_producto')->constrained('productos')->onDelete('cascade');
             $table->string('nombre');
             $table->string('slug');
+            $table->string('tipo')->default('impresion'); // impresion | bloqueada | baja_visibilidad
             $table->string('imagen_base');
             $table->integer('area_x')->default(0);
             $table->integer('area_y')->default(0);
@@ -129,6 +154,40 @@ return new class extends Migration {
     }
 };
 ```
+
+---
+
+## 1.2b Migración adicional: Campo `tipo` en `zonas_personalizacion`
+
+**Archivo**: `TierOne/TierOne/database/migrations/2026_04_27_100150_add_tipo_to_zonas_personalizacion.php`
+
+Si la tabla ya existe sin el campo `tipo`, esta migración lo añade:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::table('zonas_personalizacion', function (Blueprint $table) {
+            $table->string('tipo')->default('impresion')->after('slug');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('zonas_personalizacion', function (Blueprint $table) {
+            $table->dropColumn('tipo');
+        });
+    }
+};
+```
+
+> **Nota**: Las zonas existentes recibirán el valor `'impresion'` por defecto, manteniendo compatibilidad.
 
 ---
 
@@ -198,10 +257,18 @@ class ZonaPersonalizacion extends Model
     protected $table = 'zonas_personalizacion';
 
     protected $fillable = [
-        'id_producto', 'nombre', 'slug', 'imagen_base',
+        'id_producto', 'nombre', 'slug', 'tipo', 'imagen_base',
         'area_x', 'area_y', 'area_width', 'area_height',
         'canvas_width', 'canvas_height', 'orden', 'activa',
     ];
+
+    /**
+     * Tipos de zona disponibles.
+     * - impresion: el cliente puede personalizar esta zona
+     * - bloqueada: zona con elemento fijo, excluida del editor del cliente
+     * - baja_visibilidad: se puede personalizar pero se muestra un aviso
+     */
+    const TIPOS = ['impresion', 'bloqueada', 'baja_visibilidad'];
 
     protected $casts = [
         'area_x'        => 'integer',

@@ -26,6 +26,7 @@ class StoreCarritoRequest extends FormRequest
             'id_producto' => 'required|exists:productos,id',
             'id_variante' => 'nullable|exists:variantes_productos,id',
             'cantidad' => 'required|integer|min:1',
+            'personalizacion_data' => 'nullable|array',
         ];
     }
 }

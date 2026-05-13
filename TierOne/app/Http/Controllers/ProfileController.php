@@ -41,7 +41,7 @@ class ProfileController extends Controller
 
         // Historial de compras con items y nombre del producto
         $ordenes = $user->ordenes()
-            ->with(['items.producto:id,nombre,imagen_principal'])
+            ->with(['items.producto:id,nombre,slug,imagen_principal', 'items.variante:id,nombre'])
             ->orderByDesc('fecha_orden')
             ->get(['id', 'numero_orden', 'total', 'estado', 'fecha_orden', 'tracking_number', 'transportista']);
 

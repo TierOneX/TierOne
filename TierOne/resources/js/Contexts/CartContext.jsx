@@ -25,11 +25,24 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('tierone_cart', JSON.stringify(cart));
     }, [cart]);
 
-    const addToCart = (product, variant = null, quantity = 1) => {
+    const addToCart = (product, variant = null, quantity = 1, customization = null) => {
         setCart(prevCart => {
+            // Los productos personalizados siempre son items nuevos (cada diseño es único)
+            if (customization) {
+                return [...prevCart, {
+                    ...product,
+                    variant,
+                    quantity,
+                    customization,
+                    customizationSurcharge: customization.precio_elementos?.total_recargo || 0,
+                    cartId: Math.random().toString(36).substr(2, 9) // ID único para el item del carrito
+                }];
+            }
+
             const existingItemIndex = prevCart.findIndex(item =>
                 item.id === product.id &&
-                JSON.stringify(item.variant) === JSON.stringify(variant)
+                JSON.stringify(item.variant) === JSON.stringify(variant) &&
+                !item.customization
             );
 
             if (existingItemIndex > -1) {
@@ -38,20 +51,23 @@ export const CartProvider = ({ children }) => {
                 return newCart;
             }
 
-            return [...prevCart, { ...product, variant, quantity }];
+            return [...prevCart, { 
+                ...product, 
+                variant, 
+                quantity, 
+                cartId: Math.random().toString(36).substr(2, 9) 
+            }];
         });
     };
 
-    const removeFromCart = (productId, variant = null) => {
-        setCart(prevCart => prevCart.filter(item =>
-            !(item.id === productId && JSON.stringify(item.variant) === JSON.stringify(variant))
-        ));
+    const removeFromCart = (cartId) => {
+        setCart(prevCart => prevCart.filter(item => item.cartId !== cartId));
     };
 
-    const updateQuantity = (productId, variant = null, quantity) => {
+    const updateQuantity = (cartId, quantity) => {
         if (quantity < 1) return;
         setCart(prevCart => prevCart.map(item => {
-            if (item.id === productId && JSON.stringify(item.variant) === JSON.stringify(variant)) {
+            if (item.cartId === cartId) {
                 return { ...item, quantity };
             }
             return item;
@@ -62,7 +78,11 @@ export const CartProvider = ({ children }) => {
 
     const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
-    const subtotal = cart.reduce((total, item) => total + (Number(item.precio_venta) * item.quantity), 0);
+    const subtotal = cart.reduce((total, item) => {
+        const basePrice = Number(item.precio_venta);
+        const surcharge = Number(item.customizationSurcharge || 0);
+        return total + ((basePrice + surcharge) * item.quantity);
+    }, 0);
 
     return (
         <CartContext.Provider value={{

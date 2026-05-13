@@ -8,6 +8,7 @@ import { createRoot } from 'react-dom/client';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 import { CartProvider } from './Contexts/CartContext';
+import CookieConsentBanner from './Components/CookieConsentBanner';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -22,6 +23,7 @@ createInertiaApp({
         root.render(
             <CartProvider>
                 <App {...props} />
+                <CookieConsentBanner />
             </CartProvider>
         );
     },

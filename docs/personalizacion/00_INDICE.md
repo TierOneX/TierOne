@@ -17,12 +17,17 @@ Este documento es el **índice maestro** del sistema de personalización de prod
 | 6 | [Admin: Visualización Pedidos Personalizados](./07_ADMIN_PEDIDOS_PERSONALIZADOS.md) | `07_ADMIN_PEDIDOS_PERSONALIZADOS.md` | Módulos 0, 1, 2, 5 |
 
 ### Reglas para los Agentes
-
 1. **Lee SIEMPRE el Módulo 0 primero** — contiene el contexto técnico del proyecto (stack, estructura de archivos, convenciones).
 2. **Cada módulo es autocontenido** — incluye todo el código necesario, rutas de archivo exactas, y contratos de entrada/salida.
 3. **No modifiques código fuera del alcance del módulo** — si un módulo dice "modificar X", solo modifica X.
 4. **Verifica al final de cada módulo** — cada módulo incluye una sección de verificación con comandos exactos.
 5. **Si algo falla, vuelve al checkpoint del módulo anterior** — los módulos son puntos de respawn.
+
+### Principios Arquitectónicos Clave
+1. **Arquitectura Bunker**: Fondo real (`<img>`) + Canvas transparente para evitar desplazamientos de Fabric.js.
+2. **Snapshot de Coordenadas**: Los pedidos guardan copia de las zonas para inmutabilidad histórica.
+3. **Persistencia Automática**: Los diseños se renderizan a PNG físico durante el Checkout.
+4. **Activos de Alta Resolución**: Se conservan los archivos originales subidos por el usuario para impresión profesional.
 
 ### Orden de Ejecución Recomendado
 

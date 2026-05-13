@@ -142,15 +142,26 @@
                     FACTURADO A
                 </div>
                 <div class="bold text-white text-md pb-5">
+<<<<<<< HEAD
                     {{ $cliente_nombre }}
+=======
+                    {{ $orden->direccionEnvio?->nombre_completo ?? $orden->usuario?->nombre }}
+>>>>>>> origin/dev
                 </div>
                 <div class="text-sm text-gray" style="line-height: 1.7;">
                     @if($orden->direccionEnvio && $orden->id_direccion_envio != 1)
                         {{ $orden->direccionEnvio->direccion_linea1 }}<br>
                         {{ $orden->direccionEnvio->codigo_postal }}, {{ $orden->direccionEnvio->ciudad }}<br>
-                        {{ $orden->direccionEnvio->pais }}
+                        {{ $orden->direccionEnvio->pais }}<br>
+                        @if($orden->direccionEnvio->telefono)
+                            Tel: {{ $orden->direccionEnvio->telefono }}
+                        @endif
                     @else
                         {{ $orden->usuario->email }}
+                    @endif
+                    {{-- Placeholder para NIF/CIF si se añade a la BD --}}
+                    @if(isset($orden->usuario->dni_cif))
+                        <br>NIF/CIF: {{ $orden->usuario->dni_cif }}
                     @endif
                 </div>
             </td>
@@ -211,27 +222,37 @@
         @foreach($items_procesados as $index => $item)
         <tr>
             <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                <table>
+                <table style="width: 100%;">
                     <tr>
                         @if(!empty($item['imagen_base64']))
-                        <td style="width: 40px; padding-right: 10px;">
-                            <img src="{{ $item['imagen_base64'] }}" width="40" height="40" style="border-radius: 4px; object-cover: fit;">
+                        <td style="width: 50px; padding-right: 12px;">
+                            <img src="{{ $item['imagen_base64'] }}" width="50" height="50" style="border-radius: 4px; object-fit: cover; border: 1px solid #333; background-color: #1a1a1a;">
                         </td>
                         @endif
-                        <td>
-                            <span class="bold text-white">{{ $item['nombre'] }}</span>
+                        <td style="vertical-align: middle;">
+                            <div class="bold text-white">{{ $item['nombre'] }}</div>
+                            
+                            @if(!empty($item['variante_nombre']))
+                                <div class="text-xs text-gray" style="margin-top: 4px;">Opción: {{ $item['variante_nombre'] }}</div>
+                            @endif
+
+                            @if(!empty($item['es_personalizado']))
+                                <div class="text-xs text-red bold" style="margin-top: 4px;">
+                                    <span style="border: 1px solid #E10600; padding: 1px 4px; border-radius: 2px; font-size: 8px;">PERSONALIZADO</span>
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 </table>
             </td>
-            <td class="text-right text-light" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
+            <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}" class="text-right text-sm text-white">
                 {{ $item['cantidad'] }}
             </td>
-            <td class="text-right text-light" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
+            <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}" class="text-right text-sm text-gray">
                 {{ number_format($item['precio_unitario'], 2, ',', '.') }} €
             </td>
-            <td class="text-right text-white bold" style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}">
-                {{ number_format($item['cantidad'] * $item['precio_unitario'], 2, ',', '.') }} €
+            <td style="padding: 12px 14px; border-bottom: 1px solid #1e1e1e; {{ $index % 2 === 0 ? '' : 'background-color: #111111;' }}" class="text-right text-sm text-white bold">
+                {{ number_format($item['subtotal'], 2, ',', '.') }} €
             </td>
         </tr>
         @endforeach
@@ -253,7 +274,9 @@
                         <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->subtotal, 2, ',', '.') }} €</td>
                     </tr>
                     <tr>
-                        <td class="text-sm text-gray" style="padding: 6px 0;">IVA (21%)</td>
+                        <td class="text-sm text-gray" style="padding: 6px 0;">
+                            IVA @if($orden->subtotal > 0) ({{ round(($orden->impuestos / $orden->subtotal) * 100) }}%) @endif
+                        </td>
                         <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->impuestos, 2, ',', '.') }} €</td>
                     </tr>
                     @if($orden->costo_envio > 0)

@@ -10,13 +10,14 @@ use Throwable;
 class TwitchAuthService
 {
     /**
-     * Returns a valid app access token from cache or Twitch OAuth.
+     * Obtener un token válido (de caché o generando uno nuevo).
+     * TTL: 55 días (el token dura 60, renovamos con margen).
      */
     public function getAccessToken(): string
     {
         $token = Cache::get('twitch:access_token');
 
-        if ($token && ! in_array($token, ['MISSING_TWITCH_CREDENTIALS', 'TWITCH_AUTH_ERROR'], true)) {
+        if ($token && !in_array($token, ['MISSING_TWITCH_CREDENTIALS', 'TWITCH_AUTH_ERROR'], true)) {
             return $token;
         }
 
@@ -64,7 +65,7 @@ class TwitchAuthService
     }
 
     /**
-     * Shared headers for Twitch API calls.
+     * Headers comunes para todas las llamadas a IGDB y Twitch Helix.
      */
     public function getHeaders(): array
     {
@@ -74,10 +75,12 @@ class TwitchAuthService
         ];
     }
 
+    /**
+     * Forzar renovación del token (si caduca antes de tiempo).
+     */
     public function refreshToken(): string
     {
         Cache::forget('twitch:access_token');
-
         return $this->getAccessToken();
     }
 }
