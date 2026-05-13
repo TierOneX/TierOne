@@ -77,7 +77,10 @@ export default function Transacciones({ transacciones, filters = {} }) {
     };
 
     const renderRow = (t) => (
-        <tr key={t.id} className="hover:bg-gray-50 transition-colors">
+        <tr
+            key={t.id}
+            className="transition-colors border-b border-white/5 hover:bg-white/5"
+        >
             <td className="px-6 py-4 text-sm font-medium text-gray-900">
                 <div className="flex items-center gap-2">
                     <User size={14} className="text-gray-400" />

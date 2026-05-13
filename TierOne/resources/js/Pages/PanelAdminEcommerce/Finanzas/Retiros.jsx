@@ -105,7 +105,7 @@ export default function Retiros({ retiros, filters = {}, admins = [] }) {
     const renderRow = (retiro) => (
         <tr
             key={retiro.id}
-            className="hover:bg-gray-50 transition-colors group cursor-pointer"
+            className="transition-colors group cursor-pointer border-b border-white/5 hover:bg-white/5"
             onClick={() => openDetails(retiro, true)}
         >
             <td className="px-6 py-4">

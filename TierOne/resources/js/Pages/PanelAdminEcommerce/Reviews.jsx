@@ -73,7 +73,10 @@ export default function Reviews({ reviews, filters = {} }) {
     };
 
     const renderRow = (r) => (
-        <tr key={r.id} className="hover:bg-gray-50 transition-colors group">
+        <tr
+            key={r.id}
+            className="transition-colors group border-b border-white/5 hover:bg-white/5"
+        >
             <td className="px-6 py-4">
                 <div className="text-sm font-bold text-gray-900 flex items-center gap-2">
                     <Package size={14} className="text-gray-400" />

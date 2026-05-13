@@ -73,7 +73,10 @@ export default function Pagos({ pagos, filters = {} }) {
     };
 
     const renderRow = (pago) => (
-        <tr key={pago.id} className="hover:bg-gray-50 transition-colors">
+        <tr
+            key={pago.id}
+            className="transition-colors border-b border-white/5 hover:bg-white/5"
+        >
             <td className="px-6 py-4 font-mono text-xs text-gray-500">
                 <div className="flex items-center gap-2">
                     <Hash size={12} className="text-gray-300" />
