@@ -27,9 +27,11 @@ export default function TournamentCheckout({ torneo, stripeKey }) {
     useEffect(() => {
         fetch('/stripe/create-intent-torneo', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             },
             body: JSON.stringify({ id_torneo: torneo.id }),

@@ -33,9 +33,11 @@ export default function CheckoutSuccess() {
             // ✅ Notificamos al backend para que verifique el PI y marque la orden como pagada
             fetch('/stripe/confirm', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                    'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({ payment_intent_id: paymentIntent }),

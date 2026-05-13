@@ -26,9 +26,11 @@ export default function HydraCheckout({ pack, stripeKey }) {
     useEffect(() => {
         fetch('/stripe/create-intent-hydra', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             },
             body: JSON.stringify({ 

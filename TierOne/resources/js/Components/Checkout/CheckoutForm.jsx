@@ -48,9 +48,11 @@ export default function CheckoutForm({ orderId, numeroOrden, total, onSuccess })
             try {
                 const res = await fetch('/stripe/confirm', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                     },
                     body: JSON.stringify({ payment_intent_id: paymentIntent.id }),
