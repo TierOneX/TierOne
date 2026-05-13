@@ -6,6 +6,7 @@ Bienvenido al centro de documentación unificado de **TierOne**. Este hub consol
 - [🚀 Decisiones Técnicas](./01_ARCHITECTURE/DECISIONES_TECNICAS.md): Justificación del stack y patrones.
 - [🔄 Flujos de Negocio](./01_ARCHITECTURE/FLUJOS_NEGOCIO.md): Diagramas de secuencia (Pagos, Torneos).
 - [👁️ Visión del Proyecto](./01_ARCHITECTURE/VISION_PROYECTO.md): Objetivos y alcance.
+- [🏗️ Estructura Real (Producción)](./01_ARCHITECTURE/ESTRUCTURA_REAL.md): Diferencias entre desarrollo y entorno real.
 
 ## 📂 02. Backend (Laravel Core)
 - [🎮 Controladores y Métodos](./02_BACKEND/CONTROLADORES.md): Definición de toda la lógica de control.

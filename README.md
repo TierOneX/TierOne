@@ -54,6 +54,7 @@ Navega por nuestro [Hub de Documentación](docs/README.md) para acceder a inform
 - 🗄️ **Base de Datos**: [Diagramas ER y Plan de Implementación](docs/database/)
 - 🔌 **API**: [Contratos y Endpoints](docs/api/)
 - 📊 **Arquitectura**: [Diagramas de Flujo Mermaid](docs/diagrams/)
+- 🏗️ **Producción**: [Estructura del Entorno Real](docs/01_ARCHITECTURE/ESTRUCTURA_REAL.md)
 - 🎤 **Proyecto**: [Presentación y Visión General](docs/presentations/proyecto-completo.md)
 
 ---

@@ -64,6 +64,7 @@ class StripeController extends Controller
 
             // --- Calcular montos desde la BD (nunca fiarnos del frontend) ---
             $subtotal = 0;
+            $impuestos = 0;
             $itemsData = [];
 
             foreach ($validated['items'] as $itemReq) {
@@ -89,6 +90,12 @@ class StripeController extends Controller
                 $lineSubtotal = round(($precio + $recargo) * $itemReq['cantidad'], 2);
                 $subtotal += $lineSubtotal;
 
+                // IVA: Hydra Coins no tienen IVA (0%), el resto 21%
+                $isHydra = str_contains(strtolower($producto->nombre), 'hydra');
+                if (!$isHydra) {
+                    $impuestos += round($lineSubtotal * 0.21, 2);
+                }
+
                 $itemsData[] = [
                     'id_producto' => $producto->id,
                     'id_variante' => $itemReq['id_variante'] ?? null,
@@ -100,8 +107,6 @@ class StripeController extends Controller
                 ];
             }
 
-            $taxRate = 0.21;
-            $impuestos = round($subtotal * $taxRate, 2);
             $costoEnvio = 0.00;
             $descuento = 0.00;
             $total = round($subtotal + $impuestos + $costoEnvio - $descuento, 2);
@@ -240,7 +245,7 @@ class StripeController extends Controller
 
                 $orden = Orden::create([
                     'id_usuario' => $user->id,
-                    'id_direccion_envio' => $direccion->id ?? 1, // Fallback to 1 ONLY if no address exists
+                    'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                     'numero_orden' => $numeroOrden,
                     'subtotal' => $subtotal,
                     'impuestos' => $impuestos,
@@ -319,9 +324,9 @@ class StripeController extends Controller
 
             $user = Auth::user();
             $total = (float) $validated['price'];
-            $taxRate = 0.21;
-            $subtotal = round($total / (1 + $taxRate), 2);
-            $impuestos = round($total - $subtotal, 2);
+            $taxRate = 0.00; // Hydra Coins sin IVA
+            $subtotal = $total;
+            $impuestos = 0.00;
 
             $amountCents = (int)round($total * 100);
 
@@ -336,7 +341,7 @@ class StripeController extends Controller
 
                 $orden = Orden::create([
                     'id_usuario' => $user->id,
-                    'id_direccion_envio' => $direccion->id ?? 1,
+                    'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                     'numero_orden' => $numeroOrden,
                     'subtotal' => $subtotal,
                     'impuestos' => $impuestos,
@@ -671,7 +676,7 @@ class StripeController extends Controller
 
             $orden = Orden::create([
                 'id_usuario' => $userId,
-                'id_direccion_envio' => 1, // No aplica para digital (usamos placeholder)
+                'id_direccion_envio' => null, // Digital purchase: no shipping address needed
                 'numero_orden' => $numeroOrden,
                 'subtotal' => $subtotal,
                 'impuestos' => $impuestos,

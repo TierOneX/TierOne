@@ -1,16 +1,30 @@
 import { Head, usePage } from "@inertiajs/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import TournamentsHero from "@/Components/Tournaments/TournamentsHero";
 import TournamentsGameGrid from "@/Components/Tournaments/TournamentsGameGrid";
 import TournamentsDrawer from "@/Components/Tournaments/TournamentsDrawer";
+import MyTournamentsSection from "@/Components/Tournaments/MyTournamentsSection";
 import SponsorTriangle from "@/Components/SponsorTriangle";
 
-export default function Tournaments({ juegos = [], categorias = [] }) {
+export default function Tournaments({ juegos = [], categorias = [], myTournaments = [] }) {
     const { auth } = usePage().props;
     const [searchTerm, setSearchTerm] = useState("");
     const [activeCategory, setActiveCategory] = useState("TODOS");
     const [selectedGameId, setSelectedGameId] = useState(null);
+
+    useEffect(() => {
+        const tournamentId = new URLSearchParams(window.location.search).get("torneo");
+        if (!tournamentId) return;
+
+        const gameWithTournament = juegos.find((game) =>
+            game.torneos?.some((torneo) => String(torneo.id) === tournamentId),
+        );
+
+        if (gameWithTournament) {
+            setSelectedGameId(gameWithTournament.id);
+        }
+    }, [juegos]);
 
     const filteredGames = useMemo(() => {
         return juegos.filter((game) => {
@@ -56,6 +70,14 @@ export default function Tournaments({ juegos = [], categorias = [] }) {
                 onSelectGame={(game) => setSelectedGameId(game.id)}
                 isAdmin={auth?.user?.rol === "admin"}
             />
+
+            <div className="border-b border-white/5">
+                <MyTournamentsSection
+                    tournaments={myTournaments}
+                    isAuthenticated={Boolean(auth?.user)}
+                    onOpenTournament={(gameId) => setSelectedGameId(gameId)}
+                />
+            </div>
 
             <TournamentsGameGrid
                 games={filteredGames}
