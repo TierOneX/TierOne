@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "@inertiajs/react";
+import { igdbImageUrl } from "@/Utils/igdb";
 
 /**
  * Carrusel de juegos:
@@ -59,6 +60,12 @@ export default function GamesCarousel({ games }) {
     if (!games || games.length === 0) return null;
 
     const juego = games[current];
+
+    // Función para obtener la mejor imagen disponible
+    const getGameImage = (g) => {
+        if (g.cover_image_id) return igdbImageUrl(g.cover_image_id, 't_cover_big');
+        return g.imagen_url;
+    };
 
     return (
         <section
@@ -195,9 +202,9 @@ export default function GamesCarousel({ games }) {
                                 className="relative h-[160px] overflow-hidden"
                                 style={{ background: "#ffffff" }}
                             >
-                                {juego.imagen_url && !imgErrors[juego.id] ? (
+                                {getGameImage(juego) && !imgErrors[juego.id] ? (
                                     <img
-                                        src={juego.imagen_url}
+                                        src={getGameImage(juego)}
                                         alt={juego.nombre}
                                         className="absolute inset-0 w-full h-full object-contain object-center"
                                         onError={() => handleImgError(juego.id)}
@@ -292,6 +299,11 @@ export default function GamesCarousel({ games }) {
 
 /* Card para DESKTOP — scroll horizontal */
 function DesktopCard({ juego, imgErrors, onImgError }) {
+    const getGameImage = (g) => {
+        if (g.cover_image_id) return igdbImageUrl(g.cover_image_id, 't_cover_big');
+        return g.imagen_url;
+    };
+
     return (
         <Link
             href={`/games/${juego.slug}`}
@@ -302,9 +314,9 @@ function DesktopCard({ juego, imgErrors, onImgError }) {
                 className="relative h-[200px] lg:h-[220px] overflow-hidden"
                 style={{ background: "#ffffff" }}
             >
-                {juego.imagen_url && !imgErrors[juego.id] ? (
+                {getGameImage(juego) && !imgErrors[juego.id] ? (
                     <img
-                        src={juego.imagen_url}
+                        src={getGameImage(juego)}
                         alt={juego.nombre}
                         className="absolute inset-0 w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
                         onError={() => onImgError(juego.id)}
