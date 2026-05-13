@@ -1,4 +1,6 @@
 import { Link } from '@inertiajs/react';
+import { useCart } from '@/Contexts/CartContext';
+import { ShoppingCart } from 'lucide-react';
 
 const HYDRA_PACKS = [
     {
@@ -40,6 +42,18 @@ const HYDRA_PACKS = [
 ];
 
 export default function HydraPacks() {
+    const { addToCart } = useCart();
+
+    const handleAddToCart = (pack) => {
+        addToCart({
+            id: `hydra-${pack.id}`,
+            pack_id: pack.id,
+            nombre: `Pack ${pack.name}: ${pack.hc.toLocaleString()} Hydra Coins`,
+            precio_venta: pack.price,
+            hc_amount: pack.hc,
+            imagen_principal: '/assets/hydra-coin.png'
+        }, null, 1, null, 'hydra');
+    };
     return (
         <section className="relative bg-[#050505] px-4 py-24 sm:px-6 lg:px-8 overflow-hidden">
             {/* Background elements */}
@@ -104,15 +118,25 @@ export default function HydraPacks() {
                                         <span className="text-xs text-red-600 ml-2 not-italic tracking-[0.2em] uppercase">HC</span>
                                     </h3>
                                     
-                                    <Link 
-                                        href={route('hydra.checkout', pack.id)}
-                                        className="group/btn relative flex items-center justify-center w-full h-16 overflow-hidden rounded-[20px] bg-white text-black transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        <div className="absolute inset-0 bg-red-600 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
-                                        <span className="relative z-10 text-sm font-black uppercase tracking-widest group-hover/btn:text-white transition-colors">
-                                            Comprar por €{pack.price}
-                                        </span>
-                                    </Link>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleAddToCart(pack)}
+                                            className="flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+                                            title="Añadir al carrito"
+                                        >
+                                            <ShoppingCart className="h-5 w-5" />
+                                        </button>
+                                        <Link 
+                                            href={route('hydra.checkout', pack.id)}
+                                            className="group/btn relative flex-1 flex items-center justify-center h-16 overflow-hidden rounded-[20px] bg-white text-black transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                        >
+                                            <div className="absolute inset-0 bg-red-600 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
+                                            <span className="relative z-10 text-xs font-black uppercase tracking-widest group-hover/btn:text-white transition-colors">
+                                                Comprar €{pack.price}
+                                            </span>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>

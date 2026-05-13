@@ -72,6 +72,20 @@
             border-bottom: 1px solid #282828;
             margin-bottom: 20px;
         }
+
+        /* Badge de tipo de factura */
+        .tipo-badge {
+            display: inline-block;
+            background-color: #1a0505;
+            border: 1px solid #E10600;
+            color: #E10600;
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -105,7 +119,7 @@
                     </tr>
                 </table>
             </td>
-            <td style="width: 50%;" class="text-right text-sm text-gray" style="line-height: 1.6;">
+            <td style="width: 50%; text-align: right;" class="text-sm text-gray">
                 <span class="bold text-white text-md">{{ $empresa['nombre'] }}</span><br>
                 CIF: {{ $empresa['cif'] }}<br>
                 {{ $empresa['direccion'] }}<br>
@@ -124,6 +138,7 @@
         <tr>
             <td>
                 <span class="text-xl bold italic text-white" style="letter-spacing: 1px;">FACTURA</span>
+                <span class="tipo-badge">{{ $etiqueta_tipo }}</span>
             </td>
             <td class="text-right text-sm text-gray">
                 Nº Factura: <span class="bold text-red text-md">{{ $orden->numero_orden }}</span>
@@ -145,7 +160,7 @@
                     {{ $cliente_nombre }}
                 </div>
                 <div class="text-sm text-gray" style="line-height: 1.7;">
-                    @if($orden->direccionEnvio && $orden->id_direccion_envio != 1)
+                    @if($orden->direccionEnvio && $orden->id_direccion_envio)
                         {{ $orden->direccionEnvio->direccion_linea1 }}<br>
                         {{ $orden->direccionEnvio->codigo_postal }}, {{ $orden->direccionEnvio->ciudad }}<br>
                         {{ $orden->direccionEnvio->pais }}<br>
@@ -153,10 +168,13 @@
                             Tel: {{ $orden->direccionEnvio->telefono }}
                         @endif
                     @else
-                        {{ $orden->usuario->email }}
+                        {{ $orden->usuario->email ?? '' }}
+                        @if($tipo_factura !== 'merchandising')
+                            <br><span class="text-xs italic text-gray">Producto digital — sin envío</span>
+                        @endif
                     @endif
-                    {{-- Placeholder para NIF/CIF si se añade a la BD --}}
-                    @if(isset($orden->usuario->dni_cif))
+                    {{-- NIF/CIF del cliente --}}
+                    @if(isset($orden->usuario->dni_cif) && $orden->usuario->dni_cif)
                         <br>NIF/CIF: {{ $orden->usuario->dni_cif }}
                     @endif
                 </div>
@@ -182,6 +200,10 @@
                                 {{ strtoupper($orden->estado) }}
                             </span>
                         </td>
+                    </tr>
+                    <tr>
+                        <td class="text-sm text-gray pb-5">Tipo:</td>
+                        <td class="text-sm text-white pb-5">{{ $etiqueta_tipo }}</td>
                     </tr>
                     @if($orden->tracking_number)
                     <tr>
@@ -269,12 +291,24 @@
                         <td class="text-sm text-gray" style="padding: 6px 0;">Subtotal</td>
                         <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->subtotal, 2, ',', '.') }} €</td>
                     </tr>
+                    @if($orden->impuestos > 0)
                     <tr>
                         <td class="text-sm text-gray" style="padding: 6px 0;">
                             IVA @if($orden->subtotal > 0) ({{ round(($orden->impuestos / $orden->subtotal) * 100) }}%) @endif
                         </td>
                         <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->impuestos, 2, ',', '.') }} €</td>
                     </tr>
+                    @elseif($tipo_factura === 'partida')
+                    <tr>
+                        <td class="text-sm text-gray" style="padding: 6px 0;">IVA</td>
+                        <td class="text-sm text-light text-right" style="padding: 6px 0;">N/A (Moneda virtual)</td>
+                    </tr>
+                    @else
+                    <tr>
+                        <td class="text-sm text-gray" style="padding: 6px 0;">IVA</td>
+                        <td class="text-sm text-light text-right" style="padding: 6px 0;">{{ number_format($orden->impuestos, 2, ',', '.') }} €</td>
+                    </tr>
+                    @endif
                     @if($orden->costo_envio > 0)
                     <tr>
                         <td class="text-sm text-gray" style="padding: 6px 0;">Envío</td>

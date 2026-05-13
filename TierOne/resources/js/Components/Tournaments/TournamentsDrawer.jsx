@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { useCart } from '@/Contexts/CartContext';
+import { ShoppingCart } from 'lucide-react';
 
 const currency = new Intl.NumberFormat('es-ES', {
     style: 'currency',
@@ -25,6 +27,18 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
     const [isPanelVisible, setIsPanelVisible] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const joinForm = useForm({});
+    const { addToCart } = useCart();
+
+    const handleAddToCart = (torneo) => {
+        addToCart({
+            id: `torneo-${torneo.id}`,
+            nombre: `Inscripción: ${torneo.nombre}`,
+            precio_venta: torneo.cuota_inscripcion,
+            imagen_principal: renderedGame?.imagen_url,
+            torneo_id: torneo.id,
+            juego: renderedGame
+        }, null, 1, null, 'tournament');
+    };
 
     useEffect(() => {
         if (isOpen && game) {
@@ -195,14 +209,25 @@ export default function TournamentsDrawer({ isOpen, game, onClose }) {
                                             <p className="text-xs font-semibold text-gray-400">
                                                 {torneo.plazas_disponibles} plazas disponibles
                                             </p>
-                                            <button
-                                                type="button"
-                                                onClick={() => joinTournament(torneo.id)}
-                                                disabled={alreadyJoined || joinForm.processing || torneo.plazas_disponibles === 0}
-                                                className="flex h-11 min-w-[120px] items-center justify-center rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
-                                            >
-                                                {alreadyJoined ? 'Inscrito' : 'Unirme'}
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleAddToCart(torneo)}
+                                                    disabled={alreadyJoined || torneo.plazas_disponibles === 0}
+                                                    className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    title="Añadir al carrito"
+                                                >
+                                                    <ShoppingCart className="h-4 w-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => joinTournament(torneo.id)}
+                                                    disabled={alreadyJoined || joinForm.processing || torneo.plazas_disponibles === 0}
+                                                    className="flex h-11 min-w-[120px] items-center justify-center rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
+                                                >
+                                                    {alreadyJoined ? 'Inscrito' : 'Unirme'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </article>
                                 );
