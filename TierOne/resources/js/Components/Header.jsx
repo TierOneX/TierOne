@@ -82,6 +82,17 @@ export default function Header() {
                 </svg>
             ),
         },
+        ...(user ? [{
+            name: "HYDRAS",
+            href: "/shop",
+            icon: (
+                <img 
+                    src="/assets/hydra-coin.png" 
+                    alt="H" 
+                    className="w-6 h-6 object-contain shadow-[0_0_8px_rgba(227,24,55,0.4)]"
+                />
+            ),
+        }] : []),
         {
             name: "TIENDA",
             href: "/shop",
@@ -97,7 +108,7 @@ export default function Header() {
         },
         {
             name: "CUENTA",
-            href: "/login",
+            href: user ? "/profile" : "/login",
             icon: (
                 <svg
                     className="w-6 h-6"
@@ -161,6 +172,41 @@ export default function Header() {
                                     Administrar
                                 </Link>
                             )}
+                            {/* Saldo de Moneda Virtual (Premium Design) */}
+                            {user && (
+                                <Link 
+                                    href="/shop"
+                                    className="hidden sm:flex items-center gap-0 group relative"
+                                >
+                                    <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-l-xl bg-white/[0.03] border border-white/10 border-r-0 group-hover:bg-white/[0.06] transition-all duration-300">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-red-600 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
+                                            <img 
+                                                src="/assets/hydra-coin.png" 
+                                                alt="HC" 
+                                                className="relative w-5 h-5 object-contain animate-pulse"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col -space-y-1">
+                                            <span className="text-[8px] font-black text-red-500/80 uppercase tracking-widest">Saldo</span>
+                                            <span className="text-[13px] font-black text-white tabular-nums tracking-tight">
+                                                {Number(user.balance_tokens || 0).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-center h-[38px] px-2 rounded-r-xl bg-red-600/10 border border-white/10 border-l-0 group-hover:bg-red-600/20 transition-all duration-300">
+                                        <svg className="w-3.5 h-3.5 text-red-500 group-hover:text-red-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                                        </svg>
+                                    </div>
+                                    
+                                    {/* Custom Tooltip */}
+                                    <div className="absolute top-full right-0 mt-3 px-3 py-2 rounded-lg bg-black border border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-widest opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-2xl z-50 whitespace-nowrap">
+                                        Recargar <span className="text-red-500">Hydra Coins</span>
+                                    </div>
+                                </Link>
+                            )}
+
                             {/* Carrito */}
                             <Link
                                 href="/cart"

@@ -31,7 +31,7 @@ export default function MatchesHero({
                             Encuentra partida o crea la tuya en segundos
                         </h1>
                         <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-gray-400 sm:text-base">
-                            Explora los juegos mas activos, filtra por categoria y entra en una sala con lista de partidas en vivo o crea una nueva desde el panel lateral.
+                            Explora los juegos mas activos, filtra por categoria y entra en una sala con lista de partidas en vivo. <span className="text-red-500 font-black">Todas las salas operan exclusivamente con Hydra Coins (HC).</span>
                         </p>
                     </div>
 

@@ -5,6 +5,7 @@ import ShopHero from "@/Components/Shop/ShopHero";
 import SearchBar from "@/Components/Shop/SearchBar";
 import CategoryFilter from "@/Components/Shop/CategoryFilter";
 import ProductGrid from "@/Components/Shop/ProductGrid";
+import HydraPacks from "@/Components/Shop/HydraPacks";
 
 const SORT_OPTIONS = [
     { value: "default", label: "Relevancia" },
@@ -199,6 +200,9 @@ export default function Shop({ productos = [], categorias = [] }) {
                     </div>
                 </div>
             </section>
+
+            {/* 2.5 Hydra Coins Packs */}
+            <HydraPacks />
 
             {/* 3. Grid de productos */}
             <ProductGrid

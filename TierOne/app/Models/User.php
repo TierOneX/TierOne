@@ -46,6 +46,7 @@ class User extends Authenticatable
         'apellido',
         'pais',
         'rol',
+        'balance_tokens',
         'verificado',
         'activo',
     ];
@@ -65,6 +66,7 @@ class User extends Authenticatable
     protected $casts = [
         'verificado' => 'boolean',
         'activo' => 'boolean',
+        'balance_tokens' => 'decimal:2',
         'fecha_registro' => 'datetime',
         'ultima_conexion' => 'datetime',
     ];

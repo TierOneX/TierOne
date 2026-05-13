@@ -8,11 +8,9 @@ const modeLabels = {
     custom: 'Custom',
 };
 
-const currency = new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 2,
-});
+const hcFormatter = (val) => {
+    return `${Number(val || 0).toLocaleString()} HC`;
+};
 
 const dateFormatter = new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
@@ -260,11 +258,11 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                             <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-300 sm:grid-cols-4">
                                                 <div className="rounded-2xl bg-white/[0.03] p-3">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Entrada</p>
-                                                    <p className="mt-2 text-base font-black text-white">{currency.format(match.buy_in)}</p>
+                                                    <p className="mt-2 text-base font-black text-white">{hcFormatter(match.buy_in)}</p>
                                                 </div>
                                                 <div className="rounded-2xl bg-white/[0.03] p-3">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Premio</p>
-                                                    <p className="mt-2 text-base font-black text-white">{currency.format(match.premio_total)}</p>
+                                                    <p className="mt-2 text-base font-black text-white">{hcFormatter(match.premio_total)}</p>
                                                 </div>
                                                 <div className="rounded-2xl bg-white/[0.03] p-3 sm:col-span-2">
                                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-500">Creador</p>
