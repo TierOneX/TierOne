@@ -1,4 +1,4 @@
-﻿import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import MatchesHero from '@/Components/Matches/MatchesHero';
@@ -63,11 +63,6 @@ export default function Matches({ juegos = [], categorias = [] }) {
         );
     }, [auth?.user, juegos]);
 
-    const isDrawerActionFlash = [
-        'Partida creada correctamente.',
-        'Te has unido a la partida correctamente.',
-    ].includes(flash?.success);
-
     const openGameDrawer = (gameOrId, tab = 'list') => {
         setSelectedGameId(typeof gameOrId === 'object' ? gameOrId.id : gameOrId);
         setDrawerTab(tab);
@@ -75,29 +70,7 @@ export default function Matches({ juegos = [], categorias = [] }) {
 
     return (
         <MainLayout>
-            <Head title="Partidas" />
-            <Head>
-                <meta
-                    name="description"
-                    content="Explora juegos competitivos, consulta salas abiertas y crea nuevas partidas desde el panel de matchmaking de TierOne."
-                />
-            </Head>
-
-            {flash?.success && !selectedGame && !isDrawerActionFlash && (
-                <div className="px-4 pt-6 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-[1400px] rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
-                        {flash.success}
-                    </div>
-                </div>
-            )}
-
-            {flash?.error && !selectedGame && (
-                <div className="px-4 pt-6 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-[1400px] rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-300">
-                        {flash.error}
-                    </div>
-                </div>
-            )}
+            <Head title="Matchmaking - TierOne" />
 
             <MatchesHero
                 popularGames={popularGames}
@@ -112,17 +85,23 @@ export default function Matches({ juegos = [], categorias = [] }) {
                 onCreateGame={(game) => openGameDrawer(game, 'create')}
             />
 
-            <MatchesGameGrid
-                games={filteredGames}
-                selectedGameId={selectedGameId}
-                onSelectGame={(game) => openGameDrawer(game, 'list')}
-            />
+            {/* MY MATCHES (Full Width) */}
+            <div className="border-b border-white/5">
+                <MyMatchesSection
+                    matches={myMatches}
+                    isAuthenticated={Boolean(auth?.user)}
+                    onOpenGame={(gameId) => openGameDrawer(gameId, 'list')}
+                />
+            </div>
 
-            <MyMatchesSection
-                matches={myMatches}
-                isAuthenticated={Boolean(auth?.user)}
-                onOpenGame={(gameId) => openGameDrawer(gameId, 'list')}
-            />
+            {/* GAMES GRID */}
+            <div className="py-12">
+                <MatchesGameGrid
+                    games={filteredGames}
+                    selectedGameId={selectedGameId}
+                    onSelectGame={(game) => openGameDrawer(game, 'list')}
+                />
+            </div>
 
             <MatchesDrawer
                 isOpen={Boolean(selectedGame)}

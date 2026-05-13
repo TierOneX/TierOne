@@ -1,9 +1,12 @@
+import { useState } from 'react';
+
 const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
     return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
 };
 
 export default function MatchesGameGrid({ games = [], selectedGameId, onSelectGame }) {
+    const [imgErrors, setImgErrors] = useState({});
     return (
         <section className="bg-[radial-gradient(circle_at_top_right,_rgba(227,24,55,0.28),_transparent_48%),radial-gradient(circle_at_18%_78%,_rgba(227,24,55,0.14),_transparent_44%),linear-gradient(180deg,_#141414_0%,_#090909_100%)] px-4 pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1400px]">
@@ -33,9 +36,10 @@ export default function MatchesGameGrid({ games = [], selectedGameId, onSelectGa
                             >
                                 <div className="relative aspect-[4/5] overflow-hidden">
                                     <img
-                                        src={imgUrl(game.imagen_url)}
+                                        src={imgErrors[game.id] ? imgUrl(game.imagen_url_local) : imgUrl(game.imagen_url)}
                                         alt={game.nombre}
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        onError={() => setImgErrors((prev) => ({ ...prev, [game.id]: true }))}
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                                     <div className="absolute left-3 right-3 top-3 flex items-center justify-between gap-2">

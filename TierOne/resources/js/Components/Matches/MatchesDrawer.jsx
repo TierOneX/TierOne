@@ -281,14 +281,22 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                                 <p className="text-xs font-semibold text-gray-400">
                                                     {match.slots_disponibles} plazas disponibles
                                                 </p>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => joinMatch(match.id)}
-                                                    disabled={isJoined || joinForm.processing || match.slots_disponibles === 0}
-                                                    className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
-                                                >
-                                                    {isJoined ? 'Unido' : 'Unirse'}
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <Link
+                                                        href={route('matches.show', match.id)}
+                                                        className="flex items-center justify-center rounded-2xl border border-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-gray-300 transition hover:border-white/30 hover:text-white"
+                                                    >
+                                                        Detalles
+                                                    </Link>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => joinMatch(match.id)}
+                                                        disabled={isJoined || joinForm.processing || match.slots_disponibles === 0}
+                                                        className="rounded-2xl bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-gray-500"
+                                                    >
+                                                        {isJoined ? 'Unido' : 'Unirse'}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </article>
                                     );

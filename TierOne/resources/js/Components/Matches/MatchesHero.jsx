@@ -1,4 +1,4 @@
-﻿import GameDiscoveryFilters from './GameDiscoveryFilters';
+import GameDiscoveryFilters from './GameDiscoveryFilters';
 
 const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
@@ -54,7 +54,7 @@ export default function MatchesHero({
                     onCategoryChange={onCategoryChange}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 mt-8">
                     {popularGames.map((game, index) => (
                         <article
                             key={game.id}
@@ -89,10 +89,10 @@ export default function MatchesHero({
                                 <h2 className="max-w-sm text-2xl font-black uppercase italic text-white">
                                     {game.nombre}
                                 </h2>
-                                <p className="mt-2 max-w-lg text-sm leading-6 text-gray-300">
+                                <p className="mt-2 max-w-lg text-sm leading-6 text-gray-300 line-clamp-2">
                                     {game.descripcion}
                                 </p>
-                                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                     <button
                                         type="button"
                                         onClick={(event) => {

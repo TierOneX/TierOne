@@ -1,35 +1,37 @@
-import { Head, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
-import MainLayout from '@/Layouts/MainLayout';
-import TournamentsHero from '@/Components/Tournaments/TournamentsHero';
-import TournamentsGameGrid from '@/Components/Tournaments/TournamentsGameGrid';
-import TournamentsDrawer from '@/Components/Tournaments/TournamentsDrawer';
-import SponsorTriangle from '@/Components/SponsorTriangle';
+import { Head, usePage } from "@inertiajs/react";
+import { useMemo, useState } from "react";
+import MainLayout from "@/Layouts/MainLayout";
+import TournamentsHero from "@/Components/Tournaments/TournamentsHero";
+import TournamentsGameGrid from "@/Components/Tournaments/TournamentsGameGrid";
+import TournamentsDrawer from "@/Components/Tournaments/TournamentsDrawer";
+import SponsorTriangle from "@/Components/SponsorTriangle";
 
 export default function Tournaments({ juegos = [], categorias = [] }) {
     const { auth } = usePage().props;
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeCategory, setActiveCategory] = useState('TODOS');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeCategory, setActiveCategory] = useState("TODOS");
     const [selectedGameId, setSelectedGameId] = useState(null);
 
     const filteredGames = useMemo(() => {
         return juegos.filter((game) => {
-            const matchesCategory = activeCategory === 'TODOS' || game.categoria === activeCategory;
+            const matchesCategory =
+                activeCategory === "TODOS" || game.categoria === activeCategory;
             const needle = searchTerm.trim().toLowerCase();
             const matchesSearch =
                 needle.length === 0 ||
                 game.nombre.toLowerCase().includes(needle) ||
                 game.categoria.toLowerCase().includes(needle) ||
-                (game.descripcion ?? '').toLowerCase().includes(needle);
+                (game.descripcion ?? "").toLowerCase().includes(needle);
 
             return matchesCategory && matchesSearch;
         });
     }, [activeCategory, juegos, searchTerm]);
 
     const featuredGames = useMemo(() => {
-        const source = activeCategory === 'TODOS'
-            ? juegos
-            : juegos.filter((game) => game.categoria === activeCategory);
+        const source =
+            activeCategory === "TODOS"
+                ? juegos
+                : juegos.filter((game) => game.categoria === activeCategory);
 
         return source.slice(0, 4);
     }, [activeCategory, juegos]);
@@ -52,7 +54,7 @@ export default function Tournaments({ juegos = [], categorias = [] }) {
                 onSearchChange={setSearchTerm}
                 totalGames={filteredGames.length}
                 onSelectGame={(game) => setSelectedGameId(game.id)}
-                isAdmin={auth?.user?.rol === 'admin'}
+                isAdmin={auth?.user?.rol === "admin"}
             />
 
             <TournamentsGameGrid

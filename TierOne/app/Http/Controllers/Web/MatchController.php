@@ -7,6 +7,7 @@ use App\Models\Juego;
 use App\Models\Partida;
 use App\Models\ParticipantePartida;
 use App\Models\User;
+use App\Services\GameImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +15,10 @@ use Inertia\Response;
 
 class MatchController extends Controller
 {
+    public function __construct(private readonly GameImageService $gameImageService)
+    {
+    }
+
     public function index(): Response
     {
         $juegos = Juego::query()
@@ -70,7 +75,15 @@ class MatchController extends Controller
                     'nombre' => $juego->nombre,
                     'slug' => $juego->slug,
                     'descripcion' => $juego->descripcion,
-                    'imagen_url' => $juego->imagen_url,
+                    'imagen_url' => $this->gameImageService->resolveTournamentImageUrl(
+                        gameName: $juego->nombre,
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
+                    'imagen_url_local' => $this->gameImageService->resolveTournamentLocalImageUrl(
+                        storedImageUrl: $juego->imagen_url,
+                        gameSlug: $juego->slug
+                    ),
                     'categoria' => $juego->categoria,
                     'activo' => (bool) $juego->activo,
                     'total_partidas' => (int) $juego->total_partidas,
@@ -93,6 +106,61 @@ class MatchController extends Controller
             'juegos' => $juegos,
             'categorias' => $categorias,
             'demoUser' => null,
+        ]);
+    }
+
+    public function show(Partida $partida): Response
+    {
+        $partida->load(['creador:id,username,nombre,apellido', 'juego', 'participantes.usuario:id,username,nombre']);
+
+        $capacidad = $this->matchCapacity($partida->tipo);
+        $participantesCount = $partida->participantes->count();
+
+        $formattedMatch = [
+            'id' => $partida->id,
+            'titulo' => $partida->titulo,
+            'tipo' => $partida->tipo,
+            'buy_in' => (float) $partida->buy_in,
+            'premio_total' => (float) $partida->premio_total,
+            'comision_plataforma' => (float) $partida->comision_plataforma,
+            'fecha_inicio' => $partida->fecha_inicio?->toIso8601String(),
+            'estado' => $partida->estado,
+            'origen' => $partida->origen,
+            'capacidad' => $capacidad,
+            'participantes_count' => $participantesCount,
+            'slots_disponibles' => max($capacidad - $participantesCount, 0),
+            'creador' => [
+                'username' => $partida->creador?->username,
+                'nombre' => trim(($partida->creador?->nombre ?? '') . ' ' . ($partida->creador?->apellido ?? '')),
+            ],
+            'juego' => [
+                'id' => $partida->juego?->id,
+                'nombre' => $partida->juego?->nombre,
+                'slug' => $partida->juego?->slug,
+                'imagen_url' => $this->gameImageService->resolveTournamentImageUrl(
+                    gameName: $partida->juego?->nombre,
+                    storedImageUrl: $partida->juego?->imagen_url,
+                    gameSlug: $partida->juego?->slug
+                ),
+                'imagen_url_local' => $this->gameImageService->resolveTournamentLocalImageUrl(
+                    storedImageUrl: $partida->juego?->imagen_url,
+                    gameSlug: $partida->juego?->slug
+                ),
+                'categoria' => $partida->juego?->categoria,
+            ],
+            'participantes' => $partida->participantes->map(fn ($p) => [
+                'id' => $p->id,
+                'id_usuario' => $p->id_usuario,
+                'username' => $p->usuario?->username,
+                'nombre' => $p->usuario?->nombre,
+                'equipo_asignado' => $p->equipo_asignado,
+                'confirmado' => (bool) $p->confirmado,
+                'fecha_union' => $p->fecha_union?->toIso8601String(),
+            ])->values(),
+        ];
+
+        return Inertia::render('MatchDetail', [
+            'partida' => $formattedMatch,
         ]);
     }
 

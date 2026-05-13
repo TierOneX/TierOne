@@ -63,6 +63,7 @@ Route::get('/shop', function () {
 })->name('shop');
 
 Route::get('/matches', [MatchController::class, 'index'])->name('matches');
+Route::get('/matches/{partida}', [MatchController::class, 'show'])->name('matches.show');
 Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
 Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
 Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');

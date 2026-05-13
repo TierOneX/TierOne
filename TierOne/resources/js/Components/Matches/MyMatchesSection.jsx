@@ -1,4 +1,4 @@
-﻿import { Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 const imgUrl = (src) => {
     if (!src) return '/images/landing/Partidas.jpg';
@@ -19,12 +19,57 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', {
     minute: '2-digit',
 });
 
-export default function MyMatchesSection({ matches = [], isAuthenticated, onOpenGame }) {
+export default function MyMatchesSection({ matches = [], isAuthenticated, onOpenGame, layout = 'full' }) {
     const leaveMatch = (matchId) => {
         router.delete(`/matches/${matchId}/leave`, {
             preserveScroll: true,
         });
     };
+
+    if (layout === 'sidebar') {
+        return (
+            <div className="rounded-[32px] border border-white/10 bg-[#0f0f0f] p-6 shadow-2xl">
+                <div className="mb-6 flex items-center justify-between">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-red-500">Tus Salas</h3>
+                    <span className="rounded-full bg-red-600/10 px-2 py-0.5 text-[10px] font-black text-red-500">
+                        {matches.length}
+                    </span>
+                </div>
+
+                {!isAuthenticated ? (
+                    <div className="py-4 text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Inicia sesión</p>
+                    </div>
+                ) : matches.length === 0 ? (
+                    <div className="py-8 text-center border border-dashed border-white/5 rounded-2xl">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Sin salas activas</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {matches.map((match) => (
+                            <div key={`${match.juego.id}-${match.id}`} className="group relative rounded-2xl border border-white/5 bg-white/[0.02] p-3 transition hover:border-red-500/30">
+                                <div className="flex items-center gap-3">
+                                    <img src={imgUrl(match.juego.imagen_url)} className="h-12 w-10 rounded-lg object-cover" alt="" />
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="truncate text-[11px] font-black uppercase text-white">{match.titulo}</h4>
+                                        <p className="truncate text-[9px] font-bold text-gray-500 uppercase tracking-tighter">{match.juego.nombre}</p>
+                                    </div>
+                                    <Link 
+                                        href={route('matches.show', match.id)}
+                                        className="rounded-lg bg-white/5 p-2 text-gray-400 hover:bg-red-600 hover:text-white transition-all"
+                                    >
+                                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                        </svg>
+                                    </Link>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     return (
         <section className="bg-[radial-gradient(circle_at_top_right,_rgba(227,24,55,0.28),_transparent_48%),radial-gradient(circle_at_18%_78%,_rgba(227,24,55,0.14),_transparent_44%),linear-gradient(180deg,_#141414_0%,_#090909_100%)] px-4 pb-16 sm:px-6 lg:px-8">
@@ -91,13 +136,21 @@ export default function MyMatchesSection({ matches = [], isAuthenticated, onOpen
                                     <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
                                         {match.participantes_count}/{match.capacidad}
                                     </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => leaveMatch(match.id)}
-                                        className="rounded-xl border border-red-500/30 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-500 hover:text-white"
-                                    >
-                                        Salir
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <Link
+                                            href={route('matches.show', match.id)}
+                                            className="rounded-xl border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 transition hover:border-white/30 hover:text-white"
+                                        >
+                                            Detalles
+                                        </Link>
+                                        <button
+                                            type="button"
+                                            onClick={() => leaveMatch(match.id)}
+                                            className="rounded-xl border border-red-500/30 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-red-300 transition hover:bg-red-500 hover:text-white"
+                                        >
+                                            Salir
+                                        </button>
+                                    </div>
                                 </div>
                             </article>
                         ))}

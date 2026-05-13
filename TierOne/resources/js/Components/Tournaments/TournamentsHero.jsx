@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import GameDiscoveryFilters from '@/Components/Matches/GameDiscoveryFilters';
-import { Link } from '@inertiajs/react';
+import { useState } from "react";
+import GameDiscoveryFilters from "@/Components/Matches/GameDiscoveryFilters";
+import { Link } from "@inertiajs/react";
 
 const imgUrl = (src) => {
-    if (!src) return '/images/landing/torneos.jpg';
-    return src.startsWith('/') || src.startsWith('http') ? src : `/${src}`;
+    if (!src) return "/images/landing/torneos.jpg";
+    return src.startsWith("/") || src.startsWith("http") ? src : `/${src}`;
 };
 
 export default function TournamentsHero({
@@ -18,7 +18,7 @@ export default function TournamentsHero({
     onSelectGame,
     isAdmin = false,
 }) {
-    const availableCategories = ['TODOS', ...categories];
+    const availableCategories = ["TODOS", ...categories];
     const [imgErrors, setImgErrors] = useState({});
 
     return (
@@ -30,13 +30,17 @@ export default function TournamentsHero({
                             Torneos destacados
                         </p>
                         <h1 className="max-w-3xl text-4xl font-black uppercase italic tracking-tight text-white sm:text-6xl">
-                            Encuentra torneos y compite por el top
+                            Torneos alcanza la cima
                         </h1>
                     </div>
 
                     <div className="rounded-2xl border border-red-500/20 bg-black/30 px-5 py-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur">
-                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-500">Estado</p>
-                        <p className="mt-2 text-2xl font-black text-white">{featuredGames.length} juegos con torneos</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-500">
+                            Estado
+                        </p>
+                        <p className="mt-2 text-2xl font-black text-white">
+                            {featuredGames.length} juegos con torneos
+                        </p>
                     </div>
                 </div>
 
@@ -54,13 +58,22 @@ export default function TournamentsHero({
                     {featuredGames.map((game, index) => (
                         <article
                             key={game.id}
-                            className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#101010] ${index === 0 ? 'xl:col-span-2 xl:row-span-2 min-h-[360px]' : 'min-h-[220px]'} `}
+                            className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-[#101010] ${index === 0 ? "xl:col-span-2 xl:row-span-2 min-h-[360px]" : "min-h-[220px]"} `}
                         >
                             <img
-                                src={imgErrors[game.id] ? imgUrl(game.imagen_url_local) : imgUrl(game.imagen_url)}
+                                src={
+                                    imgErrors[game.id]
+                                        ? imgUrl(game.imagen_url_local)
+                                        : imgUrl(game.imagen_url)
+                                }
                                 alt={game.nombre}
                                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                onError={() => setImgErrors((prev) => ({ ...prev, [game.id]: true }))}
+                                onError={() =>
+                                    setImgErrors((prev) => ({
+                                        ...prev,
+                                        [game.id]: true,
+                                    }))
+                                }
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
                             <div
@@ -68,7 +81,10 @@ export default function TournamentsHero({
                                 tabIndex={0}
                                 onClick={() => onSelectGame(game)}
                                 onKeyDown={(event) => {
-                                    if (event.key === 'Enter' || event.key === ' ') {
+                                    if (
+                                        event.key === "Enter" ||
+                                        event.key === " "
+                                    ) {
                                         event.preventDefault();
                                         onSelectGame(game);
                                     }
@@ -86,7 +102,9 @@ export default function TournamentsHero({
                                 <h2 className="max-w-sm line-clamp-2 text-2xl font-black uppercase italic text-white">
                                     {game.nombre}
                                 </h2>
-                                <div className={`mt-auto grid gap-2 pt-4 ${isAdmin ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} sm:max-w-md sm:ml-auto`}>
+                                <div
+                                    className={`mt-auto grid gap-2 pt-4 ${isAdmin ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"} sm:max-w-md sm:ml-auto`}
+                                >
                                     <button
                                         type="button"
                                         onClick={(event) => {
@@ -99,8 +117,10 @@ export default function TournamentsHero({
                                     </button>
                                     {isAdmin && (
                                         <Link
-                                            href={route('panel.gaming.index')}
-                                            onClick={(event) => event.stopPropagation()}
+                                            href={route("panel.gaming.index")}
+                                            onClick={(event) =>
+                                                event.stopPropagation()
+                                            }
                                             className="flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-red-500"
                                         >
                                             Administrar
