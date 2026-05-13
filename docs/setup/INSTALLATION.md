@@ -42,7 +42,7 @@ mysql --version
 Si tienes `mysql` en tu PATH, puedes usar nuestro script de inicialización:
 
 ```powershell
-mysql -u root -p < scripts/database/setup_mysql.sql
+mysql -u root -p < database/setup_mysql.sql
 ```
 
 ### Opción 2: Manualmente (phpMyAdmin / Workbench)
@@ -74,12 +74,12 @@ Contamos con scripts que automatizan la instalación de dependencias, generació
 
 **En Windows:**
 ```powershell
-.\scripts\install\install.bat
+.\scripts\install.bat
 ```
 
 **En Linux/Mac:**
 ```bash
-bash scripts/install/install.sh
+bash scripts/install.sh
 ```
 
 ---

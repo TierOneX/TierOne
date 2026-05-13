@@ -7,8 +7,8 @@ Este documento proporciona una descripción detallada de cada archivo clave en e
 ## 🚀 Raíz del Repositorio
 | Archivo | Descripción |
 |---------|-------------|
-| `install.bat` | Script de instalación automatizada para Windows. |
-| `ENV_CONFIG.md` | Documentación de todas las variables de entorno necesarias. |
+| `scripts/install.bat` | Script de instalación automatizada para Windows. |
+| `scripts/ENV_CONFIG.md` | Documentación de todas las variables de entorno necesarias. |
 | `AGENTS.md` | Guía de reglas y contexto para asistentes de IA. |
 | `README.md` | Punto de entrada principal y visión general del proyecto. |
 

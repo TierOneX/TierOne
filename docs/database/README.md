@@ -38,7 +38,7 @@ Guía paso a paso para implementar la base de datos relacional.
 Comienza revisando el [Diagrama ER](ER-Diagram.md).
 
 ### 2. Verificar Cambios
-Consulta el [Estado del Esquema](Updated-Analysis.md) para ver las últimas modificaciones.
+Consulta el [Análisis de Correcciones v2](Analysis-Corrections-v2.md) para ver las últimas modificaciones.
 
 ---
 

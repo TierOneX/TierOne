@@ -1,6 +1,6 @@
 # 🏛️ TierOne Documentation Hub
 
-Bienvenido al centro de documentación oficial de **TierOne**. Este portal está diseñado para proporcionar una visión clara, técnica y funcional del proyecto, ideal tanto para desarrolladores como para evaluadores académicos.
+Bienvenido al centro de documentación oficial de **TierOne**. Este portal está diseñado para proporcionar una visión clara, técnica y funcional del proyecto.
 
 ---
 
