@@ -237,7 +237,7 @@ export default function GamesCarousel({ games }) {
                                     </p>
                                 )}
                                 <Link
-                                    href={`/games/${juego.slug}`}
+                                    href={`/matches`}
                                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e31837] hover:bg-[#c2102d] text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all"
                                 >
                                     VER JUEGO
@@ -306,7 +306,7 @@ function DesktopCard({ juego, imgErrors, onImgError }) {
 
     return (
         <Link
-            href={`/games/${juego.slug}`}
+            href={`/matches`}
             className="group flex-shrink-0 w-[200px] lg:w-[230px] rounded-xl overflow-hidden border border-white/5 hover:border-[#e31837]/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-red-900/10"
             style={{ scrollSnapAlign: "start", background: "#141418" }}
         >
