@@ -304,7 +304,7 @@ export default function MatchesDrawer({ isOpen, game, games, initialTab = 'list'
                                                     {isAuthenticated && auth.user.balance_tokens < match.buy_in ? (
                                                         <Link
                                                             href="/shop"
-                                                            className="rounded-2xl bg-red-600 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] flex items-center gap-2"
+                                                            className="rounded-2xl bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.3)] flex items-center justify-center gap-2"
                                                         >
                                                             <img src="/assets/hydra-coin.png" className="w-4 h-4 object-contain" alt="" />
                                                             Recargar

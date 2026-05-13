@@ -68,6 +68,10 @@ Route::post('/matches', [MatchController::class, 'store'])->name('matches.store'
 Route::post('/matches/{partida}/join', [MatchController::class, 'join'])->name('matches.join');
 Route::delete('/matches/{partida}/leave', [MatchController::class, 'leave'])->name('matches.leave');
 Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments');
+Route::redirect('/torneos', '/tournaments');
+Route::get('/torneos/{torneo}', function ($torneo) {
+    return redirect("/tournaments?torneo={$torneo}");
+});
 Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])
     ->middleware('auth')
     ->name('tournaments.join');
