@@ -3,6 +3,7 @@ import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import { Head, Link, router } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     ArrowUpRight,
     ArrowDownLeft,
@@ -26,6 +27,7 @@ const tipoBadge = (tipo) => {
 
 export default function Transacciones({ transacciones, filters = {} }) {
     const { data = [], links = [] } = transacciones ?? {};
+    const { routeUrl } = useAdminRoutes();
 
     const filtersConfig = [
         {
@@ -65,7 +67,7 @@ export default function Transacciones({ transacciones, filters = {} }) {
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.finanzas.transacciones"),
+            routeUrl("panel.ecommerce.finanzas.transacciones"),
             { ...filters, sort_by: key, sort_dir: newDir },
             {
                 preserveState: true,

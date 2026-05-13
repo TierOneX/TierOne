@@ -4,6 +4,7 @@ import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import { 
     Trophy, 
     Swords, 
@@ -50,6 +51,7 @@ export default function PanelAdminGaming({
     cuentas = [],
 }) {
     const { auth } = usePage().props;
+    const { routeUrl } = useAdminRoutes();
     const activeSection = filters.section || "torneos";
     const [modal, setModal] = useState({ type: null, item: null });
     const [form, setForm] = useState({});
@@ -67,9 +69,9 @@ export default function PanelAdminGaming({
             {
                 title: "Gaming Core",
                 items: [
-                    { label: "Torneos", icon: "Trophy", link: route("panel.gaming.index", { section: "torneos", search: filters.search || "" }) },
-                    { label: "Partidas", icon: "Swords", link: route("panel.gaming.index", { section: "partidas", search: filters.search || "" }) },
-                    { label: "Juegos", icon: "Gamepad2", link: route("panel.gaming.index", { section: "juegos", search: filters.search || "" }) },
+                    { label: "Torneos", icon: "Trophy", link: routeUrl("panel.gaming.index", { section: "torneos", search: filters.search || "" }) },
+                    { label: "Partidas", icon: "Swords", link: routeUrl("panel.gaming.index", { section: "partidas", search: filters.search || "" }) },
+                    { label: "Juegos", icon: "Gamepad2", link: routeUrl("panel.gaming.index", { section: "juegos", search: filters.search || "" }) },
                 ],
             },
             {
@@ -78,13 +80,13 @@ export default function PanelAdminGaming({
                     {
                         label: "Incidencias",
                         icon: "ShieldAlert",
-                        link: route("panel.gaming.index", {
+                        link: routeUrl("panel.gaming.index", {
                             section: "incidencias",
                             search: filters.search || "",
                             incidencias_sort: filters.incidencias_sort || "newest",
                         }),
                     },
-                    { label: "Cuentas", icon: "UserCog", link: route("panel.gaming.index", { section: "cuentas", search: filters.search || "" }) },
+                    { label: "Cuentas", icon: "UserCog", link: routeUrl("panel.gaming.index", { section: "cuentas", search: filters.search || "" }) },
                 ],
             },
         ],
@@ -135,34 +137,34 @@ export default function PanelAdminGaming({
         const id = modal.item?.id;
 
         if (modal.type === "torneo-create") {
-            router.post(route("panel.gaming.torneos.store"), normalizeTorneoPayload(form), {
+            router.post(routeUrl("panel.gaming.torneos.store"), normalizeTorneoPayload(form), {
                 preserveScroll: true,
                 onSuccess: closeModal,
             });
         } else if (modal.type === "torneo") {
-            router.put(route("panel.gaming.torneos.update", id), normalizeTorneoPayload(form), {
+            router.put(routeUrl("panel.gaming.torneos.update", id), normalizeTorneoPayload(form), {
                 preserveScroll: true,
                 onSuccess: closeModal,
             });
         } else if (modal.type === "partida") {
-            router.put(route("panel.gaming.partidas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.partidas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
         } else if (modal.type === "incidencia") {
-            router.put(route("panel.gaming.incidencias.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.incidencias.update", id), form, { preserveScroll: true, onSuccess: closeModal });
         } else if (modal.type === "cuenta") {
-            router.put(route("panel.gaming.cuentas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.cuentas.update", id), form, { preserveScroll: true, onSuccess: closeModal });
         } else if (modal.type === "juego-create") {
-            router.post(route("panel.gaming.juegos.store"), form, { preserveScroll: true, onSuccess: closeModal });
+            router.post(routeUrl("panel.gaming.juegos.store"), form, { preserveScroll: true, onSuccess: closeModal });
         } else if (modal.type === "juego") {
-            router.put(route("panel.gaming.juegos.update", id), form, { preserveScroll: true, onSuccess: closeModal });
+            router.put(routeUrl("panel.gaming.juegos.update", id), form, { preserveScroll: true, onSuccess: closeModal });
         }
     };
 
     const handleDelete = (id, type) => {
         if (confirm("¿Estás seguro de eliminar este registro?")) {
             let url = "";
-            if (type === "torneo") url = route("panel.gaming.torneos.destroy", id);
-            else if (type === "partida") url = route("panel.gaming.partidas.destroy", id);
-            else if (type === "juego") url = route("panel.gaming.juegos.destroy", id);
+            if (type === "torneo") url = routeUrl("panel.gaming.torneos.destroy", id);
+            else if (type === "partida") url = routeUrl("panel.gaming.partidas.destroy", id);
+            else if (type === "juego") url = routeUrl("panel.gaming.juegos.destroy", id);
             
             router.delete(url, { preserveScroll: true });
         }
@@ -218,7 +220,7 @@ export default function PanelAdminGaming({
             activeItem={activeLabel}
             menuItems={menuItems}
             showGamingShortcut
-            shortcutLink={route("panel.ecommerce.dashboard")}
+            shortcutLink={routeUrl("panel.ecommerce.dashboard")}
             shortcutLabel="Administrar Ecommerce"
         >
             <Head title={`Admin Gaming: ${activeLabel}`} />

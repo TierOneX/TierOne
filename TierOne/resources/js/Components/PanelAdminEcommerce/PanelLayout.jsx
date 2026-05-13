@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react"; // Añadimos usePage
 import Sidebar from "@/Components/PanelAdminEcommerce/Sidebar";
 import { Home } from "lucide-react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
+import { buildUnifiedAdminMenu } from "@/Utils/adminMenu";
 
 // Importamos el CSS específico del panel
 // Nota: En Vite, esto puede requerir configuración adicional si no es global,
@@ -19,8 +21,12 @@ export default function PanelLayout({
     shortcutLabel = "Administrar Gaming",
 }) {
     const { menu_admin, auth } = usePage().props; // Atrapamos el menú y el user del servidor
+    const { isSuperAdmin, routeUrl } = useAdminRoutes();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const isAdmin = auth?.user?.rol === "admin";
+    const resolvedMenuItems = isSuperAdmin
+        ? buildUnifiedAdminMenu(routeUrl)
+        : menuItems ?? menu_admin;
 
     // Usamos auth.user usando las propiedades correctas de TierOne (username, rol)
     const userDisplay = auth.user || {
@@ -40,10 +46,11 @@ export default function PanelLayout({
             <Head title={title} />
             {/* SIDEBAR */}
             <Sidebar
-                menuItems={menuItems ?? menu_admin}
+                menuItems={resolvedMenuItems}
                 activeItem={activeItem}
                 user={userDisplay}
                 isSidebarOpen={isSidebarOpen}
+                homeLink={isSuperAdmin ? route("panel.superadmin.index") : route("panel.ecommerce.dashboard")}
             />
             {/* SIDEBAR OVERLAY */}
             <div
@@ -61,12 +68,12 @@ export default function PanelLayout({
                     <h1 className="page-title italic font-['Outfit']">{title}</h1>
                 </div>
                 <div className="header-actions">
-                    {isAdmin && (
+                    {isAdmin && !isSuperAdmin && (
                         <Link href={route("panel.superadmin.index")} className="btn-secondary">
                             <span>Super Admin</span>
                         </Link>
                     )}
-                    {isAdmin && showGamingShortcut && (
+                    {isAdmin && !isSuperAdmin && showGamingShortcut && (
                         <Link href={shortcutLink} className="btn-secondary">
                             <span>{shortcutLabel}</span>
                         </Link>

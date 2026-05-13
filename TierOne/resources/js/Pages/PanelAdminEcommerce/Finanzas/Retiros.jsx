@@ -5,6 +5,7 @@ import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
 import { User, TrendingDown, CreditCard, Calendar, Eye, Edit2 } from "lucide-react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 
 const estadoBadge = (estado) => {
     const map = {
@@ -17,6 +18,7 @@ const estadoBadge = (estado) => {
 
 export default function Retiros({ retiros, filters = {}, admins = [] }) {
     const { data = [], links = [] } = retiros ?? {};
+    const { routeUrl } = useAdminRoutes();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRetiro, setEditingRetiro] = useState(null);
     const [isReadOnly, setIsReadOnly] = useState(false);
@@ -76,7 +78,7 @@ export default function Retiros({ retiros, filters = {}, admins = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("panel.ecommerce.retiros.update", formData.id_retiro), {
+        post(routeUrl("panel.ecommerce.finanzas.retiros.update", formData.id_retiro), {
             onSuccess: () => {
                 setIsModalOpen(false);
                 reset();
@@ -90,7 +92,7 @@ export default function Retiros({ retiros, filters = {}, admins = [] }) {
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.retiros"),
+            routeUrl("panel.ecommerce.finanzas.retiros"),
             {
                 ...filters,
                 sort_by: key,
@@ -188,7 +190,7 @@ export default function Retiros({ retiros, filters = {}, admins = [] }) {
             <FilterBar
                 filtersConfig={filtersConfig}
                 currentFilters={filters}
-                routeName="panel.ecommerce.retiros"
+                routeName="panel.ecommerce.finanzas.retiros"
             />
 
             <AdminTable

@@ -5,9 +5,11 @@ import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
 import { Plus, Eye, Edit2, Trash2, Truck, Search, Filter } from "lucide-react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 
 export default function Proveedores({ proveedores, filters = {} }) {
     const { data = [], links = [] } = proveedores ?? {};
+    const { routeUrl } = useAdminRoutes();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProveedor, setEditingProveedor] = useState(null);
@@ -62,7 +64,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.proveedores"),
+            routeUrl("panel.ecommerce.proveedores"),
             { ...filters, sort_by: key, sort_dir: newDir },
             {
                 preserveState: true,
@@ -114,7 +116,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
         e.preventDefault();
         if (editingProveedor) {
             put(
-                route(
+                routeUrl(
                     "panel.ecommerce.proveedores.update",
                     editingProveedor.id,
                 ),
@@ -123,7 +125,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
                 },
             );
         } else {
-            post(route("panel.ecommerce.proveedores.store"), {
+            post(routeUrl("panel.ecommerce.proveedores.store"), {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
@@ -134,7 +136,7 @@ export default function Proveedores({ proveedores, filters = {} }) {
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
-            router.delete(route("panel.ecommerce.proveedores.destroy", id));
+            router.delete(routeUrl("panel.ecommerce.proveedores.destroy", id));
         }
     };
 

@@ -3,6 +3,7 @@ import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import { Head, Link, router } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     Star,
     Trash2,
@@ -15,6 +16,7 @@ import {
 
 export default function Reviews({ reviews, filters = {} }) {
     const { data = [], links = [] } = reviews ?? {};
+    const { routeUrl } = useAdminRoutes();
 
     const filtersConfig = [
         {
@@ -55,7 +57,7 @@ export default function Reviews({ reviews, filters = {} }) {
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.reviews"),
+            routeUrl("panel.ecommerce.reviews"),
             { ...filters, sort_by: key, sort_dir: newDir },
             {
                 preserveState: true,
@@ -66,7 +68,7 @@ export default function Reviews({ reviews, filters = {} }) {
 
     const deleteReview = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta reseña?")) {
-            router.delete(route("panel.ecommerce.reviews.destroy", id));
+            router.delete(routeUrl("panel.ecommerce.reviews.destroy", id));
         }
     };
 

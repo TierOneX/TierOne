@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { Search, ChevronUp, ChevronDown, SlidersHorizontal, XCircle, CheckCircle2 } from 'lucide-react';
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 
 /**
  * Componente modular para filtrado dinámico en el Panel Administrativo.
@@ -12,6 +13,7 @@ import { Search, ChevronUp, ChevronDown, SlidersHorizontal, XCircle, CheckCircle
 export default function FilterBar({ filtersConfig, currentFilters = {}, routeName }) {
     const [values, setValues] = useState(currentFilters);
     const [isExpanded, setIsExpanded] = useState(false);
+    const { routeName: resolveRouteName } = useAdminRoutes();
 
     // Sincronizar estado local con los filtros actuales cuando cambian (ej. al limpiar)
     useEffect(() => {
@@ -25,7 +27,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
     const handleApply = (e) => {
         e.preventDefault();
         const payload = { ...currentFilters, ...values };
-        router.get(route(routeName), payload, {
+        router.get(route(resolveRouteName(routeName)), payload, {
             preserveState: true,
             replace: true
         });
@@ -37,7 +39,7 @@ export default function FilterBar({ filtersConfig, currentFilters = {}, routeNam
         setValues(resetValues);
         const staticFilters = { ...currentFilters };
         filtersConfig.forEach((f) => delete staticFilters[f.name]);
-        router.get(route(routeName), staticFilters, {
+        router.get(route(resolveRouteName(routeName)), staticFilters, {
             preserveState: true,
             replace: true
         });

@@ -4,6 +4,7 @@ import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import { Head, Link, router } from "@inertiajs/react";
 import { CreditCard, Euro, Calendar, User, Hash, Receipt } from "lucide-react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 
 const estadoBadge = (estado) => {
     const map = {
@@ -17,6 +18,7 @@ const estadoBadge = (estado) => {
 
 export default function Pagos({ pagos, filters = {} }) {
     const { data = [], links = [] } = pagos ?? {};
+    const { routeUrl } = useAdminRoutes();
 
     const filtersConfig = [
         {
@@ -61,7 +63,7 @@ export default function Pagos({ pagos, filters = {} }) {
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.finanzas.pagos"),
+            routeUrl("panel.ecommerce.finanzas.pagos"),
             { ...filters, sort_by: key, sort_dir: newDir },
             {
                 preserveState: true,

@@ -1,5 +1,6 @@
 import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import { Head, Link } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     Euro,
     Package,
@@ -25,6 +26,8 @@ const estadoBadge = (estado) => {
 };
 
 export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
+    const { routeUrl } = useAdminRoutes();
+
     return (
         <PanelLayout title="Dashboard Estratégico" activeItem="Dashboard">
             <Head title="Admin Dashboard - TierOne" />
@@ -140,7 +143,7 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                             Últimas Operaciones
                         </h3>
                         <Link
-                            href={route("panel.ecommerce.orders")}
+                            href={routeUrl("panel.ecommerce.orders")}
                             className="text-[10px] font-black text-red-500 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center gap-1 group"
                         >
                             Gestionar Todo{" "}
@@ -253,7 +256,7 @@ export default function Dashboard({ stats = {}, ordenes_recientes = [] }) {
                             ¿Necesitas lanzar un nuevo producto?
                         </p>
                         <Link
-                            href={route("panel.ecommerce.products")}
+                            href={routeUrl("panel.ecommerce.products")}
                             className="inline-block bg-white text-red-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
                         >
                             Ir a Catálogo

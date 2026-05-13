@@ -6,6 +6,7 @@ export default function Sidebar({
     activeItem,
     user,
     isSidebarOpen,
+    homeLink,
 }) {
     // Función para renderizar el icono dinámicamente
     const renderIcon = (iconName) => {
@@ -19,7 +20,7 @@ export default function Sidebar({
             id="sidebar"
         >
             <Link
-                href={route("panel.ecommerce.dashboard")}
+                href={homeLink ?? route("panel.ecommerce.dashboard")}
                 className="logo-sidebar group"
             >
                 <img 

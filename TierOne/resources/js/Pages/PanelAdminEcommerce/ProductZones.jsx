@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import FabricZoneEditor from "@/Components/PanelAdminEcommerce/FabricZoneEditor";
 import { imgUrl } from "@/Utils/imageUtils";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 
 const ZONE_COLORS = {
     impresion:        { border: 'border-purple-400', bg: 'bg-purple-500/15', label: 'bg-purple-600', text: 'Impresión' },
@@ -21,6 +22,7 @@ export default function ProductZones({
 }) {
     const [editingView, setEditingView] = useState(null);
     const [imageDimensions, setImageDimensions] = useState({});
+    const { routeUrl } = useAdminRoutes();
 
     const { data: formData, setData, post, processing, reset } = useForm({
         imagen_base: null,
@@ -64,7 +66,7 @@ export default function ProductZones({
 
     const handleSubmitSync = (e) => {
         if (e) e.preventDefault();
-        post(route('panel.ecommerce.products.zonas.sync', producto.id), {
+        post(routeUrl('panel.ecommerce.products.zonas.sync', producto.id), {
             onSuccess: () => {
                 exitStudio();
             },
@@ -73,13 +75,13 @@ export default function ProductZones({
 
     const handleDeleteZone = (zonaId) => {
         if (confirm("¿Eliminar esta zona de personalización?")) {
-            router.delete(route('panel.ecommerce.zonas.destroy', zonaId));
+            router.delete(routeUrl('panel.ecommerce.zonas.destroy', zonaId));
         }
     };
 
     const handleSavePrecios = (e) => {
         e.preventDefault();
-        putPrecios(route('panel.ecommerce.products.precios', producto.id));
+        putPrecios(routeUrl('panel.ecommerce.products.precios', producto.id));
     };
 
     const groupedViews = zonas.reduce((acc, z) => {
@@ -96,7 +98,7 @@ export default function ProductZones({
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-4">
                     <Link
-                        href={route('panel.ecommerce.products')}
+                        href={routeUrl('panel.ecommerce.products')}
                         className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg border border-gray-700 transition-colors"
                     >
                         <ArrowLeft size={16} />

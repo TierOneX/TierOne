@@ -4,6 +4,7 @@ import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     Plus,
     Eye,
@@ -36,6 +37,7 @@ export default function Orders({
     filters = {},
 }) {
     const { data = [], links = [] } = ordenes ?? {};
+    const { routeUrl } = useAdminRoutes();
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState("view"); // 'create', 'view', 'edit'
@@ -77,7 +79,7 @@ export default function Orders({
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.orders"),
+            routeUrl("panel.ecommerce.orders"),
             { ...filters, sort_by: key, sort_dir: newDir },
             {
                 preserveState: true,
@@ -172,11 +174,11 @@ export default function Orders({
     const handleSubmit = (e) => {
         e.preventDefault();
         if (modalMode === "create") {
-            post(route("panel.ecommerce.orders.store"), {
+            post(routeUrl("panel.ecommerce.orders.store"), {
                 onSuccess: () => setIsModalOpen(false),
             });
         } else if (modalMode === "edit") {
-            put(route("panel.ecommerce.orders.update", selectedOrder.id), {
+            put(routeUrl("panel.ecommerce.orders.update", selectedOrder.id), {
                 onSuccess: () => setIsModalOpen(false),
             });
         }
@@ -188,7 +190,7 @@ export default function Orders({
                 "¿Estás seguro de eliminar este pedido? Esta acción no se puede deshacer.",
             )
         ) {
-            router.delete(route("panel.ecommerce.orders.destroy", id));
+            router.delete(routeUrl("panel.ecommerce.orders.destroy", id));
         }
     };
 

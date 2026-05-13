@@ -4,6 +4,7 @@ import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     Plus,
     Eye,
@@ -20,6 +21,7 @@ export default function Categories({
     filters = {},
     todas_categorias = [],
 }) {
+    const { routeUrl } = useAdminRoutes();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [isReadOnly, setIsReadOnly] = useState(false);
@@ -99,13 +101,13 @@ export default function Categories({
         e.preventDefault();
         if (editingCategory) {
             put(
-                route("panel.ecommerce.categories.update", editingCategory.id),
+                routeUrl("panel.ecommerce.categories.update", editingCategory.id),
                 {
                     onSuccess: () => setIsModalOpen(false),
                 },
             );
         } else {
-            post(route("panel.ecommerce.categories.store"), {
+            post(routeUrl("panel.ecommerce.categories.store"), {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
@@ -116,7 +118,7 @@ export default function Categories({
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
-            router.delete(route("panel.ecommerce.categories.destroy", id));
+            router.delete(routeUrl("panel.ecommerce.categories.destroy", id));
         }
     };
 
@@ -126,7 +128,7 @@ export default function Categories({
             newDir = filters.sort_dir === "asc" ? "desc" : "asc";
         }
         router.get(
-            route("panel.ecommerce.categories"),
+            routeUrl("panel.ecommerce.categories"),
             {
                 ...filters,
                 sort_by: key,

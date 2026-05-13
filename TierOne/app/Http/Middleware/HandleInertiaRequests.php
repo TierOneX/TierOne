@@ -38,6 +38,9 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'adminContext' => [
+                'isSuperAdmin' => $request->routeIs('panel.superadmin.*'),
+            ],
             'menu_admin' => [
                 [
                     'title' => 'Catálogo',

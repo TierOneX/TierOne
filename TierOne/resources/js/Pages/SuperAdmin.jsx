@@ -1,293 +1,170 @@
+import PanelLayout from "@/Components/PanelAdminEcommerce/PanelLayout";
 import { Head, Link } from "@inertiajs/react";
 import {
-    ArrowLeft,
+    Activity,
+    ArrowRight,
     BarChart3,
-    Building2,
     ClipboardList,
     CreditCard,
-    ExternalLink,
     Gamepad2,
     Package,
-    ShieldCheck,
     ShieldAlert,
     ShoppingBag,
-    Star,
     Swords,
-    Tag,
     Trophy,
-    Truck,
     Users,
 } from "lucide-react";
 
-const panelCards = [
+const stats = [
     {
-        title: "Panel Gaming",
-        description: "Torneos, partidas, juegos, incidencias y cuentas de usuario.",
-        href: route("panel.gaming.index"),
+        label: "Gaming",
+        value: "5 areas",
+        detail: "Torneos, partidas, juegos, incidencias y cuentas",
         icon: Gamepad2,
-        accent: "from-red-600 to-red-800",
-        items: [
-            { label: "Torneos", icon: Trophy },
-            { label: "Partidas", icon: Swords },
-            { label: "Cuentas", icon: Users },
-        ],
+        href: route("panel.superadmin.gaming.index", { section: "torneos" }),
     },
     {
-        title: "Panel Ecommerce",
-        description: "Productos, pedidos, categorias, proveedores, finanzas y reviews.",
-        href: route("panel.ecommerce.dashboard"),
+        label: "Catalogo",
+        value: "3 areas",
+        detail: "Productos, categorias y proveedores",
+        icon: Package,
+        href: route("panel.superadmin.ecommerce.products"),
+    },
+    {
+        label: "Ventas",
+        value: "4 areas",
+        detail: "Ordenes, pagos, transacciones y retiros",
         icon: ShoppingBag,
-        accent: "from-zinc-700 to-zinc-950",
-        items: [
-            { label: "Productos", icon: Package },
-            { label: "Pedidos", icon: ClipboardList },
-            { label: "Finanzas", icon: BarChart3 },
-        ],
+        href: route("panel.superadmin.ecommerce.orders"),
+    },
+    {
+        label: "Moderacion",
+        value: "2 areas",
+        detail: "Incidencias gaming y reviews ecommerce",
+        icon: ShieldAlert,
+        href: route("panel.superadmin.gaming.index", { section: "incidencias" }),
     },
 ];
 
-const adminSections = [
+const workspaces = [
     {
-        title: "Gaming",
-        description: "Gestion competitiva, moderacion y catalogo de juegos.",
-        items: [
-            {
-                label: "Torneos",
-                description: "Crear, editar y controlar competiciones.",
-                href: route("panel.gaming.index", { section: "torneos" }),
-                icon: Trophy,
-            },
-            {
-                label: "Partidas",
-                description: "Revisar estados y administrar partidas.",
-                href: route("panel.gaming.index", { section: "partidas" }),
-                icon: Swords,
-            },
-            {
-                label: "Juegos",
-                description: "Mantener el catalogo gaming activo.",
-                href: route("panel.gaming.index", { section: "juegos" }),
-                icon: Gamepad2,
-            },
-            {
-                label: "Incidencias",
-                description: "Gestionar reportes y resoluciones.",
-                href: route("panel.gaming.index", { section: "incidencias" }),
-                icon: ShieldAlert,
-            },
-            {
-                label: "Cuentas",
-                description: "Editar roles, verificacion y estado.",
-                href: route("panel.gaming.index", { section: "cuentas" }),
-                icon: Users,
-            },
+        title: "Operacion Gaming",
+        description: "Control competitivo y comunidad desde el mismo panel.",
+        icon: Trophy,
+        links: [
+            { label: "Torneos", icon: Trophy, href: route("panel.superadmin.gaming.index", { section: "torneos" }) },
+            { label: "Partidas", icon: Swords, href: route("panel.superadmin.gaming.index", { section: "partidas" }) },
+            { label: "Juegos", icon: Gamepad2, href: route("panel.superadmin.gaming.index", { section: "juegos" }) },
+            { label: "Incidencias", icon: ShieldAlert, href: route("panel.superadmin.gaming.index", { section: "incidencias" }) },
+            { label: "Cuentas", icon: Users, href: route("panel.superadmin.gaming.index", { section: "cuentas" }) },
         ],
     },
     {
-        title: "Ecommerce",
-        description: "Operacion comercial, catalogo, pedidos y finanzas.",
-        items: [
-            {
-                label: "Dashboard",
-                description: "Resumen principal de tienda.",
-                href: route("panel.ecommerce.dashboard"),
-                icon: BarChart3,
-            },
-            {
-                label: "Productos",
-                description: "Alta, edicion, imagenes y personalizacion.",
-                href: route("panel.ecommerce.products"),
-                icon: Package,
-            },
-            {
-                label: "Categorias",
-                description: "Organizacion del catalogo.",
-                href: route("panel.ecommerce.categories"),
-                icon: Tag,
-            },
-            {
-                label: "Proveedores",
-                description: "Gestion de proveedores.",
-                href: route("panel.ecommerce.proveedores"),
-                icon: Truck,
-            },
-            {
-                label: "Ordenes",
-                description: "Pedidos, estados y facturas.",
-                href: route("panel.ecommerce.orders"),
-                icon: ClipboardList,
-            },
-            {
-                label: "Pagos",
-                description: "Seguimiento de pagos.",
-                href: route("panel.ecommerce.finanzas.pagos"),
-                icon: CreditCard,
-            },
-            {
-                label: "Transacciones",
-                description: "Movimientos y trazabilidad financiera.",
-                href: route("panel.ecommerce.finanzas.transacciones"),
-                icon: BarChart3,
-            },
-            {
-                label: "Retiros",
-                description: "Solicitudes y revision administrativa.",
-                href: route("panel.ecommerce.finanzas.retiros"),
-                icon: Building2,
-            },
-            {
-                label: "Reviews",
-                description: "Moderacion de resenas de producto.",
-                href: route("panel.ecommerce.reviews"),
-                icon: Star,
-            },
+        title: "Operacion Ecommerce",
+        description: "Catalogo, pedidos y finanzas sin salir del superadmin.",
+        icon: BarChart3,
+        links: [
+            { label: "Dashboard tienda", icon: BarChart3, href: route("panel.superadmin.ecommerce.dashboard") },
+            { label: "Productos", icon: Package, href: route("panel.superadmin.ecommerce.products") },
+            { label: "Ordenes", icon: ClipboardList, href: route("panel.superadmin.ecommerce.orders") },
+            { label: "Pagos", icon: CreditCard, href: route("panel.superadmin.ecommerce.finanzas.pagos") },
         ],
     },
 ];
 
 export default function SuperAdmin() {
     return (
-        <div className="min-h-screen bg-[#090909] text-white">
-            <Head title="Super Admin" />
+        <PanelLayout title="Super Admin" activeItem="Dashboard" showGamingShortcut={false}>
+            <Head title="Super Admin - TierOne" />
 
-            <header className="border-b border-white/10 bg-[#111111]">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-red-500">
-                            TierOne
-                        </p>
-                        <h1 className="mt-1 font-['Outfit'] text-2xl font-black uppercase italic tracking-[0.12em]">
-                            Super Admin
-                        </h1>
-                    </div>
-
-                    <Link
-                        href={route("home")}
-                        className="inline-flex items-center gap-2 rounded-md border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-gray-300 transition hover:border-red-500/50 hover:text-white"
-                    >
-                        <ArrowLeft size={16} />
-                        Volver a la web
-                    </Link>
-                </div>
-            </header>
-
-            <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                <section className="mb-8">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-red-300">
-                        <ShieldCheck size={14} />
-                        Acceso global
-                    </div>
-                    <h2 className="mt-5 max-w-3xl font-['Outfit'] text-3xl font-black uppercase italic tracking-[0.08em] sm:text-4xl">
-                        Centro de control administrativo
+            <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">
+                        Acceso global TierOne
+                    </p>
+                    <h2 className="mt-2 font-['Outfit'] text-3xl font-black uppercase italic tracking-[0.08em] text-white">
+                        Panel unificado
                     </h2>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400">
-                        Desde aqui puedes entrar a las dos areas de administracion
-                        y saltar entre ellas sin volver a la web publica.
+                        El superadmin concentra Gaming y Ecommerce en la misma interfaz:
+                        usa el menu lateral para cambiar de seccion y conserva las tablas,
+                        filtros, modales y acciones de cada area.
                     </p>
-                </section>
+                </div>
 
-                <section className="grid gap-5 lg:grid-cols-2">
-                    {panelCards.map((panel) => {
-                        const Icon = panel.icon;
+                <Link
+                    href={route("home")}
+                    className="btn-secondary w-fit"
+                >
+                    Volver a la web
+                </Link>
+            </div>
 
-                        return (
-                            <Link
-                                key={panel.title}
-                                href={panel.href}
-                                className="group overflow-hidden rounded-lg border border-white/10 bg-[#141414] transition hover:-translate-y-1 hover:border-red-500/40 hover:shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
-                            >
-                                <div className={`h-1.5 bg-gradient-to-r ${panel.accent}`} />
-                                <div className="p-6 sm:p-8">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-red-400">
-                                                <Icon size={24} />
-                                            </span>
-                                            <div>
-                                                <h3 className="font-['Outfit'] text-xl font-black uppercase italic tracking-[0.12em]">
-                                                    {panel.title}
-                                                </h3>
-                                                <p className="mt-2 max-w-lg text-sm leading-6 text-gray-400">
-                                                    {panel.description}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+                {stats.map((item) => {
+                    const Icon = item.icon;
 
-                                    <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                                        {panel.items.map((item) => {
-                                            const ItemIcon = item.icon;
-
-                                            return (
-                                                <div
-                                                    key={item.label}
-                                                    className="flex items-center gap-2 rounded-md border border-white/10 bg-black/20 px-3 py-3 text-xs font-bold uppercase tracking-wider text-gray-300"
-                                                >
-                                                    <ItemIcon size={15} className="text-red-400" />
-                                                    {item.label}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-
-                                    <div className="mt-8 inline-flex items-center text-xs font-black uppercase tracking-[0.25em] text-red-400 transition group-hover:text-red-300">
-                                        Entrar al panel
-                                    </div>
+                    return (
+                        <Link key={item.label} href={item.href} className="stat-card group">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-red-500">
+                                    <Icon size={20} />
                                 </div>
-                            </Link>
-                        );
-                    })}
-                </section>
-
-                <section className="mt-10 space-y-8">
-                    {adminSections.map((section) => (
-                        <div key={section.title}>
-                            <div className="mb-4 flex items-end justify-between gap-4">
-                                <div>
-                                    <h3 className="font-['Outfit'] text-lg font-black uppercase italic tracking-[0.14em]">
-                                        {section.title}
-                                    </h3>
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        {section.description}
-                                    </p>
-                                </div>
+                                <ArrowRight size={16} className="text-gray-600 transition group-hover:translate-x-1 group-hover:text-red-500" />
                             </div>
+                            <div className="mt-6 text-3xl font-black text-white">
+                                {item.value}
+                            </div>
+                            <div className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+                                {item.label}
+                            </div>
+                            <p className="mt-3 text-xs leading-5 text-gray-400">
+                                {item.detail}
+                            </p>
+                        </Link>
+                    );
+                })}
+            </div>
 
-                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                                {section.items.map((item) => {
-                                    const Icon = item.icon;
+            <div className="mt-10 grid grid-cols-1 gap-8 xl:grid-cols-2">
+                {workspaces.map((workspace) => {
+                    const WorkspaceIcon = workspace.icon;
+
+                    return (
+                        <section key={workspace.title} className="section">
+                            <div className="section-header">
+                                <h3 className="section-title">
+                                    <WorkspaceIcon size={16} className="text-red-500" />
+                                    {workspace.title}
+                                </h3>
+                                <Activity size={16} className="text-gray-600" />
+                            </div>
+                            <p className="mb-6 text-sm leading-6 text-gray-400">
+                                {workspace.description}
+                            </p>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {workspace.links.map((link) => {
+                                    const LinkIcon = link.icon;
 
                                     return (
                                         <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            className="group flex min-h-[112px] items-start justify-between gap-4 rounded-lg border border-white/10 bg-[#121212] p-4 transition hover:border-red-500/40 hover:bg-[#171717]"
+                                            key={link.label}
+                                            href={link.href}
+                                            className="group flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-4 py-3 text-sm font-black uppercase tracking-[0.12em] text-gray-300 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-white"
                                         >
-                                            <div className="flex gap-3">
-                                                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-black/30 text-red-400">
-                                                    <Icon size={19} />
-                                                </span>
-                                                <div>
-                                                    <h4 className="text-sm font-black uppercase tracking-[0.12em] text-white">
-                                                        {item.label}
-                                                    </h4>
-                                                    <p className="mt-2 text-xs leading-5 text-gray-500">
-                                                        {item.description}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <ExternalLink
-                                                size={15}
-                                                className="mt-1 shrink-0 text-gray-600 transition group-hover:text-red-400"
-                                            />
+                                            <span className="flex items-center gap-3">
+                                                <LinkIcon size={16} className="text-red-500" />
+                                                {link.label}
+                                            </span>
+                                            <ArrowRight size={14} className="text-gray-600 transition group-hover:translate-x-1 group-hover:text-red-500" />
                                         </Link>
                                     );
                                 })}
                             </div>
-                        </div>
-                    ))}
-                </section>
-            </main>
-        </div>
+                        </section>
+                    );
+                })}
+            </div>
+        </PanelLayout>
     );
 }

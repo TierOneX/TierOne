@@ -4,6 +4,7 @@ import FilterBar from "@/Components/PanelAdminEcommerce/FilterBar";
 import AdminTable from "@/Components/PanelAdminEcommerce/AdminTable";
 import AdminModal from "@/Components/PanelAdminEcommerce/AdminModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
+import { useAdminRoutes } from "@/Utils/adminRoutes";
 import {
     Plus,
     Eye,
@@ -27,6 +28,7 @@ export default function Products({
     filters = {},
 }) {
     const { data = [], links = [] } = productos ?? {};
+    const { routeUrl } = useAdminRoutes();
     const [expandedProduct, setExpandedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState("create"); // 'create', 'edit', 'view'
@@ -94,7 +96,7 @@ export default function Products({
         }
 
         router.get(
-            route("panel.ecommerce.products"),
+            routeUrl("panel.ecommerce.products"),
             {
                 ...filters,
                 sort_by: key,
@@ -180,7 +182,7 @@ export default function Products({
     const handleSubmit = (e) => {
         e.preventDefault();
         if (modalMode === "create") {
-            post(route("panel.ecommerce.products.store"), {
+            post(routeUrl("panel.ecommerce.products.store"), {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
@@ -190,7 +192,7 @@ export default function Products({
         } else if (modalMode === "edit") {
             // Usamos post con _method: put para soportar subida de archivos en actualización
             router.post(
-                route("panel.ecommerce.products.update", selectedProduct.id),
+                routeUrl("panel.ecommerce.products.update", selectedProduct.id),
                 {
                     ...formData,
                     _method: "put",
@@ -222,7 +224,7 @@ export default function Products({
                 "¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.",
             )
         ) {
-            router.delete(route("panel.ecommerce.products.destroy", id));
+            router.delete(routeUrl("panel.ecommerce.products.destroy", id));
         }
     };
 
@@ -321,7 +323,7 @@ export default function Products({
                         </button>
                         {product.personalizable && (
                             <Link
-                                href={route('panel.ecommerce.products.zonas', product.id)}
+                                href={routeUrl('panel.ecommerce.products.zonas', product.id)}
                                 className="p-2 bg-white/5 text-gray-600 hover:text-purple-500 rounded-lg border border-white/5 hover:border-purple-500/20 transition-all"
                                 title="Configurar Zonas"
                                 onClick={(e) => e.stopPropagation()}
