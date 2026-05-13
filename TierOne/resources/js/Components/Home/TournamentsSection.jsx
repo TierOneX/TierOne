@@ -108,7 +108,7 @@ function TournamentCard({ torneo, estadoColor, estadoLabel }) {
 
     return (
         <Link
-            href={`/tournaments/${torneo.id}`}
+            href={`/tournaments?torneo=${torneo.id}`}
             className="group block rounded-xl border border-white/5 hover:border-[#e31837]/30 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-red-900/5 transform hover:-translate-y-1"
             style={{ background: "#141418" }}
         >

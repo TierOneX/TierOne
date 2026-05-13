@@ -103,7 +103,7 @@ export default function TournamentsHero({
                                     {game.nombre}
                                 </h2>
                                 <div
-                                    className={`mt-auto grid gap-2 pt-4 ${isAdmin ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"} sm:max-w-md sm:ml-auto`}
+                                    className={`mt-4 grid gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${isAdmin ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"} sm:max-w-md`}
                                 >
                                     <button
                                         type="button"
@@ -111,7 +111,7 @@ export default function TournamentsHero({
                                             event.stopPropagation();
                                             onSelectGame(game);
                                         }}
-                                        className="flex h-11 items-center justify-center rounded-xl border border-white/20 bg-black/55 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-black/80"
+                                        className="flex h-11 items-center justify-center rounded-xl border border-white/20 bg-black/35 px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-white transition hover:border-red-500/60 hover:bg-red-500/10"
                                     >
                                         Ver torneos
                                     </button>

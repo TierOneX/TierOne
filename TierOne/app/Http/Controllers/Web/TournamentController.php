@@ -99,9 +99,67 @@ class TournamentController extends Controller
             ->sort()
             ->values();
 
+        $myTournaments = collect();
+
+        if (request()->user()) {
+            $myTournaments = InscripcionTorneo::query()
+                ->where('id_usuario', request()->user()->id)
+                ->with([
+                    'torneo' => function ($query) {
+                        $query
+                            ->with('juego')
+                            ->withCount(['inscripciones' => function ($q) {
+                                $q->where('estado', 'confirmada');
+                            }]);
+                    },
+                ])
+                ->orderByDesc('fecha_inscripcion')
+                ->get()
+                ->filter(fn (InscripcionTorneo $inscripcion) => $inscripcion->torneo !== null)
+                ->map(function (InscripcionTorneo $inscripcion) {
+                    $torneo = $inscripcion->torneo;
+                    $juego = $torneo->juego;
+
+                    return [
+                        'id' => $torneo->id,
+                        'nombre' => $torneo->nombre,
+                        'formato' => $torneo->formato,
+                        'estado' => $torneo->estado,
+                        'cuota_inscripcion' => (float) $torneo->cuota_inscripcion,
+                        'premio_total' => (float) $torneo->premio_total,
+                        'fecha_inicio' => $torneo->fecha_inicio?->toIso8601String(),
+                        'fecha_fin' => $torneo->fecha_fin?->toIso8601String(),
+                        'max_participantes' => (int) $torneo->max_participantes,
+                        'inscripciones_count' => (int) ($torneo->inscripciones_count ?? 0),
+                        'inscripcion' => [
+                            'id' => $inscripcion->id,
+                            'estado' => $inscripcion->estado,
+                            'pago_cuota' => (float) $inscripcion->pago_cuota,
+                            'fecha_inscripcion' => $inscripcion->fecha_inscripcion?->toIso8601String(),
+                        ],
+                        'juego' => [
+                            'id' => $juego?->id,
+                            'nombre' => $juego?->nombre,
+                            'categoria' => $juego?->categoria,
+                            'imagen_url' => $this->gameImageService->resolveTournamentImageUrl(
+                                gameName: $juego?->nombre,
+                                storedImageUrl: $juego?->imagen_url,
+                                gameSlug: $juego?->slug
+                            ),
+                            'imagen_url_local' => $this->gameImageService->resolveTournamentLocalImageUrl(
+                                storedImageUrl: $juego?->imagen_url,
+                                gameSlug: $juego?->slug
+                            ),
+                        ],
+                    ];
+                })
+                ->values();
+        }
+
         return Inertia::render('Tournaments', [
             'juegos' => $juegos,
             'categorias' => $categorias,
+            'myTournaments' => $myTournaments,
         ]);
     }
 
