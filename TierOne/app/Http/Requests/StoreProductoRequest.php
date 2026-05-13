@@ -25,7 +25,7 @@ class StoreProductoRequest extends FormRequest
             'id_categoria' => 'required|exists:categorias,id',
             'id_proveedor' => 'required|exists:proveedores,id',
             'nombre' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:productos,slug',
+            'slug' => 'nullable|string|max:255|unique:productos,slug',
             'descripcion' => 'nullable|string',
             'precio_proveedor' => 'required|numeric|min:0',
             'precio_venta' => 'required|numeric|min:0',

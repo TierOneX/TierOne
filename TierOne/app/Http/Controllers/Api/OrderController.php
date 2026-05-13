@@ -26,7 +26,14 @@ class OrderController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $ordenes = $this->orderService->getAllOrders();
+            $user = auth()->user();
+            if ($user->rol === 'admin') {
+                $ordenes = $this->orderService->getAllOrders();
+            } else {
+                $ordenes = Orden::where('id_usuario', $user->id)
+                    ->with(['usuario', 'items.producto', 'direccionEnvio'])
+                    ->get();
+            }
             return $this->successResponse($ordenes, 'Órdenes obtenidas correctamente');
         } catch (\Exception $e) {
             return $this->errorResponse('Error al obtener las órdenes', $e->getMessage());

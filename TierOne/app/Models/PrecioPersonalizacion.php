@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PrecioPersonalizacion extends Model
 {
+    use HasFactory;
     protected $table = 'precios_personalizacion';
 
     protected $fillable = ['id_producto', 'tipo_elemento', 'precio'];
