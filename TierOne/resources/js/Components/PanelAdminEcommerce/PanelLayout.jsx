@@ -17,7 +17,7 @@ export default function PanelLayout({
     menuItems = null,
     homeRoute = "home",
     showGamingShortcut = true,
-    shortcutLink = "/paneladmingaming",
+    shortcutLink = "/panel-admin-gaming",
     shortcutLabel = "Administrar Gaming",
 }) {
     const { menu_admin, auth } = usePage().props; // Atrapamos el menú y el user del servidor

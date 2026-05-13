@@ -71,7 +71,7 @@ Route::get('/tournaments', [TournamentController::class, 'index'])->name('tourna
 Route::post('/tournaments/{torneo}/join', [TournamentController::class, 'join'])
     ->middleware('auth')
     ->name('tournaments.join');
-Route::middleware('auth')->prefix('paneladmingaming')->name('panel.gaming.')->group(function () {
+Route::middleware('auth')->prefix('panel-admin-gaming')->name('panel.gaming.')->group(function () {
     Route::get('/', [GamingAdminController::class, 'index'])->name('index');
     Route::post('/torneos', [GamingAdminController::class, 'storeTorneo'])->name('torneos.store');
     Route::put('/torneos/{torneo}', [GamingAdminController::class, 'updateTorneo'])->name('torneos.update');
