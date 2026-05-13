@@ -1,219 +1,54 @@
-# 📚 TierOne - Centro de Documentación
+# 🏛️ TierOne Documentation Hub
 
-Bienvenido al hub central de documentación del proyecto **TierOne**. Aquí encontrarás toda la información sobre la arquitectura, base de datos MySQL, API y flujos del sistema.
-
----
-
-## 🗂️ Índice de Documentación
-
-### 📋 Guías de Instalación
-
-- **[📖 Guía de Instalación Completa](INSTALLATION.md)** - Instalación paso a paso del proyecto
-- **[🔄 Flujo Backend Laravel](guides/BACKEND_FLOW.md)** - Guía sobre el flujo de peticiones y estructura
-- **[📄 Módulo Facturación PDF](guides/01_Modulo_Facturas_PDF.md)** - Documentación técnica del generador de PDFs
-  - Requisitos previos (PHP, MySQL, Node.js)
-  - Configuración de entorno (.env)
-  - Instalación de dependencias
-  - Ejecución de migraciones
+Bienvenido al centro de documentación oficial de **TierOne**. Este portal está diseñado para proporcionar una visión clara, técnica y funcional del proyecto, ideal tanto para desarrolladores como para evaluadores académicos.
 
 ---
 
-### 📅 Daily Reviews
+## 🗺️ Navegación Rápida
 
-**[📁 Carpeta daily-reviews/](daily-reviews/)**
+### 🚀 1. Puesta en Marcha (Setup)
+Toda la información necesaria para desplegar el proyecto desde cero.
+- [📖 **Guía de Instalación**](setup/INSTALLATION.md) — Requisitos y pasos para el despliegue.
+- [🔐 **Configuración (.env)**](setup/ENV_CONFIG.md) — Detalle de variables y claves de API.
 
-- [📝 2026-01-21](daily-reviews/2026-01-21.md) - Implementación del esquema de base de datos
+### 💼 2. Visión de Negocio (Business)
+Entiende el "por qué" y el "cómo" de las funcionalidades principales.
+- [💡 **Lógica de Negocio**](business/LOGIC.md) — E-commerce, Torneos y Personalización.
+- [📊 **Flujos de Usuario**](diagrams/README.md) — Diagramas visuales de los procesos.
 
----
+### 🛠️ 3. Documentación Técnica (Technical)
+La "caja negra" del proyecto desglosada.
+- [🗺️ **Mapa de Archivos**](technical/FILE_MAP.md) — Guía detallada de cada archivo del proyecto.
+- [🗄️ **Base de Datos**](database/README.md) — Esquema MySQL y Diagrama ER.
+- [🔌 **API REST**](api/README.md) — Contratos y rutas de comunicación.
 
-### 📊 Diagramas de Flujo
-
-**[📁 Carpeta diagrams/](diagrams/)** - [Ver Índice](diagrams/README.md)
-
-Diagramas Mermaid de los flujos principales:
-
-- [🛒 Admin E-commerce](diagrams/DF-Admin-Ecommerce.md) - Panel de administración de tienda
-- [🏆 Admin Torneos](diagrams/DF-Admin-Torneos.md) - Gestión de torneos y partidas  
-- [💳 Pagos Stripe](diagrams/DF-Pagos-Stripe.md) - Sistema de pagos y transacciones
-- [🔀 Git Workflow](diagrams/Feature-Branch-Workflow.md) - Estrategia de branching
-
----
-
-### 🗄️ Base de Datos
-
-**[📁 Carpeta database/](database/)** - [Ver Índice](database/README.md)
-
-Arquitectura y diseño del esquema MySQL:
-
-- **[📊 Diagrama ER Completo](database/ER-Diagram.md)** - Diagrama entidad-relación (~28 tablas)
-  - 6 módulos: Usuarios, Juegos, Torneos, E-commerce, Finanzas, Reportes
-  - Todas las relaciones y foreign keys
-  
-- **[📋 Plan de Implementación](database/Implementation-Plan.md)** - Guía paso a paso
-  - Stack tecnológico
-  - Estructura de tablas por módulo
-  - Cronograma de desarrollo
-
-- **[📉 Análisis y Correcciones v2](database/Analysis-Corrections-v2.md)** - Estado actual del esquema
-  - Correcciones aplicadas
-  - Deuda técnica pendiente
-  - Propuestas de mejora
+#### 📘 Deep Dives (Módulos Específicos)
+- [🎨 **Módulo Personalización**](technical/customizer/00_INDICE.md) — Todo sobre Fabric.js y lógica de diseño.
+- [🎮 **Módulo Comunidad/Torneos**](technical/community/00_RESUMEN_EJECUTIVO.md) — Integración con IGDB y lógica de torneos.
+- [📄 **Generación de Facturas**](technical/01_Modulo_Facturas_PDF.md) — Documentación técnica de DomPDF.
 
 ---
 
-### 🔌 API REST
-
-**[📁 Carpeta api/](api/)** - [Ver Índice](api/README.md)
-
-Documentación de endpoints y contratos API:
-
-- **[📑 Detalle de Rutas API](api/API_ROUTES.md)** - Listado completo de endpoints y ejemplos de uso
-
-#### Contratos por Módulo
-
-**Autenticación:**
-- [🔐 Auth API](api/contracts/Auth-API.md) - Login, Registro, Logout, Recuperar Password
-
-**Usuarios:**
-- [👥 Users API](api/contracts/Users-API.md) - Gestión de usuarios y perfiles
-
-**Juegos y Partidas:**
-- [🎮 Games API](api/contracts/Games-API.md) - Catálogo de juegos
-- [⚔️ Matches API](api/contracts/Matches-API.md) - Creación de partidas y resultados
-
-**Torneos:**
-- [🏆 Tournaments API](api/contracts/Tournaments-API.md) - Brackets, Inscripciones, Premios
-
-**E-Commerce:**
-- [🛍️ Shop API](api/contracts/Shop-API.md) - Productos y órdenes
-- [🛒 Cart API](api/contracts/Cart-API.md) - Gestión del carrito de compras
-- [⭐ Reviews API](api/contracts/Reviews-API.md) - Reseñas con moderación
-
-**Recursos:**
-- [📄 Plantilla de Contratos](api/contracts/_TEMPLATE.md) - Template para nuevos endpoints
+## 🎯 Estado del Proyecto
+| Módulo | Estado | Avance |
+|--------|--------|--------|
+| **Core Laravel** | ✅ Estable | 100% |
+| **Tienda & Stripe** | 🏗️ En Pruebas | 90% |
+| **Gestión Torneos** | 🚀 Beta | 75% |
+| **Customizer JS** | ✅ Funcional | 100% |
 
 ---
 
-### 🎨 Frontend
-
-**[📁 Carpeta frontend/](frontend/)** - [Ver Índice](frontend/README.md)
-
-Documentación de React + Inertia.js (en construcción)
-
----
-
-### 📊 Presentaciones
-
-**[📁 Carpeta presentations/](presentations/)**
-
-- [📊 Proyecto Completo](presentations/proyecto-completo.md) - Presentación ejecutiva del proyecto
-  - Estado general (actualizado: Feb 2026)
-  - Stack tecnológico
-  - Roadmap y objetivos
+## 📽️ Presentaciones Académicas
+Para una visión ejecutiva y rápida del proyecto:
+- [📊 **Presentación Completa**](presentations/proyecto-completo.md) — Roadmap, objetivos y stack.
+- [👁️ **Visión del Proyecto**](VISION_PROYECTO.md) — Filosofía y alcance.
 
 ---
 
-### 📋 Planificación y Auditoría
-
-**[📁 Carpeta planning/](planning/)**
-
-- **[👁️ Visión del Proyecto](VISION_PROYECTO.md)** - Objetivos y visión general
-- **[🔍 Auditoría Backend Senior](planning/auditoria_backend_senior.md)** - Revisión técnica profunda
-- **[🛠️ Plan de Corrección Backend](planning/plan_correccion_backend.md)** - Hoja de ruta para mejoras
-- **[📋 Repaso Rama Migrations](planning/REPASO_RAMA_MIGRATIONS_MODELS_CONTROLLERS.md)** - Análisis de estructura actual
+> [!TIP]
+> Si es tu primera vez en el proyecto, te recomendamos empezar por el [Mapa de Archivos](technical/FILE_MAP.md) para entender la estructura global.
 
 ---
-
-### 💻 Ejemplos de Código
-
-- **[🚀 Ejemplos Backend](examples/ejemplos_codigo_backend.md)** - Snippets y patrones de código utilizados
-
----
-
-### 📦 Archivos
-
-**[📁 Carpeta archive/](archive/)**
-
-Documentación histórica y archivada
-
----
-
-## 🚀 Inicio Rápido
-
-### Para Desarrolladores Nuevos
-
-1. **📖 Instalación** → Lee [INSTALLATION.md](INSTALLATION.md)
-2. **🗄️ Base de Datos** → Consulta [database/ER-Diagram.md](database/ER-Diagram.md)
-3. **🔌 API** → Revisa [api/README.md](api/README.md)
-4. **📊 Arquitectura** → Ver [presentations/proyecto-completo.md](presentations/proyecto-completo.md)
-
-### Para Administradores
-
-1. **📊 Estado del Proyecto** → [presentations/proyecto-completo.md](presentations/proyecto-completo.md)
-2. **🗄️ Esquema de BD** → [database/ER-Diagram.md](database/ER-Diagram.md)
-3. **📋 Flujos de Negocio** → [diagrams/README.md](diagrams/README.md)
-
----
-
-## 📂 Estructura de Carpetas
-
-```
-docs/
-├── README.md                    # Este archivo
-├── INSTALLATION.md              # Guía de instalación
-│
-├── api/                         # Documentación de API
-│   ├── README.md
-│   ├── API_ROUTES.md            # RUTAS DETALLADAS
-│   └── contracts/               # Contratos por endpoint
-│
-├── guides/                      # Guías técnicas
-│   ├── BACKEND_FLOW.md
-│   └── 01_Modulo_Facturas_PDF.md
-│
-├── planning/                    # Auditorías y Planes
-│   ├── auditoria_backend_senior.md
-│   └── plan_correccion_backend.md
-│
-├── examples/                    # Ejemplos de código
-│   └── ejemplos_codigo_backend.md
-│
-├── database/                    # Documentación de BD
-│   ├── README.md
-│   ├── ER-Diagram.md           # Diagrama principal
-│   ├── Implementation-Plan.md
-│   └── Analysis-Corrections-v2.md
-│
-├── diagrams/                    # Diagramas de flujo
-│   ├── README.md
-│   ├── DF-Admin-Ecommerce.md
-│   ├── DF-Admin-Torneos.md
-│   ├── DF-Pagos-Stripe.md
-│   └── Feature-Branch-Workflow.md
-│
-├── presentations/               # Presentaciones
-│   └── proyecto-completo.md
-│
-├── frontend/                    # Docs de frontend
-│   └── README.md
-│
-├── daily-reviews/              # Resúmenes diarios
-│   └── 2026-01-21.md
-│
-└── archive/                    # Histórico
-```
-
----
-
-## 📞 Enlaces Rápidos
-
-- **[← Volver al README Principal](../README.md)**
-- **[📊 Presentación del Proyecto](presentations/proyecto-completo.md)**
-- **[🗄️ Diagrama de Base de Datos](database/ER-Diagram.md)**
-- **[🔌 Contratos API](api/README.md)**
-
----
-
-**Estado**: ✅ Documentación actualizada  
-**Última actualización**: Febrero 2026  
-**Versión**: 2.0
+**Última actualización:** 13 Mayo 2026  
+**Versión Doc:** 3.0 (Clean Update)

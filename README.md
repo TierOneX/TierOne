@@ -12,11 +12,11 @@
 
 Para mantener la claridad y escalabilidad, el proyecto se organiza en tres pilares fundamentales:
 
-| Directorio | Propósito |
-|------------|-----------|
 | [**`TierOne/`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/TierOne/) | 🚀 **Código Fuente**: Aplicación principal (Laravel + React). |
 | [**`docs/`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/docs/) | 📚 **Centro de Documentación**: Hub central con guías, diagramas y contratos. |
-| [**`scripts/`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/scripts/) | 🔧 **Utilidades**: Scripts automatizados para instalación y gestión de BD. |
+| [**`install.bat`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/scripts/install.bat) | 🔧 **Instalación (Win)**: Script automatizado para Windows. |
+| [**`scripts/install.sh`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/scripts/install.sh) | 🔧 **Instalación (Unix)**: Script automatizado para Linux/Mac. |
+| [**`scripts/ENV_CONFIG.md`**](file:///c:/Users/Fran/Desktop/WorkSpace/TierOne/scripts/ENV_CONFIG.md) | 🔐 **Configuración**: Guía de variables de entorno (.env). |
 
 ---
 
@@ -30,14 +30,16 @@ Para mantener la claridad y escalabilidad, el proyecto se organiza en tres pilar
 ### Instalación en un paso
 Ejecuta el script de instalación automatizado desde la raíz del proyecto:
 
-**Windows (PowerShell):**
+**Windows:**
+Ejecuta el script desde el explorador de archivos o la terminal:
 ```powershell
-.\scripts\install\install.bat
+.\scripts\install.bat
 ```
 
-**Linux/Mac (Bash):**
+**Linux/Mac:**
+Ejecuta el script desde la terminal:
 ```bash
-bash scripts/install/install.sh
+bash scripts/install.sh
 ```
 
 > [!TIP]
