@@ -31,7 +31,7 @@ Este documento contiene las variables de entorno necesarias para que el proyecto
 - `STRIPE_KEY`: `pk_test_51TRv8UPGgluX3iiuRZL5XD0tGm8eM3rUWovbYdc40udfRFHLjd4zzBCPuMdzoVxg4qk2bCyT7UrN2C6h0bXAYUC000GFylHTdW`
 - `STRIPE_SECRET` (Parte 1): `sk_test_51TRv8UPGgluX3iiu09h2boYkYY46U96khoVjO8ONuJ2JCRuN1`
 - `STRIPE_SECRET` (Parte 2): `jgYVx78IU6qN2YxiocK8LKgiXtLVLJ2urDBPTDc007dfcpoRQ`
-*(Nota: Se muestra en dos partes para evitar bloqueos de seguridad de GitHub; el profesor debe unirlas sin espacios en el .env)*
+*(Nota: Se muestra en dos partes para evitar bloqueos de seguridad de GitHub; el SERGIO UNELOS QUE SI NO VAS A VER UN MOJON ASI GRANDE ---------------- en el .env)*
 - `STRIPE_WEBHOOK_SECRET`: *(opcional para dev local)*
 - `STRIPE_CURRENCY`: `eur`
 
