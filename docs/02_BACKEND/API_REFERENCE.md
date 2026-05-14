@@ -96,4 +96,4 @@ Endpoint público (excluido de CSRF) que recibe eventos de Stripe.
 - `checkout.session.completed`: Maneja inscripciones que usan el flujo de Checkout externo.
 
 ---
-*Documentación de Integración - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Documentación de Integración - TierOne*

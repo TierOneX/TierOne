@@ -36,4 +36,4 @@ Este documento detalla las razones detrás de la arquitectura y las tecnologías
 - **Relaciones Complejas**: Se han implementado relaciones `hasMany`, `belongsTo` y `belongsToMany` para manejar la complejidad de torneos, inscripciones y pedidos.
 
 ---
-*Documentación de Arquitectura - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Documentación de Arquitectura - TierOne*

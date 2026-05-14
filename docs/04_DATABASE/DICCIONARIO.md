@@ -52,4 +52,4 @@ La tabla central de transacciones.
 3.  **Auditoría**: Todas las tablas principales incluyen `created_at` y `updated_at`.
 
 ---
-*Arquitectura de Datos - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Arquitectura de Datos - TierOne*

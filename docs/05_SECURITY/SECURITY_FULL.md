@@ -59,4 +59,4 @@ TierOne sigue el principio de **Privilegio Mínimo**:
 - **Validación de Estado**: El `TwitchAuthService` valida el `state` en el callback para prevenir ataques CSRF en el flujo de login.
 
 ---
-*Manual de Seguridad - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Manual de Seguridad - TierOne*

@@ -62,3 +62,6 @@ Durante la implementación se aplicaron los siguientes parches de seguridad y es
 ---
 > [!TIP]
 > Todos los tests utilizan una base de datos **SQLite en memoria** por lo que son extremadamente rápidos y no ensucian tu base de datos de desarrollo (XAMPP).
+
+---
+[🔙 Volver al Hub](../00_HUB.md) | *Guía de Testing - TierOne*

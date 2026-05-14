@@ -131,5 +131,4 @@ php artisan migrate:status
 - **"Connection refused"**: Verifica que el servicio de MySQL (o XAMPP) esté activo.
 
 ---
-
-**Última actualización:** Febrero 2026 | **Versión:** 2.1 (MySQL optimized)
+[🔙 Volver al Hub](../00_HUB.md) | **Última actualización:** Febrero 2026 | **Versión:** 2.1 (MySQL optimized)
