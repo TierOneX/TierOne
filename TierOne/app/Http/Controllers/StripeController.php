@@ -264,6 +264,13 @@ class StripeController extends Controller
                     'cantidad' => 1,
                     'precio_unitario' => $subtotal,
                     'subtotal' => $subtotal,
+                    'personalizacion_data' => [
+                        'tipo' => 'torneo',
+                        'torneo_id' => $torneo->id,
+                        'torneo_nombre' => $torneo->nombre,
+                        'juego' => $torneo->juego->nombre ?? 'Juego',
+                        'juego_imagen' => $torneo->juego->imagen_url ?? null,
+                    ],
                 ]);
 
                 // 3. Crear PaymentIntent
@@ -697,6 +704,13 @@ class StripeController extends Controller
                 'cantidad' => 1,
                 'precio_unitario' => $subtotal,
                 'subtotal' => $subtotal,
+                'personalizacion_data' => [
+                    'tipo' => 'torneo',
+                    'torneo_id' => $torneoId,
+                    'torneo_nombre' => $torneo->nombre ?? 'Torneo',
+                    'juego' => $torneo->juego->nombre ?? 'Juego',
+                    'juego_imagen' => $torneo->juego->imagen_url ?? null,
+                ],
             ]);
 
             // 4. Crear Pago
