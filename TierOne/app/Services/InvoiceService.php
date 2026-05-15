@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Orden;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceService
 {
@@ -34,43 +35,49 @@ class InvoiceService
         // 3. Procesamiento dinámico de los items
         $itemsProcesados = $orden->items->map(function ($item) use ($orden, $tipoFactura) {
             $nombre = $item->producto->nombre ?? 'Producto';
-            $urlImagen = $item->producto->imagenes->first()->url_imagen ?? null;
+            
+            // Resolución de imagen principal del producto
+            $urlImagen = null;
+            if ($item->producto) {
+                $urlImagen = $item->producto->imagenes->first()->url_imagen ?? $item->producto->imagen_principal ?? null;
+            }
+            
             $imagenBase64 = '';
+            $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data ?? '{}', true);
 
-            // A. Lógica específica para TORNEOS
+            // --- A. LÓGICA POR TIPO DE COMPRA ---
+
             if ($tipoFactura === 'torneo') {
-                $inscripcion = \App\Models\InscripcionTorneo::where('id_usuario', $orden->id_usuario)
-                    ->where(function($q) use ($orden) {
-                        $q->where('pago_cuota', $orden->total)
-                          ->orWhere('pago_cuota', $orden->subtotal);
-                    })
-                    ->whereIn('estado', ['pendiente', 'confirmada'])
-                    ->with(['torneo.juego'])
-                    ->latest()
-                    ->first();
-                
-                if ($inscripcion && $inscripcion->torneo) {
-                    $nombre = 'Inscripción Torneo: ' . $inscripcion->torneo->nombre;
-                    $urlImagen = $inscripcion->torneo->juego->imagen_url ?? null;
+                if (isset($data['torneo_nombre'])) {
+                    $nombre = 'Inscripción Torneo: ' . $data['torneo_nombre'];
+                    $urlImagen = $data['juego_imagen'] ?? $urlImagen;
+                } else {
+                    $inscripcion = \App\Models\InscripcionTorneo::where('id_usuario', $orden->id_usuario)
+                        ->where(function($q) use ($orden) {
+                            $q->where('pago_cuota', $orden->total)
+                              ->orWhere('pago_cuota', $orden->subtotal);
+                        })
+                        ->whereIn('estado', ['pendiente', 'confirmada'])
+                        ->with(['torneo.juego'])
+                        ->latest()
+                        ->first();
+                    
+                    if ($inscripcion && $inscripcion->torneo) {
+                        $nombre = 'Inscripción Torneo: ' . $inscripcion->torneo->nombre;
+                        $urlImagen = $inscripcion->torneo->juego->imagen_url ?? null;
+                    }
                 }
             }
-
-            // A.2 Lógica específica para HYDRA COINS
-            if ($tipoFactura === 'hydra') {
-                $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data, true);
+            elseif ($tipoFactura === 'hydra') {
                 if (isset($data['pack_name'])) {
-                    $nombre = 'Pack ' . $data['pack_name'] . ': ' . number_format($data['hc_amount']) . ' Hydra Coins';
-                    $urlImagen = 'assets/hydra-coin.png'; // Ruta al icono de Hydra
+                    $nombre = 'Pack ' . $data['pack_name'] . ': ' . number_format($data['hc_amount'] ?? 0) . ' Hydra Coins';
+                    $urlImagen = 'assets/hydra-coin.png';
                 }
             }
-
-            // A.3 Lógica específica para PARTIDAS
-            if ($tipoFactura === 'partida') {
-                $data = is_array($item->personalizacion_data) ? $item->personalizacion_data : json_decode($item->personalizacion_data, true);
-                if (isset($data['tipo']) && $data['tipo'] === 'partida') {
-                    $nombre = 'Partida: ' . ($data['titulo'] ?? 'Match') . ' (' . ($data['juego'] ?? '') . ')';
+            elseif ($tipoFactura === 'partida') {
+                if (isset($data['titulo'])) {
+                    $nombre = 'Partida: ' . $data['titulo'] . ' (' . ($data['juego'] ?? '') . ')';
                 }
-                // Intentar obtener la imagen del juego a través de la partida
                 if (isset($data['partida_id'])) {
                     $partida = \App\Models\Partida::with('juego')->find($data['partida_id']);
                     if ($partida && $partida->juego) {
@@ -79,18 +86,19 @@ class InvoiceService
                 }
             }
 
-            // B. Lógica específica para PRODUCTOS PERSONALIZADOS
+            // --- B. PRODUCTOS PERSONALIZADOS (Tienda) ---
             if ($item->personalizacion_imagen) {
-                $path = str_replace('/storage/', '', $item->personalizacion_imagen);
+                $path = str_replace(['/storage/', 'storage/'], '', $item->personalizacion_imagen);
                 $absolutePath = storage_path('app/public/' . $path);
                 
                 if (file_exists($absolutePath)) {
                     $imageData = base64_encode(file_get_contents($absolutePath));
-                    $imagenBase64 = 'data:image/png;base64,' . $imageData;
+                    $mime = mime_content_type($absolutePath) ?: 'image/png';
+                    $imagenBase64 = 'data:' . $mime . ';base64,' . $imageData;
                 }
             }
 
-            // C. Lógica de imagen Base64 estándar (si no hay personalización)
+            // --- C. RESOLUCIÓN DE IMAGEN FINAL ---
             if (empty($imagenBase64) && extension_loaded('gd') && $urlImagen) {
                 $imagenBase64 = $this->resolverImagenBase64($urlImagen);
             }
@@ -102,12 +110,12 @@ class InvoiceService
                 'subtotal' => $item->subtotal,
                 'imagen_base64' => $imagenBase64,
                 'variante_nombre' => $item->variante->nombre ?? null,
-                'es_personalizado' => (bool)$item->personalizacion_imagen
+                'es_personalizado' => (bool)$item->personalizacion_imagen || (bool)$item->personalizacion_data
             ];
         });
 
-        // 4. Resolución ROBUSTA de datos del cliente
-        $clienteNombre = $this->resolverNombreCliente($orden, $tipoFactura);
+        // 4. Resolución de datos del cliente (Nombre legal para factura)
+        $clienteNombre = trim(($orden->usuario->nombre ?? '') . ' ' . ($orden->usuario->apellido ?? ''));
 
         // 5. Etiqueta del tipo de factura
         $etiquetaTipo = match($tipoFactura) {
@@ -119,6 +127,7 @@ class InvoiceService
 
         $data = [
             'orden' => $orden,
+            'usuario' => $orden->usuario,
             'items_procesados' => $itemsProcesados,
             'cliente_nombre' => $clienteNombre,
             'tipo_factura' => $tipoFactura,
@@ -154,70 +163,45 @@ class InvoiceService
         if (str_starts_with($numeroOrden, 'TRN-')) return 'torneo';
         if (str_starts_with($numeroOrden, 'HYD-')) return 'hydra';
         if (str_starts_with($numeroOrden, 'PTD-')) return 'partida';
-        return 'merchandising'; // TIO- u otro
+        return 'merchandising';
     }
 
     /**
-     * Resuelve el nombre del cliente de forma robusta.
-     * Para compras digitales (torneo, hydra, partida) → SIEMPRE usa datos del usuario.
-     * Para merchandising → usa la dirección de envío si existe, sino datos del usuario.
-     */
-    private function resolverNombreCliente(Orden $orden, string $tipoFactura): string
-    {
-        // Para compras digitales, SIEMPRE usar el nombre del usuario autenticado
-        if (in_array($tipoFactura, ['torneo', 'hydra', 'partida'])) {
-            return trim(($orden->usuario->nombre ?? '') . ' ' . ($orden->usuario->apellido ?? ''));
-        }
-
-        // Para merchandising, usar dirección de envío si existe y es válida
-        if ($orden->direccionEnvio && $orden->id_direccion_envio) {
-            // Verificar que la dirección pertenece al usuario de la orden
-            if ($orden->direccionEnvio->id_usuario === $orden->id_usuario) {
-                return $orden->direccionEnvio->nombre_completo;
-            }
-        }
-
-        // Fallback: nombre del usuario
-        return trim(($orden->usuario->nombre ?? '') . ' ' . ($orden->usuario->apellido ?? ''));
-    }
-
-    /**
-     * Resuelve la imagen a base64 desde una URL relativa.
+     * Resuelve la imagen a base64 desde una URL o path.
      */
     private function resolverImagenBase64(?string $urlImagen): string
     {
         if (!$urlImagen || !extension_loaded('gd')) return '';
 
-        // Intentar múltiples rutas
-        $rutas = [
-            public_path('storage/' . $urlImagen),
-            public_path($urlImagen),
-            storage_path('app/public/' . $urlImagen),
-        ];
-
-        // Si es una URL externa (IGDB, etc.), intentar descargar
         if (str_starts_with($urlImagen, 'http')) {
             try {
                 $imageData = @file_get_contents($urlImagen);
                 if ($imageData) {
-                    $type = 'jpeg'; // Default
                     $finfo = new \finfo(FILEINFO_MIME_TYPE);
                     $mimeType = $finfo->buffer($imageData);
-                    if (str_contains($mimeType, 'png')) $type = 'png';
-                    elseif (str_contains($mimeType, 'webp')) $type = 'webp';
-                    return 'data:image/' . $type . ';base64,' . base64_encode($imageData);
+                    return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
                 }
             } catch (\Exception $e) {
-                // Silently fail
+                Log::error("Error descargando imagen para PDF: " . $e->getMessage());
             }
             return '';
         }
 
+        $rutas = [
+            public_path($urlImagen),
+            public_path('storage/' . $urlImagen),
+            storage_path('app/public/' . $urlImagen),
+        ];
+
         foreach ($rutas as $path) {
-            if (file_exists($path)) {
-                $type = pathinfo($path, PATHINFO_EXTENSION) ?: 'png';
-                $data = file_get_contents($path);
-                return 'data:image/' . $type . ';base64,' . base64_encode($data);
+            if (file_exists($path) && is_file($path)) {
+                try {
+                    $data = file_get_contents($path);
+                    $mime = mime_content_type($path);
+                    return 'data:' . $mime . ';base64,' . base64_encode($data);
+                } catch (\Exception $e) {
+                    continue;
+                }
             }
         }
 

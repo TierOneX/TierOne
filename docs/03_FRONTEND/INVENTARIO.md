@@ -49,4 +49,4 @@ TierOne utiliza React con Vite para ofrecer una experiencia de usuario rápida y
 - **Framer Motion**: Utilizado para micro-animaciones (hovers, transiciones de página y modales).
 
 ---
-*Interfaz de Usuario - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Interfaz de Usuario - TierOne*

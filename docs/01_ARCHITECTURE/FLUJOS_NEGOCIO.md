@@ -91,4 +91,4 @@ graph TD
 ```
 
 ---
-*Arquitectura de Procesos - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Arquitectura de Procesos - TierOne*

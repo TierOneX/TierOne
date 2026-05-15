@@ -80,4 +80,4 @@ Este documento detalla el esquema físico de la base de datos de TierOne, basado
 | `estado_pago` | Boolean | Confirmación de cuota |
 
 ---
-*Manual de Base de Datos - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Manual de Base de Datos - TierOne*

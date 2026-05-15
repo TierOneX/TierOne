@@ -54,4 +54,4 @@ Este documento detalla la lógica interna, propiedades y comportamientos de los 
   - `participantes()`: BelongsToMany `User` a través de `ParticipantePartida`.
 
 ---
-*Referencia de Modelos - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Referencia de Modelos - TierOne*

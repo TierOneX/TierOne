@@ -55,4 +55,4 @@ Este documento detalla el "cerebro" del sistema, donde reside la lógica de nego
   - Gestión de variantes: Si una variante se agota, el producto puede seguir listado pero la variante se marca como `out_of_stock`.
 
 ---
-*Referencia de Lógica - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Referencia de Lógica - TierOne*

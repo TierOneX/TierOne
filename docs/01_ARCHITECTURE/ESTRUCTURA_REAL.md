@@ -56,5 +56,4 @@ Las claves de Stripe, Twitch y Steam no estarían en un archivo `.env` plano en 
 Obligatorio el uso de TLS 1.3 y certificados SSL/TLS renovados automáticamente (Let's Encrypt).
 
 ---
-
-*Documentación Técnica - TierOne Project - 2026*
+[🔙 Volver al Hub](../00_HUB.md) | *Documentación Técnica - TierOne Project*

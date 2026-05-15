@@ -45,4 +45,4 @@ Este documento es el catálogo completo de la lógica de control del backend de 
 - **`processWithdrawal`**: Lógica para que los usuarios retiren fondos (Hydra Coins a EUR).
 
 ---
-*Referencia de Controladores - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Referencia de Controladores - TierOne*

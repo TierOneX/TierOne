@@ -55,4 +55,4 @@ Este documento detalla la estructura y propósito de las vistas principales del 
 - **Responsabilidad**: Gestiona el carrito de compras, persistiendo los datos en `localStorage` y sincronizándolos con el servidor.
 
 ---
-*Referencia Frontend - TierOne*
+[🔙 Volver al Hub](../00_HUB.md) | *Referencia Frontend - TierOne*

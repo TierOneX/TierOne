@@ -149,3 +149,6 @@ Auditoría técnica completa — 20/02/2026
 - [ ] Categorías dinámicas en la tienda
 - [ ] Creación de la página de Checkout
 - [ ] Fusión de ramas hacia `dev`
+
+---
+[🔙 Volver al Hub](../00_HUB.md) | *Visión del Proyecto - TierOne*
