@@ -34,5 +34,13 @@ Bienvenido al centro de documentación unificado de **TierOne**. Este hub consol
 ## 📂 09. Gestión del Proyecto
 - [📝 TODO List](./09_PROJECT/TODO.md): Seguimiento de tareas, bugs y próximos pasos.
 
+## 📂 10. Gestión, Evaluación y Calidad
+- [📈 Procedimientos de Evaluación](./10_MANAGEMENT/01_PROCEDIMIENTOS_EVALUACION.md): Metodología de auditorías y Sprints.
+- [🎯 KPIs de Calidad](./10_MANAGEMENT/02_KPIS_CALIDAD.md): Indicadores con umbrales medibles.
+- [🚨 Gestión de Incidencias](./10_MANAGEMENT/03_GESTION_INCIDENCIAS.md): Flujo de resolución y Post-Mortem de Bugs.
+- [🔄 Control de Cambios](./10_MANAGEMENT/04_CONTROL_CAMBIOS.md): Procedimiento RFC y análisis de impacto.
+- [👥 Feedback UAT](./10_MANAGEMENT/05_FEEDBACK_UAT.md): Protocolos de pruebas de aceptación y logs.
+- [📋 Matriz de Trazabilidad](./10_MANAGEMENT/06_MATRIZ_TRAZABILIDAD.md): Verificación del cumplimiento del pliego.
+
 ---
 *Documentación Unificada - TierOne Project*
